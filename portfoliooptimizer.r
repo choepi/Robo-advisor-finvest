@@ -6,7 +6,6 @@ rsconnect::setAccountInfo(name='fusionfinance',
                           secret='qieZeYAIhQpl8uE8+zwjI78xAoDQdXEMIwjWoBsI')
 
 
-
 ui <- fluidPage(
   titlePanel("Markowitz Portfolio Optimization"),
   sidebarLayout(
