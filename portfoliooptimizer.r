@@ -1,7 +1,6 @@
 library(shiny)
 library(quantmod)
-library(rsconnect)
-rsconnect::deployApp('path/to/your/app')
+
 ui <- fluidPage(
   titlePanel("Markowitz Portfolio Optimization"),
   sidebarLayout(
