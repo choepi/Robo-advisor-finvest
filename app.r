@@ -1,12 +1,12 @@
 library(shiny)
-
-# See above for the definitions of ui and server
+# Load functions ----
+source("global.R")
 
 # Define UI for app that draws a histogram ----
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("Hello World!"),
+  titlePanel("Hello Shiny!"),
   
   # Sidebar layout with input and output definitions ----
   sidebarLayout(
