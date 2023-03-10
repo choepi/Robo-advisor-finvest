@@ -2,7 +2,7 @@ library(shiny)
 # Load functions ----
 source("global.R")
 
-# Define UI for app that draws a histogram ----
+# UI ----
 ui <- fluidPage(
   
   # App title ----
@@ -33,7 +33,7 @@ ui <- fluidPage(
   )
 )
 
-# Define server logic required to draw a histogram ----
+# Function and Calculation ----
 server <- function(input, output) {
   
   # Histogram of the Old Faithful Geyser Data ----
