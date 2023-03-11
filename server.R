@@ -15,7 +15,7 @@ server <- function(input, output) {
     
     hist(x, breaks = bins, col = "#007bc2", border = "white",
          xlab = "Waiting time to next eruption (in mins)",
-         main = "Histogram of waiting times")
+         main = "Histogram of Tenpa")
     
   })
   
