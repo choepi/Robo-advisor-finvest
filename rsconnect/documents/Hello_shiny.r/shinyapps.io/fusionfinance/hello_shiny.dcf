@@ -1,6 +1,6 @@
 name: hello_shiny
 title: hello_shiny
-username:
+username: 
 account: fusionfinance
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
