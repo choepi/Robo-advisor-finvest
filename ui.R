@@ -20,17 +20,37 @@ library(timevis)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- fluidPage(
-  titlePanel("My Shiny App"),
+  titlePanel(title=div(img(src="fusion.jpg", height=100)
+                       ,"Portfolio Optimizing Tool")),
   sidebarLayout(
-    sidebarPanel(),
+    sidebarPanel(h1("Willkommen"),
+                 fluidRow(
+                   column(7,
+                          selectInput("select1", h3("Menü"),
+                                       choices = list("Home" = 1, "Optimierung" = 2,
+                                                      "Forecast" = 3),selected = 1),
+                          br(),
+                          br(), 
+                          actionButton("action1", "Help"),
+                          ))
+                 ),
     mainPanel(
-      h1("First level title"),
-      h2("Second level title"),
-      h3("Third level title"),
-      h4("Fourth level title"),
-      h5("Fifth level title"),
-      h6("Sixth level title"),
-      img(src = "Happy_aggro2.jpg", height = 72, width = 100)
+      h1("BLA BLA"),
+      h2("Kurse von Heute "),
+      fluidRow(
+        column(9,
+               dateInput("dateinput1", 
+                         h3("Auswahl Historie bis"), 
+                         value = "2013-01-01"),
+               br(),
+               br(), 
+               sliderInput("slider1", h3("Risikolevel %"),
+                           min = 0, max = 100, value = 50),
+               br(),
+               br(), 
+               submitButton("Submit")
+        )),
+      textOutput("selected_var")
     )
   )
 )
