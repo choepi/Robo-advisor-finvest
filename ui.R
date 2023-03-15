@@ -30,7 +30,7 @@ ui <- fluidPage(
       h4("Fourth level title"),
       h5("Fifth level title"),
       h6("Sixth level title"),
-      img(src = "fusion.png", height = 72, width = 100)
+      img(src = "Happy_aggro2.jpg", height = 72, width = 100)
     )
   )
 )
