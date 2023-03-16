@@ -8,15 +8,8 @@ server <- function(input, output) {
   # 1. It is "reactive" and therefore should be automatically
   #    re-executed when inputs (input$bins) change
   # 2. Its output type is a plot
-  output$distPlot <- renderPlot({
-    
-    x    <- faithful$waiting
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    hist(x, breaks = bins, col = "#007bc2", border = "white",
-         xlab = "Waiting time to next eruption (in mins)",
-         main = "Histogram of Tenpa")
-    
+  output$selected_var <- renderText({ 
+    paste("You have selected", input$slider1)
   })
   
 }
