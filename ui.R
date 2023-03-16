@@ -25,7 +25,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(h1("Willkommen"),
                  fluidRow(
-                   column(7,
+                   column(8,
                           selectInput("select1", h3("Menü"),
                                        choices = list("Home" = 1, "Optimierung" = 2,
                                                       "Forecast" = 3),selected = 1),
@@ -39,18 +39,24 @@ ui <- fluidPage(
       h2("Kurse von Heute "),
       fluidRow(
         column(9,
-               dateInput("dateinput1", 
-                         h3("Auswahl Historie bis"), 
-                         value = "2013-01-01"),
-               br(),
-               br(), 
                sliderInput("slider1", h3("Risikolevel %"),
                            min = 0, max = 100, value = 50),
                br(),
+               br(),
+               dateInput("dateinput1", 
+                         h3("Auswahl Historie bis"), 
+                         value = "2020-01-01"),
+               br(), 
+               selectInput("select2", h3("SMI"),
+                           choices = list("SMI" ="SMI","SWIBND" = "SWIBND",
+                                          "GOLD"="GOLD","BITCOIN"="BITCOIN",
+                                          "SNP500"="SNP500","USBND"="USBND",
+                                          "USDCHF"="USDCHF"),selected = "SMI"),
                br(), 
                submitButton("Submit")
         )),
-      textOutput("selected_var")
+      textOutput("selected_var"),
+      plotOutput("historical_data")
     )
   )
 )
