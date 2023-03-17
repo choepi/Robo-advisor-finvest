@@ -27,13 +27,13 @@ ui <- fluidPage(
                  fluidRow(
                    column(8,
                           selectInput("select1", h3("Menü"),
-                                       choices = list("Home" = 1, "Optimierung" = 2,
-                                                      "Forecast" = 3),selected = 1),
+                                      choices = list("Home" = 1, "Optimierung" = 2,
+                                                     "Forecast" = 3),selected = 1),
                           br(),
                           br(), 
                           actionButton("action1", "Help"),
-                          ))
-                 ),
+                   ))
+    ),
     mainPanel(
       h1("BLA BLA"),
       h2("Kurse von Heute "),
