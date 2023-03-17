@@ -1,4 +1,11 @@
 library(quantmod)
+library(devtools)
+library(stringr)
+library(tradingeconomics)
+login('Your_Key:Your_Secret')
+install_github("tradingeconomics/tradingeconomics/R/tradingeconomics")
+
+
 assets_list <- c("GC=F","BTC-USD","^GSPC","UTEN","CHF=X")
 
 get_data <- function(x){
@@ -7,7 +14,7 @@ get_data <- function(x){
   return(a)
 }
 
-n <- 10 #number of days as history
+n <- 1000 #number of days as history
 l <- matrix(nrow=n,ncol=length(assets_list))
 nrow(l)
 for (i in 1:length(assets_list)){
@@ -19,3 +26,5 @@ for (i in 1:length(assets_list)){
   
 }
 l
+
+
