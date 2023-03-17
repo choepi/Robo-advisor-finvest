@@ -35,8 +35,8 @@ ui <- fluidPage(
                           ))
                  ),
     mainPanel(
-      h1("BLA BLA"),
-      h2("Kurse von Heute "),
+      h1("Patriks branch"),
+      h2("Test"),
       fluidRow(
         column(9,
                dateInput("dateinput1", 
