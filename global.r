@@ -1,30 +1,23 @@
 library(quantmod)
-library(devtools)
-library(stringr)
-library(tradingeconomics)
-login('Your_Key:Your_Secret')
-install_github("tradingeconomics/tradingeconomics/R/tradingeconomics")
+library(zoo)
+library(xts)
+library(dplyr)
 
 
-assets_list <- c("GC=F","BTC-USD","^GSPC","UTEN","CHF=X")
-
-get_data <- function(x){
-  a <- getSymbols(x,src='yahoo',auto.assign=FALSE)
-  a <- na.approx(a)
-  return(a)
+get_data <- function(n){
+  assets_list <- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
+  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
+  end <- Sys.Date()
+  start <- as.Date(end-n)
+  l <- list(rep(NA,length(assets_list)))
+  Stocks <- lapply(assets_list, getSymbols, auto.assign = FALSE)
+  Stocks <- setNames(Stocks, asl)
+  for (i in 1:length(assets_list)){
+    r <- Stocks[[i]]
+    #r <- window(r, start = end)
+    r <- r[,4]
+    colnames(r) <- c("Price")
+    l[[i]] <- r
+  }
+  return(l)
 }
-
-n <- 1000 #number of days as history
-l <- matrix(nrow=n,ncol=length(assets_list))
-nrow(l)
-for (i in 1:length(assets_list)){
-  r <- get_data(assets_list[i])
-  r <- rev(r)
-  r <- r[,4]
-  r <- r[1:n]
-  l[,i] <- r
-  
-}
-l
-
-
