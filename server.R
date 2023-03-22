@@ -14,8 +14,8 @@ server <- function(input, output) {
   })
   
   
-
-
+  
+  
   output$historical_data <- renderPlot({
     assetlist <- list("SMI" =1,"SWIBND" = 2,
                       "GOLD"=3,"BITCOIN"=4,
