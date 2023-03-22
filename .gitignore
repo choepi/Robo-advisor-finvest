@@ -26,7 +26,19 @@ vignettes/*.pdf
 *.knit.md
 # R Environment Variables
 .Renviron
+<<<<<<< HEAD
+readme.md
+=======
 .Rproj.user
 .Rdata
 .DS_Store
 portfoliooptimizer.r
+>>>>>>> cf39b72a3b9d68dcf360c96767060199f7dc5ef3
+test3.r
+howtogithub.md
+app.r
+fusion.png
+global.r
+server.R
+test_r_package.R
+ui.R

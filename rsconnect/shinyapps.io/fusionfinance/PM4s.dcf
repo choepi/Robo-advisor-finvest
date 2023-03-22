@@ -4,10 +4,10 @@ username:
 account: fusionfinance
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 8403401
-bundleId: 6942479
+appId: 8643836
+bundleId: 6993589
 url: https://fusionfinance.shinyapps.io/PM4s/
-when: 1678468084.43069
-lastSyncTime: 1678468084.43069
+when: 1679507130.97752
+lastSyncTime: 1679507130.97753
 asMultiple: FALSE
 asStatic: FALSE
