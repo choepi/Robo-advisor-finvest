@@ -4,9 +4,9 @@ library(shiny)
 source("global.r")
 
 # UI ----
-source("ui.r")
+source("ui.R")
 
 # Function and Calculation ----
-source("server.r")
+source("server.R")
 
 shinyApp(ui = ui, server = server)
