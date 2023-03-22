@@ -81,3 +81,4 @@ ui <- fluidPage(
   ),
   
 )
+dashboardPage(header, sidebar, body)
