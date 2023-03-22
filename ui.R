@@ -81,17 +81,3 @@ ui <- fluidPage(
   ),
   
 )
-dashboardPage(header, sidebar, body)
-FooterZHAW
-ZHAW
-ZHAW
-© 2023 GitHub, Inc.
-Footer navigation
-Help
-Support
-API
-Training
-Blog
-About
-GitHub Enterprise Server 3.7.7
-You have no unread notifications
