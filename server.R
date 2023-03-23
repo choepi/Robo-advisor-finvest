@@ -9,25 +9,35 @@ server <- function(input, output) {
   #    re-executed when inputs (input$bins) change
   # 2. Its output type is a plot
   
+  
+  dat_asset <- get_data(1000) #data initialization
+  
   output$selected_var <- renderText({ 
     paste("You have selected", input$select2)
   })
   
   
-
-
+  
+  
   output$historical_data <- renderPlot({
+    a <- (input$dateinput1)-Sys.Date()
+    if (a>1000) dat_asset <- get_data(a)
+    
     assetlist <- list("SMI" =1,"SWIBND" = 2,
                       "GOLD"=3,"BITCOIN"=4,
                       "SNP500"=5,"USBND"=6,
-                      "USDCHF"=6)
-    a <- (input$dateinput1)-Sys.Date()
-    l <- get_data(a)
+                      "USDCHF"=7)
+    cnames <- names(assetlist)
     chose <- as.numeric(assetlist[input$select2])
-    dat <- l[[chose]]
-    autoplot(dat, geom = "line", xlim = c(input$dateinput1, Sys.Date()))
-    #ggplot(data = dat, mapping = aes(x = Index, y = Price))+
-    #  geom_line()
+    dat <- as.xts(dat_asset[[chose]])
+    dat <- window(dat, start = input$dateinput1, end=Sys.Date())
+    #ggplot(data = dat$Close, aes(x = Index, y = Close))+
+    #geom_line()
+    chartSeries(dat,name=cnames[chose],theme = 'white')
   })
   
 }
+
+
+
+
