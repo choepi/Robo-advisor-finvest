@@ -10,7 +10,7 @@ library(withr)
 library(treemap)
 library(DT)
 library(shinyBS)
-library(shinyjs)
+library(shinyjs) 
 library(WDI)
 library(geosphere)
 library(magrittr)
@@ -20,12 +20,12 @@ library(timevis)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
-  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=40)
+  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
   ),
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
-    message = (img(src="support.jpg", height=250))
+    message = (img(src="support2.jpg", height=180))
   ))
   ),
   sidebar <- dashboardSidebar(
@@ -36,54 +36,54 @@ ui <- dashboardPage(
   
   body <- dashboardBody( 
     tabItems(
-    tabItem(tabName = "profil",
-            h1("Profil"),
-            h5("Hier können sie ihr Portfolio eingeben oder erstellen lassen"),
-            mainPanel(tabsetPanel(
-              id = "tabsetPanelID",
-              type = "tabs",
-              tabPanel("Bestehendes Portfolio"),
-              tabPanel("Kein Portfolio"),
-            ))
-    ),
-    tabItem(tabName = "portfolio",
-            h1("Portfolio"),
-            h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-            mainPanel(tabsetPanel(
-              id = "tabsetPanelID",
-              type = "tabs",
-              tabPanel("Historie",
-                       sliderInput("slider1", h3("Risikolevel %"),
-                                   min = 0, max = 100, value = 50)
-              ),
-              tabPanel("MVP"),
-              tabPanel("Tangential")
-            ))
-    ),
-    tabItem(tabName = "kurse",
-            h1("Kurse"),
-            h5("Aktuelle Kursangaben"),
-            fluidRow(
-              column(9,
-                     dateInput("dateinput1", 
-                               h3("Auswahl Historie bis"), 
-                               value = "2020-01-01"),
-                     br(), 
-                     selectInput("select2", h3("SMI"),
-                                 choices = list("SMI" ="SMI","SWIBND" = "SWIBND",
-                                                "GOLD"="GOLD","BITCOIN"="BITCOIN",
-                                                "SNP500"="SNP500","USBND"="USBND",
-                                                "USDCHF"="USDCHF"),selected = "SMI"),
-                     br(), 
-                     submitButton("Submit")
-              ),
-              column(9,
-                     textOutput("selected_var"),
-                     plotOutput("historical_data")
-              )),
-            
+      tabItem(tabName = "profil",
+              h1("Profil"),
+              h5("Hier können sie ihr Portfolio eingeben oder erstellen lassen"),
+              mainPanel(tabsetPanel(
+                id = "tabsetPanelID",
+                type = "tabs",
+                tabPanel("Bestehendes Portfolio"),
+                tabPanel("Kein Portfolio"),
+              ))
+      ),
+      tabItem(tabName = "portfolio",
+              h1("Portfolio"),
+              h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
+              mainPanel(tabsetPanel(
+                id = "tabsetPanelID",
+                type = "tabs",
+                tabPanel("Historie",
+                         sliderInput("slider1", h3("Risikolevel %"),
+                                     min = 0, max = 100, value = 50)
+                ),
+                tabPanel("MVP"),
+                tabPanel("Tangential")
+              ))
+      ),
+      tabItem(tabName = "kurse",
+              h1("Kurse"),
+              h5("Aktuelle Kursangaben"),
+              fluidRow(
+                column(9,
+                       dateInput("dateinput1", 
+                                 h3("Auswahl Historie bis"), 
+                                 value = "2020-01-01"),
+                       br(), 
+                       selectInput("select2", h3("SMI"),
+                                   choices = list("SMI" ="SMI","SWIBND" = "SWIBND",
+                                                  "GOLD"="GOLD","BITCOIN"="BITCOIN",
+                                                  "SNP500"="SNP500","USBND"="USBND",
+                                                  "USDCHF"="USDCHF"),selected = "SMI"),
+                       br(), 
+                       submitButton("Submit")
+                ),
+                column(9,
+                       textOutput("selected_var"),
+                       plotOutput("historical_data")
+                )),
+              
+      )
     )
-  )
   ),
   
 )
