@@ -19,17 +19,23 @@ library(timevis)
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
-ui <- fluidPage(
+ui <- dashboardPage(
   header <- dashboardHeader(title=div(img(src="fusion.jpg", height=40)
-  )),
-  
+  ),
+  dropdownMenu(icon = icon("circle-info"),  messageItem(
+    from = "",
+    icon = icon("headset"),
+    message = (img(src="support.jpg", height=250))
+  ))
+  ),
   sidebar <- dashboardSidebar(
     sidebarMenu(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
       menuItem("Kurse", tabName = "kurse", icon = icon("eye")))),
   
-  body <- dashboardBody( tabItems(
+  body <- dashboardBody( 
+    tabItems(
     tabItem(tabName = "profil",
             h1("Profil"),
             h5("Hier können sie ihr Portfolio eingeben oder erstellen lassen"),
@@ -81,4 +87,4 @@ ui <- fluidPage(
   ),
   
 )
-dashboardPage(header, sidebar, body)
+dashboardPage(header, sidebar, body,skin = "black")
