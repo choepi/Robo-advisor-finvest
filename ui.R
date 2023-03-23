@@ -10,7 +10,7 @@ library(withr)
 library(treemap)
 library(DT)
 library(shinyBS)
-library(shinyjs)
+library(shinyjs) 
 library(WDI)
 library(geosphere)
 library(magrittr)
@@ -20,7 +20,7 @@ library(timevis)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
-  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=40)
+  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
   ),
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",

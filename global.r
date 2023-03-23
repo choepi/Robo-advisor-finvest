@@ -14,13 +14,12 @@ get_data <- function(n){
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    #r <- window(r, start = end)
-    r <- r[,4]
-    colnames(r) <- c("Price")
+    #r <- window(r, start = end, end=start)
+    #r <- r[,4]
+    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
     l[[i]] <- r
   }
   return(l)
 }
-
 
 
