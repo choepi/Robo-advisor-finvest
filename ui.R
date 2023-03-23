@@ -25,7 +25,7 @@ ui <- dashboardPage(
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
-    message = (img(src="support.jpg", height=250))
+    message = (img(src="support2.jpg", height=180))
   ))
   ),
   sidebar <- dashboardSidebar(

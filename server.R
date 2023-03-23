@@ -20,7 +20,7 @@ server <- function(input, output) {
     assetlist <- list("SMI" =1,"SWIBND" = 2,
                       "GOLD"=3,"BITCOIN"=4,
                       "SNP500"=5,"USBND"=6,
-                      "USDCHF"=6)
+                      "USDCHF"=7)
     a <- (input$dateinput1)-Sys.Date()
     l <- get_data(a)
     chose <- as.numeric(assetlist[input$select2])
