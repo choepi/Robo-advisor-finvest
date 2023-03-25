@@ -16,6 +16,7 @@ library(geosphere)
 library(magrittr)
 library(shinycssloaders)
 library(timevis)
+library(shinyWidgets)
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -56,7 +57,9 @@ ui <- dashboardPage(
                          sliderInput("slider1", h3("Risikolevel %"),
                                      min = 0, max = 100, value = 50)
                 ),
-                tabPanel("MVP"),
+                tabPanel("MVP",
+                         fluidRow(
+                           plotOutput("mvp"))),
                 tabPanel("Tangential")
               ))
       ),
@@ -65,15 +68,22 @@ ui <- dashboardPage(
               h5("Aktuelle Kursangaben"),
               fluidRow(
                 column(9,
-                       dateInput("dateinput1", 
-                                 h3("Auswahl Historie bis"), 
-                                 value = "2020-01-01"),
+                       #sliderInput("slider2", h3("Zeit Horizont"),
+                        #           min = 1, max = 7, value = 4),
+                       #helpText("1D  5D   1M   6M  1Y   5J  Max."),
+                       sliderTextInput(
+                         inputId = "slider2",
+                         label = "Choice",
+                         choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                         selected = "1D"
+                       ),
                        br(), 
                        selectInput("select2", h3("SMI"),
                                    choices = list("SMI" ="SMI","SWIBND" = "SWIBND",
                                                   "GOLD"="GOLD","BITCOIN"="BITCOIN",
                                                   "SNP500"="SNP500","USBND"="USBND",
                                                   "USDCHF"="USDCHF"),selected = "SMI"),
+
                        br(), 
                        submitButton("Submit")
                 ),
