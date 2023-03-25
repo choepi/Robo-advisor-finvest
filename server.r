@@ -1,3 +1,4 @@
+
 server <- function(input, output) {
   
   # Histogram of the Old Faithful Geyser Data ----
@@ -9,19 +10,25 @@ server <- function(input, output) {
   #    re-executed when inputs (input$bins) change
   # 2. Its output type is a plot
   
-  
-  dat_asset <- get_data(1000) #data initialization
+  #data initialization
+  dat_asset <<- get_data() 
+  time_now <- Sys.time()
+  whichasset <- c(1,1,1,1,1,0,0)
   
   output$selected_var <- renderText({ 
     paste("You have selected", input$select2)
   })
-  
-  
-  
+
   
   output$historical_data <- renderPlot({
-    a <- (input$dateinput1)-Sys.Date()
-    if (a>1000) dat_asset <- get_data(a)
+    if (input$slider2=="1D") a <- 1
+    if (input$slider2=="5D") a <- 5
+    if (input$slider2=="1M") a <- 30
+    if (input$slider2=="6M") a <- 180
+    if (input$slider2=="1Y") a <- 365
+    if (input$slider2=="5Y") a <- 5*365
+    if (input$slider2=="Max.") a <- 0
+    if (abs(time_now-Sys.time())>300) dat_asset <- get_data() #refresh nach 3s
     
     assetlist <- list("SMI" =1,"SWIBND" = 2,
                       "GOLD"=3,"BITCOIN"=4,
@@ -30,14 +37,31 @@ server <- function(input, output) {
     cnames <- names(assetlist)
     chose <- as.numeric(assetlist[input$select2])
     dat <- as.xts(dat_asset[[chose]])
-    dat <- window(dat, start = input$dateinput1, end=Sys.Date())
+    if (a ==0) dat <- window(dat, start = Sys.Date()-nrow(dat), end=Sys.Date())
+    else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
+    
     #ggplot(data = dat$Close, aes(x = Index, y = Close))+
-    #geom_line()
+      #geom_line()
     chartSeries(dat,name=cnames[chose],theme = 'white')
   })
   
+  output$mvp <- renderPlot({
+    dat_v <- mvp(whichasset)
+    dat_mvp <- data.frame(
+      group=colnames(dat_v),
+      value=c(dat_v)
+    )
+    ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      theme_void() # remove background, grid, numeric labels
+      
+    
+  
+  })
 }
 
 
 
 
+      
