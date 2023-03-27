@@ -88,7 +88,7 @@ ui <- dashboardPage(
                        br(), 
                        radioButtons("radio1", h3("Ansicht"),
                                     choices = list("Simpel" = 1, "Erweitert" = 2),
-                                    selected = 1)),
+                                    selected = 1),
                        br(), 
                        submitButton("Submit")
                 ),
