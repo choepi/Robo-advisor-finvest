@@ -18,6 +18,7 @@ library(shinycssloaders)
 library(timevis)
 library(shinyWidgets)
 
+
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -84,6 +85,10 @@ ui <- dashboardPage(
                                                   "SNP500"="SNP500","USBND"="USBND",
                                                   "USDCHF"="USDCHF"),selected = "SMI"),
 
+                       br(), 
+                       radioButtons("view", h3("Ansicht"),
+                                    choices = list("Simpel" = 1, "Erweitert" = 2),
+                                    selected = 1)),
                        br(), 
                        submitButton("Submit")
                 ),

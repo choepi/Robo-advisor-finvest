@@ -37,12 +37,18 @@ server <- function(input, output) {
     cnames <- names(assetlist)
     chose <- as.numeric(assetlist[input$select2])
     dat <- as.xts(dat_asset[[chose]])
+    
     if (a ==0) dat <- window(dat, start = Sys.Date()-nrow(dat), end=Sys.Date())
     else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
     
-    #ggplot(data = dat$Close, aes(x = Index, y = Close))+
-      #geom_line()
-    chartSeries(dat,name=cnames[chose],theme = 'white')
+    if (input$view== 1) {
+      ggplot(data = dat$Close, aes(x = Index, y = Close))+
+        geom_line()
+    }
+    else if (input$view == 2){
+      chartSeries(dat,name=cnames[chose],theme = 'white')
+    }
+    
   })
   
   output$mvp <- renderPlot({
