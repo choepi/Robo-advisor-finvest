@@ -31,13 +31,13 @@ cbind.fill <- function(...){
     rbind(x, matrix(, n-nrow(x), ncol(x))))) 
 }
 
-
+#na.locf?
 
 mvp <- function(wa){
   zeithorizont = 365*2
   var_m <- data.frame()
   asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
-  for (i in 1:7){
+  for (i in 1:length(asl)){
     x <- (dat_asset[[i]])$Close
     x <- x[1:zeithorizont]
     var_m <- cbind.fill(var_m,x$Close)
