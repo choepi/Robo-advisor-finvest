@@ -42,9 +42,13 @@ server <- function(input, output) {
     else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
     
     
-    if (input$radio1 == 1) {
+    if (input$radio1 == 1 & a == 1) {
       ggplot(data = dat$Close, aes(x = Index, y = Close))+
         geom_point()
+    }
+    else if (input$radio1 == 1 & a != 1){
+      ggplot(data = dat$Close, aes(x = Index, y = Close))+
+        geom_line()
     }
     else if (input$radio1 == 2){
       chartSeries(dat,name=cnames[chose],theme = 'white')
