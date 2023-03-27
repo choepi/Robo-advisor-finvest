@@ -18,6 +18,7 @@ library(shinycssloaders)
 library(timevis)
 library(shinyWidgets)
 
+
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -69,7 +70,7 @@ ui <- dashboardPage(
               fluidRow(
                 column(9,
                        #sliderInput("slider2", h3("Zeit Horizont"),
-                        #           min = 1, max = 7, value = 4),
+                       #           min = 1, max = 7, value = 4),
                        #helpText("1D  5D   1M   6M  1Y   5J  Max."),
                        sliderTextInput(
                          inputId = "slider2",
@@ -83,7 +84,11 @@ ui <- dashboardPage(
                                                   "GOLD"="GOLD","BITCOIN"="BITCOIN",
                                                   "SNP500"="SNP500","USBND"="USBND",
                                                   "USDCHF"="USDCHF"),selected = "SMI"),
-
+                       
+                       br(), 
+                       radioButtons("radio1", h3("Ansicht"),
+                                    choices = list("Simpel" = 1, "Erweitert" = 2),
+                                    selected = 1),
                        br(), 
                        submitButton("Submit")
                 ),

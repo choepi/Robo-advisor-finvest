@@ -18,7 +18,7 @@ server <- function(input, output) {
   output$selected_var <- renderText({ 
     paste("You have selected", input$select2)
   })
-
+  
   
   output$historical_data <- renderPlot({
     if (input$slider2=="1D") a <- 1 #2d da am sonntag 1tag == 0
@@ -41,9 +41,18 @@ server <- function(input, output) {
     if (a ==1 ) dat <- window(dat, start = last(index(dat)), end=Sys.Date())
     else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
     
-    #ggplot(data = dat$Close, aes(x = Index, y = Close))+
-      #geom_line()
-    chartSeries(dat,name=cnames[chose],theme = 'white')
+    
+    if (input$radio1 == 1 & a == 1) {
+      ggplot(data = dat$Close, aes(x = Index, y = Close))+
+        geom_point()
+    }
+    else if (input$radio1 == 1 & a != 1){
+      ggplot(data = dat$Close, aes(x = Index, y = Close))+
+        geom_line()
+    }
+    else if (input$radio1 == 2){
+      chartSeries(dat,name=cnames[chose],theme = 'white')
+    }
   })
   
   
@@ -57,13 +66,11 @@ server <- function(input, output) {
       geom_bar(stat="identity", width=1, color="white") +
       coord_polar("y", start=0) +
       theme_void() # remove background, grid, numeric labels
-      
     
-  
+    
+    
   })
 }
 
 
 
-
-      
