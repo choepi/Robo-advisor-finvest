@@ -6,38 +6,32 @@ library(expm)
 library(imputeTS)
 
 get_data <- function(){
-  assets_list <- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
-  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   end <- Sys.Date()
-  #start <- as.Date(end-n)
   l <- list(rep(NA,length(assets_list)))
   Stocks <- lapply(assets_list, getSymbols, auto.assign = FALSE)
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    #r <- window(r, start = end, end=start)
-    #r <- r[,4]
     colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
-    l[[i]] <- na.omit(r)
+    l[[i]] <- na_locf(r)
   }
   return(l)
 }
 
+#binds data columnwise and fills with NA
 cbind.fill <- function(...){
   nm <- list(...) 
   nm <- lapply(nm, as.matrix)
   n <- max(sapply(nm, nrow)) 
   do.call(cbind, lapply(nm, function (x) 
-    rbind(x, matrix(, n-nrow(x), ncol(x))))) 
+    rbind(x, matrix(,n-nrow(x), ncol(x))))) 
 }
-
 
 
 mvp <- function(wa){
   zeithorizont = 365*2
   var_m <- data.frame()
-  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
-  for (i in 1:7){
+  for (i in 1:length(asl)){
     x <- (dat_asset[[i]])$Close
     x <- x[1:zeithorizont]
     var_m <- cbind.fill(var_m,x$Close)
@@ -60,5 +54,3 @@ mvp <- function(wa){
   w <- round(s/sum(s),3);w
   return(w)
 }
-
-
