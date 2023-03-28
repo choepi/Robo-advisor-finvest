@@ -1,4 +1,4 @@
-server <- function(input, output) {
+server <- function(input, output, session) {
   
   # Histogram of the Old Faithful Geyser Data ----
   # with requested number of bins
@@ -15,9 +15,19 @@ server <- function(input, output) {
   dat_asset <<- get_data() 
   time_now <- Sys.time()
   portfolio_s <<- c(1,0,0,0,0,0,0)
+  portfolio_s2 <<- c(1,0,0,0,0,0,0)
   
   
-  output$portfolio <- renderPlot({
+  hintjs(session, options = list("hintButtonLabel"="Hope this hint was helpful"),
+         events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
+  
+  observeEvent(input$help,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip"))
+  )
+  
+  
+  output$portfolio1 <- renderPlot({
     for (i in 1:length(portfolio_s)){
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
@@ -35,7 +45,27 @@ server <- function(input, output) {
   })
   
   
-  output$portfolio_worth <- renderText({
+  
+  output$portfolio2 <-  renderPlot({
+    for (i in 1:(length(portfolio_s2))){
+      portfolio_s2[i] <<- input[[paste0("num", as.character(i+7))]]
+    }
+    
+    dat_v <- as.matrix(t(portfolio_s2))
+    colnames(dat_v) <- asl
+    dat_port <- data.frame(
+      group=colnames(dat_v),
+      value=c(dat_v)
+    )
+    ggplot(dat_port, aes(x="", y=value, fill=group)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      theme_void() # remove background, grid, numeric labels
+  })
+  
+  
+  
+  output$portfolio_worth1 <- renderText({
     #reactive auf inputs 
     portfolio_w<<- portfolio_s
     for (i in 1:length(portfolio_s)){

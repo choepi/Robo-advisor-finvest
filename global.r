@@ -13,7 +13,7 @@ get_data <- function(){
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
     colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
-    l[[i]] <- na.locf(r)
+    l[[i]] <- na_locf(r)
   }
   return(l)
 }
@@ -24,10 +24,9 @@ cbind.fill <- function(...){
   nm <- lapply(nm, as.matrix)
   n <- max(sapply(nm, nrow)) 
   do.call(cbind, lapply(nm, function (x) 
-    rbind(x, matrix(, n-nrow(x), ncol(x))))) 
+    rbind(x, matrix(,n-nrow(x), ncol(x))))) 
 }
 
-#na.locf
 
 mvp <- function(wa){
   zeithorizont = 365*2
