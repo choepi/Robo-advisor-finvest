@@ -13,7 +13,7 @@ server <- function(input, output) {
   #data initialization
   dat_asset <<- get_data() 
   time_now <- Sys.time()
-  whichasset <- c(1,1,1,1,1,0,0)
+  portfolio <- c(0,0,0,0,0,0,0)
   
   output$selected_var <- renderText({ 
     paste("You have selected", input$select2)
@@ -37,9 +37,10 @@ server <- function(input, output) {
     cnames <- names(assetlist)
     chose <- as.numeric(assetlist[input$select2])
     dat <- as.xts(dat_asset[[chose]])
-    if (a ==0) dat <- window(dat, start = Sys.Date()-nrow(dat), end=Sys.Date())
-    if (a ==1 ) dat <- window(dat, start = last(index(dat)), end=Sys.Date())
-    else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
+    start = last(index(dat))
+    if (a == 0) dat <- window(dat, start = first(index(dat)), end=start)
+    else if (a == 1 ) dat <- window(dat, start = start, end=start)
+    else dat <- window(dat, start = start-a, end=start)
     
     
     if (input$radio1 == 1 & a == 1) {
