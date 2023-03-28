@@ -1,4 +1,3 @@
-
 server <- function(input, output) {
   
   # Histogram of the Old Faithful Geyser Data ----
@@ -11,24 +10,13 @@ server <- function(input, output) {
   # 2. Its output type is a plot
   
   #data initialization
-<<<<<<< HEAD
-  dat_asset <<- get_data() 
-  time_now <- Sys.time()
-  whichasset <- c(1,1,1,1,1,0,0)
-  
-  output$selected_var <- renderText({ 
-    paste("You have selected", input$select2)
-  })
-  
-  
-=======
   assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- get_data() 
   time_now <- Sys.time()
   portfolio <- c(0,0,0,0,0,0,0)
-
-
+  
+  
   output$profile <- renderPlot({
     
   })
@@ -55,7 +43,6 @@ server <- function(input, output) {
   
   
   
->>>>>>> 8e6addcd611c4b6204bec69f184911904298934c
   output$historical_data <- renderPlot({
     if (input$slider2=="1D") a <- 1 #2d da am sonntag 1tag == 0
     if (input$slider2=="5D") a <- 5
@@ -68,15 +55,6 @@ server <- function(input, output) {
     
     chose <<- as.numeric(input$select2)
     dat <- as.xts(dat_asset[[chose]])
-<<<<<<< HEAD
-    if (a ==0) dat <- window(dat, start = Sys.Date()-nrow(dat), end=Sys.Date())
-    if (a ==1 ) dat <- window(dat, start = last(index(dat)), end=Sys.Date())
-    else dat <- window(dat, start = Sys.Date()-a, end=Sys.Date())
-    
-    #ggplot(data = dat$Close, aes(x = Index, y = Close))+
-    #geom_line()
-    chartSeries(dat,name=cnames[chose],theme = 'white')
-=======
     start = last(index(dat))
     if (a == 0) dat <- window(dat, start = first(index(dat)), end=start)
     else if (a == 1 ) dat <- window(dat, start = start, end=start)
@@ -93,30 +71,7 @@ server <- function(input, output) {
     else if (input$radio1 == 2){
       chartSeries(dat,name=asl[chose],theme = 'white')
     }
->>>>>>> 8e6addcd611c4b6204bec69f184911904298934c
   })
   
-  
-  output$mvp <- renderPlot({
-    dat_v <- mvp(whichasset)
-    dat_mvp <- data.frame(
-      group=colnames(dat_v),
-      value=c(dat_v)
-    )
-    ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
-      geom_bar(stat="identity", width=1, color="white") +
-      coord_polar("y", start=0) +
-      theme_void() # remove background, grid, numeric labels
-    
-    
-    
-  })
 }
 
-
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 8e6addcd611c4b6204bec69f184911904298934c

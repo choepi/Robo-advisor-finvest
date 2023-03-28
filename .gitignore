@@ -42,3 +42,5 @@ global.r
 server.R
 test_r_package.R
 ui.R
+server.r
+ui.r
