@@ -17,6 +17,10 @@ library(magrittr)
 library(shinycssloaders)
 library(timevis)
 library(shinyWidgets)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8e6addcd611c4b6204bec69f184911904298934c
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -43,7 +47,19 @@ ui <- dashboardPage(
               mainPanel(tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
-                tabPanel("Bestehendes Portfolio"),
+                tabPanel("Bestehendes Portfolio",
+                         column(2,
+                         numericInput("num1", label = h5("SMI"), value = 1, width = 100),
+                         numericInput("num2", label = h5("SWIBND"), value = 1, width = 100),
+                         numericInput("num3", label = h5("GOLD"), value = 1, width = 100),
+                         numericInput("num4", label = h5("BITCOIN"), value = 1, width = 100)),
+                         column(2,
+                         numericInput("num5", label = h5("SNP500"), value = 1, width = 100),
+                         numericInput("num6", label = h5("USBND"), value = 1, width = 100),
+                         numericInput("num7", label = h5("USDCHF"), value = 1, width = 100)),
+                         column(2,
+                         )
+                         ),
                 tabPanel("Kein Portfolio"),
               ))
       ),
@@ -69,7 +85,11 @@ ui <- dashboardPage(
               fluidRow(
                 column(9,
                        #sliderInput("slider2", h3("Zeit Horizont"),
+<<<<<<< HEAD
                        #           min = 1, max = 7, value = 4),
+=======
+                        #           min = 1, max = 7, value = 4),
+>>>>>>> 8e6addcd611c4b6204bec69f184911904298934c
                        #helpText("1D  5D   1M   6M  1Y   5J  Max."),
                        sliderTextInput(
                          inputId = "slider2",
@@ -79,13 +99,23 @@ ui <- dashboardPage(
                        ),
                        br(), 
                        selectInput("select2", h3("SMI"),
+<<<<<<< HEAD
                                    choices = list("SMI" ="SMI","SWIBND" = "SWIBND",
                                                   "GOLD"="GOLD","BITCOIN"="BITCOIN",
                                                   "SNP500"="SNP500","USBND"="USBND",
                                                   "USDCHF"="USDCHF"),selected = "SMI"),
                        
+=======
+                                   choices = list("SMI" =1,"SWIBND" = 2,
+                                                  "GOLD"=3,"BITCOIN"=4,
+                                                  "SNP500"=5,"USBND"=6,
+                                                  "USDCHF"=7),selected = "SMI"),
+
+>>>>>>> 8e6addcd611c4b6204bec69f184911904298934c
                        br(), 
-                       submitButton("Submit")
+                       radioButtons("radio1", h3("Ansicht"),
+                                    choices = list("Simpel" = 1, "Erweitert" = 2),
+                                    selected = 1),
                 ),
                 column(9,
                        textOutput("selected_var"),
