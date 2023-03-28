@@ -14,13 +14,40 @@ server <- function(input, output) {
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- get_data() 
   time_now <- Sys.time()
-  portfolio <- c(0,0,0,0,0,0,0)
+  portfolio_s <<- c(1,0,0,0,0,0,0)
   
   
-  output$profile <- renderPlot({
-    
+  output$portfolio <- renderPlot({
+    for (i in 1:length(portfolio_s)){
+      portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
+    }
+
+    dat_v <- as.matrix(t(portfolio_s))
+    colnames(dat_v) <- asl
+    dat_port <- data.frame(
+      group=colnames(dat_v),
+      value=c(dat_v)
+    )
+    ggplot(dat_port, aes(x="", y=value, fill=group)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      theme_void() # remove background, grid, numeric labels
   })
   
+  
+  output$portfolio_worth <- renderText({
+    #reactive auf inputs 
+    portfolio_w<<- portfolio_s
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    
+    for (i in 1:length(asl)){
+      portfolio_w[i] <- portfolio_s[i]*last(dat_asset[[i]]$Close)
+    }
+    w <- round(sum(portfolio_w),0)
+    paste("Portfolio Value:",w , "$")
+  })
   
   
   output$mvp <- renderPlot({
@@ -32,7 +59,7 @@ server <- function(input, output) {
     ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
       geom_bar(stat="identity", width=1, color="white") +
       coord_polar("y", start=0) +
-      theme_void() # remove background, grid, numeric labels
+      theme_void()
   })
   
   
@@ -51,7 +78,8 @@ server <- function(input, output) {
     if (input$slider2=="1Y") a <- 365
     if (input$slider2=="5Y") a <- 5*365
     if (input$slider2=="Max.") a <- 0
-    if (abs(time_now-Sys.time())>300) dat_asset <- get_data() #refresh nach 300s
+    
+    if (abs(time_now-Sys.time())>300) dat_asset <<- get_data() #refresh nach 300s
     
     chose <<- as.numeric(input$select2)
     dat <- as.xts(dat_asset[[chose]])

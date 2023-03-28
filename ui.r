@@ -40,24 +40,55 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "profil",
               h1("Profil"),
-              h5("Hier können sie ihr Portfolio eingeben oder erstellen lassen"),
               mainPanel(tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
+                         h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
+                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
+                            Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
+                            verschieden Assets zu erhalten."),
                          column(2,
-                                numericInput("num1", label = h5("SMI"), value = 1, width = 100),
-                                numericInput("num2", label = h5("SWIBND"), value = 1, width = 100),
-                                numericInput("num3", label = h5("GOLD"), value = 1, width = 100),
-                                numericInput("num4", label = h5("BITCOIN"), value = 1, width = 100)),
+                                numericInput("num1", label = h5("SMI"), value = 0, width = 100, min = 0),
+                                numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                numericInput("num3", label = h5("GOLD"), value = 0, width = 100, min = 0),
+                                numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
                          column(2,
-                                numericInput("num5", label = h5("SNP500"), value = 1, width = 100),
-                                numericInput("num6", label = h5("USBND"), value = 1, width = 100),
-                                numericInput("num7", label = h5("USDCHF"), value = 1, width = 100)),
-                         column(2,
+                                numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                                numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
+                         column(7,
+                                plotOutput("portfolio"),
+                                h4(textOutput("portfolio_worth"))
                          )
                 ),
-                tabPanel("Kein Portfolio"),
+                tabPanel("Kein Portfolio",
+                         h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
+                            welches du dann nach bedarf anpassen kannst."),
+                         br(),
+                         h4("Zu investierendes Vermögen:"),
+                         numericInput("num8", label = h6(""), value = 0, width = 100, min = 0),
+                         sliderTextInput(
+                           inputId = "slider3",
+                           label = "Risikobereitschaft",
+                           choices = c("Geringes Risiko", "Mittleres Risiko", "Hohes Risiko"),
+                           selected = "Geringes Risiko"
+                         ),
+                         column(2,
+                                numericInput("num1", label = h5("SMI"), value = 0, width = 100, min = 0),
+                                numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                numericInput("num3", label = h5("GOLD"), value = 0, width = 100, min = 0),
+                                numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
+                         column(2,
+                                numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                                numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
+                         column(7,
+                                plotOutput("portfolio"),
+                                h4(textOutput("portfolio_worth"))
+                         )
+                         ),
+                
               ))
       ),
       tabItem(tabName = "portfolio",
@@ -71,8 +102,8 @@ ui <- dashboardPage(
                                      min = 0, max = 100, value = 50)
                 ),
                 tabPanel("MVP",
-                         fluidRow(
-                           plotOutput("mvp"))),
+                         fluidRow(column(5,
+                           plotOutput("mvp")))),
                 tabPanel("Tangential")
               ))
       ),
@@ -104,7 +135,7 @@ ui <- dashboardPage(
                 ),
                 column(9,
                        textOutput("selected_var"),
-                       plotOutput("historical_data")
+                       plotOutput("historical_data",width = 500)
                 )),
               
       )

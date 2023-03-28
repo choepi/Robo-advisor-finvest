@@ -7,20 +7,18 @@ library(imputeTS)
 
 get_data <- function(){
   end <- Sys.Date()
-  #start <- as.Date(end-n)
   l <- list(rep(NA,length(assets_list)))
   Stocks <- lapply(assets_list, getSymbols, auto.assign = FALSE)
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    #r <- window(r, start = end, end=start)
-    #r <- r[,4]
     colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
-    l[[i]] <- na.omit(r)
+    l[[i]] <- na.locf(r)
   }
   return(l)
 }
 
+#binds data columnwise and fills with NA
 cbind.fill <- function(...){
   nm <- list(...) 
   nm <- lapply(nm, as.matrix)
@@ -29,7 +27,7 @@ cbind.fill <- function(...){
     rbind(x, matrix(, n-nrow(x), ncol(x))))) 
 }
 
-#na.locf?
+#na.locf
 
 mvp <- function(wa){
   zeithorizont = 365*2
