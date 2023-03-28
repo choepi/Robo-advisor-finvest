@@ -11,13 +11,37 @@ server <- function(input, output) {
   # 2. Its output type is a plot
   
   #data initialization
+  assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
+  asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- get_data() 
   time_now <- Sys.time()
   portfolio <- c(0,0,0,0,0,0,0)
+
+
+  output$profile <- renderPlot({
+    
+  })
+  
+  
+  
+  output$mvp <- renderPlot({
+    dat_v <- mvp(portfolio)
+    dat_mvp <- data.frame(
+      group=colnames(dat_v),
+      value=c(dat_v)
+    )
+    ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      theme_void() # remove background, grid, numeric labels
+  })
+  
+  
   
   output$selected_var <- renderText({ 
-    paste("You have selected", input$select2)
+    paste("You have selected", asl[as.numeric(input$select2)])
   })
+  
   
   
   output$historical_data <- renderPlot({
@@ -30,18 +54,12 @@ server <- function(input, output) {
     if (input$slider2=="Max.") a <- 0
     if (abs(time_now-Sys.time())>300) dat_asset <- get_data() #refresh nach 300s
     
-    assetlist <- list("SMI" =1,"SWIBND" = 2,
-                      "GOLD"=3,"BITCOIN"=4,
-                      "SNP500"=5,"USBND"=6,
-                      "USDCHF"=7)
-    cnames <- names(assetlist)
-    chose <- as.numeric(assetlist[input$select2])
+    chose <<- as.numeric(input$select2)
     dat <- as.xts(dat_asset[[chose]])
     start = last(index(dat))
     if (a == 0) dat <- window(dat, start = first(index(dat)), end=start)
     else if (a == 1 ) dat <- window(dat, start = start, end=start)
     else dat <- window(dat, start = start-a, end=start)
-    
     
     if (input$radio1 == 1 & a == 1) {
       ggplot(data = dat$Close, aes(x = Index, y = Close))+
@@ -52,25 +70,10 @@ server <- function(input, output) {
         geom_line()
     }
     else if (input$radio1 == 2){
-      chartSeries(dat,name=cnames[chose],theme = 'white')
+      chartSeries(dat,name=asl[chose],theme = 'white')
     }
   })
   
-  
-  output$mvp <- renderPlot({
-    dat_v <- mvp(whichasset)
-    dat_mvp <- data.frame(
-      group=colnames(dat_v),
-      value=c(dat_v)
-    )
-    ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
-      geom_bar(stat="identity", width=1, color="white") +
-      coord_polar("y", start=0) +
-      theme_void() # remove background, grid, numeric labels
-    
-    
-    
-  })
 }
 
 

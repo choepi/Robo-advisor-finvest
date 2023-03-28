@@ -6,8 +6,6 @@ library(expm)
 library(imputeTS)
 
 get_data <- function(){
-  assets_list <- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
-  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   end <- Sys.Date()
   #start <- as.Date(end-n)
   l <- list(rep(NA,length(assets_list)))
@@ -36,7 +34,6 @@ cbind.fill <- function(...){
 mvp <- function(wa){
   zeithorizont = 365*2
   var_m <- data.frame()
-  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   for (i in 1:length(asl)){
     x <- (dat_asset[[i]])$Close
     x <- x[1:zeithorizont]
