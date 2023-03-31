@@ -24,7 +24,7 @@ library(rintrojs)
 ui <- dashboardPage(
   header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
   ),
-
+  
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
@@ -52,16 +52,16 @@ ui <- dashboardPage(
                             Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
                             verschieden Assets zu erhalten."),
                          introBox(
-                         column(2,
-                                numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-                                numericInput("num2", label = h5("SWIBND"), value = 1, width = 100, min = 0),
-                                numericInput("num3", label = h5("GOLD"), value = 0, width = 100, min = 0),
-                                numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
-                         column(2,
-                                numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
-                                numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
-                                numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
-                         data.step = 1,data.intro = "Auswahl welches zu Ihnen passt"),
+                           column(2,
+                                  numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  numericInput("num2", label = h5("SWIBND"), value = 1, width = 100, min = 0),
+                                  numericInput("num3", label = h5("GOLD"), value = 0, width = 100, min = 0),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
+                           column(2,
+                                  numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                  numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
+                           data.step = 1,data.intro = "Auswahl welches zu Ihnen passt"),
                          column(7,
                                 plotOutput("portfolio1"),
                                 introBox(h4(textOutput("portfolio_worth1")),data.step = 2,
@@ -90,7 +90,7 @@ ui <- dashboardPage(
                                 numericInput("num14", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
                          column(7,
                                 plotOutput("portfolio2")
-                         
+                                
                          )),
                 
               ))
@@ -102,12 +102,11 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
-                         sliderInput("slider1", h3("Risikolevel %"),
-                                     min = 0, max = 100, value = 50)
+                         plotOutput("weighted.portfolio",width = 500)
                 ),
                 tabPanel("MVP",
                          fluidRow(column(5,
-                           plotOutput("mvp")))),
+                                         plotOutput("mvp")))),
                 tabPanel("Tangential")
               ))
       ),
