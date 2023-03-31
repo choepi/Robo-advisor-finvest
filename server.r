@@ -31,7 +31,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)){
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
-
+    
     dat_v <- as.matrix(t(portfolio_s))
     colnames(dat_v) <- asl
     dat_port <- data.frame(
@@ -130,6 +130,38 @@ server <- function(input, output, session) {
       chartSeries(dat,name=asl[chose],theme = 'white')
     }
   })
+  #Plot Protfolio time series
+  output$weighted.portfolio <- renderPlot({
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    normed.weights <- portfolio_s/sum(portfolio_s)
+    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
+      normed.weights[2]*dat_asset[[2]][,4]+
+      normed.weights[3]*dat_asset[[3]][,4]+
+      normed.weights[4]*dat_asset[[4]][,4]+
+      normed.weights[5]*dat_asset[[5]][,4]+
+      normed.weights[6]*dat_asset[[6]][,4]+
+      normed.weights[7]*dat_asset[[7]][,4]
+    plot.xts(weighted.portfolio)
+  })
+  
   
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
