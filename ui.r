@@ -87,7 +87,7 @@ ui <- dashboardPage(
                          column(2,
                                 numericInput("num12", label = h5("SNP500"), value = 0, width = 100, min = 0),
                                 numericInput("num13", label = h5("USBND"), value = 0, width = 100, min = 0),
-                                numericInput("num14", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
+                                numericInput("num14", label = h5("USD"), value = 0, width = 100, min = 0)),
                          column(7,
                                 plotOutput("portfolio2")
                                 
@@ -130,7 +130,7 @@ ui <- dashboardPage(
                                    choices = list("SMI" =1,"SWIBND" = 2,
                                                   "GOLD"=3,"BITCOIN"=4,
                                                   "SNP500"=5,"USBND"=6,
-                                                  "USDCHF"=7),selected = "SMI"),
+                                                  "USD"=7),selected = "SMI"),
                        
                        br(), 
                        radioButtons("radio1", h3("Ansicht"),

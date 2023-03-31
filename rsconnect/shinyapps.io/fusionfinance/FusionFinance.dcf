@@ -5,9 +5,9 @@ account: fusionfinance
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8644314
-bundleId: 7005284
+bundleId: 7020121
 url: https://fusionfinance.shinyapps.io/FusionFinance/
-when: 1679702448.1288
-lastSyncTime: 1679702448.12881
+when: 1680033809.27822
+lastSyncTime: 1680033809.27823
 asMultiple: FALSE
 asStatic: FALSE

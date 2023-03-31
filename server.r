@@ -11,13 +11,20 @@ server <- function(input, output, session) {
   
   #data initialization
   assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
-  asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
-  dat_asset <<- get_data() 
-  time_now <- Sys.time()
+  asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USD")
+  dat_asset <<-readRDS("database.RDS") #database einlesen
+  time_now <- Sys.Date()
+  #database updaten falls älter als 1,
+  if ((time_now-last(index(dat_asset[[4]]))) >=1) {
+    dat_asset <<- get_data()
+    saveRDS(dat_asset,file="database.RDS")
+  }
   portfolio_s <<- c(1,0,0,0,0,0,0)
   portfolio_s2 <<- c(1,0,0,0,0,0,0)
+
   
   
+  #info serverfunktion
   hintjs(session, options = list("hintButtonLabel"="Hope this hint was helpful"),
          events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
   
@@ -31,8 +38,12 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)){
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
+    for (i in 1:length(asl)){
+      portfolio_w[i] <- portfolio_s[i]*last(dat_asset[[i]]$Close)
+    }
+    portfolio_w <- round((portfolio_w),0)
     
-    dat_v <- as.matrix(t(portfolio_s))
+    dat_v <- as.matrix(t(portfolio_w))
     colnames(dat_v) <- asl
     dat_port <- data.frame(
       group=colnames(dat_v),
@@ -50,6 +61,12 @@ server <- function(input, output, session) {
     for (i in 1:(length(portfolio_s2))){
       portfolio_s2[i] <<- input[[paste0("num", as.character(i+7))]]
     }
+    
+    if (input$slider3=="Geringes Risiko") risk<<- 1
+    else if (input$slider3=="Mittleres Risiko") risk<<- 2
+    else if (input$slider3=="Hohes Risiko") risk<<- 3
+    
+    zu_invest_verm <<- input$num15
     
     dat_v <- as.matrix(t(portfolio_s2))
     colnames(dat_v) <- asl
@@ -109,7 +126,7 @@ server <- function(input, output, session) {
     if (input$slider2=="5Y") a <- 5*365
     if (input$slider2=="Max.") a <- 0
     
-    if (abs(time_now-Sys.time())>300) dat_asset <<- get_data() #refresh nach 300s
+
     
     chose <<- as.numeric(input$select2)
     dat <- as.xts(dat_asset[[chose]])
