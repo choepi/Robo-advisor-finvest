@@ -28,7 +28,7 @@ ui <- dashboardPage(
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
-    message = (img(src="support2.jpg", height=180))
+    message = (img(src="support1.jpg", height=180))
   ))
   ),
   sidebar <- dashboardSidebar(
@@ -62,7 +62,7 @@ ui <- dashboardPage(
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
                                   numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
                            data.step = 1,data.intro = "Auswahl welches zu Ihnen passt"),
-                         column(7,
+                         column(8,
                                 plotOutput("portfolio1"),
                                 introBox(h4(textOutput("portfolio_worth1")),data.step = 2,
                                          data.intro = "Hier sehen sie den aktuellen Wert ihres Portfolios")),
@@ -88,7 +88,7 @@ ui <- dashboardPage(
                                 numericInput("num12", label = h5("SNP500"), value = 0, width = 100, min = 0),
                                 numericInput("num13", label = h5("USBND"), value = 0, width = 100, min = 0),
                                 numericInput("num14", label = h5("USD"), value = 0, width = 100, min = 0)),
-                         column(7,
+                         column(5,
                                 plotOutput("portfolio2")
                                 
                          )),
