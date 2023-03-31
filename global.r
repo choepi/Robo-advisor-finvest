@@ -2,37 +2,59 @@ library(quantmod)
 library(zoo)
 library(xts)
 library(dplyr)
+library(expm)
+library(imputeTS)
 
-
-pull <- function(x){
-  a <- getSymbols(x,src='yahoo',auto.assign=FALSE)
-  a <- fortify.zoo(a)
-  return(a)
-}
-
-get_data <- function(n){
-  assets_list <- c("^SSMI","0VPY.L","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
-  asl <- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
-  st <- Sys.Date()
-  en <- st-n
-  #en <- as.character(en)
-  #n = number of days as history
+get_data <- function(){
+  end <- Sys.Date()
+  l <- list(rep(NA,length(assets_list)))
+  Stocks <- lapply(assets_list, getSymbols, auto.assign = FALSE)
+  Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
-    r <- pull(assets_list[i])
-    # transpose of dataframe
-    transpose <- t(r)
-    transpose <- as.data.frame(transpose)
-    rev_data_frame <- rev(transpose)
-    rev_data_frame <- t(rev_data_frame)
-    r <- as.data.frame(rev_data_frame)
-    #r[,1] <- as.Date(r[,1])
-    e <- nrow(r %>% filter(r[,1] > en))
-    s <- r[1:e,c(1,5)]
-    assign(asl[i], s, envir = .GlobalEnv)
+    r <- Stocks[[i]]
+    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
+    l[[i]] <- na_locf(r)
   }
+  return(l)
 }
 
-get_data(1000)
+#binds data columnwise and fills with NA
+cbind.fill <- function(...){
+  nm <- list(...) 
+  nm <- lapply(nm, as.matrix)
+  n <- max(sapply(nm, nrow)) 
+  do.call(cbind, lapply(nm, function (x) 
+    rbind(x, matrix(,n-nrow(x), ncol(x))))) 
+}
+
+
+mvp <- function(wa){
+  zeithorizont = 365*2
+  var_m <- data.frame()
+  for (i in 1:length(asl)){
+    x <- (dat_asset[[i]])$Close
+    x <- x[1:zeithorizont]
+    var_m <- cbind.fill(var_m,x$Close)
+  }
+  
+  colnames(var_m) <- asl
+  var_m <- na_interpolation(var_m, option = "linear")
+  
+  #m <- matrix(diag(as.vector(var_m)), ncol = sum(wa));m#unkorrelierte assets
+  m <- cov(var_m)
+  #m <- rbind(c(0.04,0.01,0),c(0.01,0.05,0),c(0,0,0.02))
+  m <- round(m,3) 
+  m_inv <- round(solve(m),3)
+  
+  #korreliert?
+  #m <- cor(m)
+  #diag(m) <- var_m
+  
+  s <- (1/(t(rep(1,ncol(m)))%*%m%*%rep(1,ncol(m))))%*%rep(1,ncol(m))%*%m_inv
+  w <- round(s/sum(s),3);w
+  return(w)
+}
+
 
 
 
