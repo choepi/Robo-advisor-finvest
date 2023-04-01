@@ -18,9 +18,13 @@ library(shinycssloaders)
 library(timevis)
 library(shinyWidgets)
 library(rintrojs)
+library(quantmod)
+library(zoo)
+library(xts)
+library(dplyr)
+library(expm)
+library(imputeTS)
 
-## build ui.R -----------------------------------
-## 1. header -------------------------------
 ui <- dashboardPage(
   header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
   ),
@@ -55,8 +59,8 @@ ui <- dashboardPage(
                          introBox(
                            sidebarPanel(
                                   numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-                                  numericInput("num2", label = h5("SWIBND"), value = 1, width = 100, min = 0),
-                                  numericInput("num3", label = h5("GOLD"), value = 0, width = 100, min = 0),
+                                  numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                  numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
                                   numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
                                   numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
@@ -81,17 +85,17 @@ ui <- dashboardPage(
                            selected = "Geringes Risiko"
                          ),
                          sidebarPanel(
-                                numericInput("num8", label = h5("SMI"), value = 1, width = 100, min = 0),
-                                numericInput("num9", label = h5("SWIBND"), value = 1, width = 100, min = 0),
-                                numericInput("num10", label = h5("GOLD"), value = 0, width = 100, min = 0),
-                                numericInput("num11", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
-                                numericInput("num12", label = h5("SNP500"), value = 0, width = 100, min = 0),
-                                numericInput("num13", label = h5("USBND"), value = 0, width = 100, min = 0),
-                                numericInput("num14", label = h5("USD"), value = 0, width = 100, min = 0)),
+                         ),
                          mainPanel(
-                                plotOutput("portfolio2")
+                           numericInput("num8", label = h5("SMI"), value = 1, width = 100, min = 0),
+                           numericInput("num9", label = h5("SWIBND"), value = 1, width = 100, min = 0),
+                           numericInput("num10", label = h5("GOLD"), value = 0, width = 100, min = 0),
+                           numericInput("num11", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
+                           numericInput("num12", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                           numericInput("num13", label = h5("USBND"), value = 0, width = 100, min = 0),
+                           numericInput("num14", label = h5("USD"), value = 0, width = 100, min = 0)),
                                 
-                         ))),
+                         )),
                 
               ))
       ),
@@ -136,10 +140,11 @@ ui <- dashboardPage(
                        br(), 
                        radioButtons("radio1", h3("Ansicht"),
                                     choices = list("Simpel" = 1, "Erweitert" = 2),
-                                    selected = 1),
+                                    selected = 1)
+                       ),
                 mainPanel(
-                       plotOutput("historical_data",width = 100)
-                ))),
+                       plotOutput("historical_data",width = 1000)
+                )),
               
       )
     )

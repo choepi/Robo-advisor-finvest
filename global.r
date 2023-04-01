@@ -20,42 +20,28 @@ get_data <- function(){
   l <- list(rep(NA,length(assets_list)))
   Stocks <- lapply(assets_list, getSymbols, auto.assign = FALSE)
   Stocks <- setNames(Stocks, asl)
-  for (i in 1:length(assets_list)){###########################33
+  for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    r <- cbind(r,diff(r$`CHF=X.Close`))
-    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
+    r$diffs <- diff(dat_asset[[i]]$Close)
+    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted",paste0("diff.", asl[i]))
     l[[i]] <- na_locf(r)
-
+    
   }
   return(l)
 }
 
 
+mvp<- function(y){
+  N=dim(y)[1]
+  N2=dim(y)[2]
+  y <- na_locf(y)
+  mittel=t(y)%*%rep(1/N,N)*260
+  Sigma=cov(y,y);
+  MVP1=solve(Sigma)%*%rep(1,N2)
+  MVP=MVP1/sum(MVP1); MVP=MVP[,1]
+  mvpreturn=t(MVP)%*%mittel
+  mvpvola=sqrt(t(MVP)%*%(Sigma%*%MVP))*sqrt(260)
+  return(as.array((MVP)))
+  } 
 
 
-mvp <- function(wa){
-  zeithorizont = 365*2
-  var_m <- data.frame()
-  for (i in 1:length(asl)){
-    x <- (dat_asset[[i]])$Close
-    x <- x[1:zeithorizont]
-    var_m <- cbind.fill(var_m,x$Close)
-  }
-  
-  colnames(var_m) <- asl
-  var_m <- na_interpolation(var_m, option = "linear")
-  
-  #m <- matrix(diag(as.vector(var_m)), ncol = sum(wa));m#unkorrelierte assets
-  m <- cov(var_m)
-  #m <- rbind(c(0.04,0.01,0),c(0.01,0.05,0),c(0,0,0.02))
-  m <- round(m,3) 
-  m_inv <- round(solve(m),3)
-  
-  #korreliert?
-  #m <- cor(m)
-  #diag(m) <- var_m
-  
-  s <- (1/(t(rep(1,ncol(m)))%*%m%*%rep(1,ncol(m))))%*%rep(1,ncol(m))%*%m_inv
-  w <- round(s/sum(s),3);w
-  return(w)
-}

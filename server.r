@@ -19,9 +19,9 @@ server <- function(input, output, session) {
     dat_asset <<- get_data()
     saveRDS(dat_asset,file="database.RDS")
   }
-  portfolio_s <<- c(1,0,0,0,0,0,0)
+  portfolio_s <<- c(1,0,1,0,0,0,0)
   portfolio_s2 <<- c(1,0,0,0,0,0,0)
-
+  portfolio_w <<- 0
   
   
   #info serverfunktion
@@ -97,10 +97,20 @@ server <- function(input, output, session) {
   })
   
   
+  
+  
   output$mvp <- renderPlot({
-    dat_v <- mvp(portfolio)
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    a <- data.frame()
+    for (i in 1:length(portfolio_s)){
+      if (portfolio_s[i]>0) a <- cbind.fill(a,dat_asset[[i]]$diff)
+    }
+    dat_v <- mvp(a)
+
     dat_mvp <- data.frame(
-      group=colnames(dat_v),
+      group=rownames(dat_v),
       value=c(dat_v)
     )
     ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
