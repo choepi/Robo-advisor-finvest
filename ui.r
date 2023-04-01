@@ -102,6 +102,12 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+                  sliderTextInput(
+                    inputId = "sliderHistorie",
+                    label = "Zeitraum",
+                    choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                    selected = "1D"),
+                           br(),
                          plotOutput("weighted.portfolio",width = 500)
                 ),
                 tabPanel("MVP",

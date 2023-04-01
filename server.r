@@ -132,6 +132,15 @@ server <- function(input, output, session) {
   })
   #Plot Protfolio time series
   output$weighted.portfolio <- renderPlot({
+    if (input$sliderHistorie=="1D") b <- 1 #2d da am sonntag 1tag == 0
+    if (input$sliderHistorie=="5D") b <- 5
+    if (input$sliderHistorie=="1M") b <- 30
+    if (input$sliderHistorie=="6M") b <- 180
+    if (input$sliderHistorie=="1Y") b <- 365
+    if (input$sliderHistorie=="5Y") b <- 5*365
+    if (input$sliderHistorie=="Max.") b <- 0
+    
+    
     for (i in 1:length(portfolio_s)){
       input[[paste0("num", as.character(i))]]
     }
@@ -143,7 +152,22 @@ server <- function(input, output, session) {
       normed.weights[5]*dat_asset[[5]][,4]+
       normed.weights[6]*dat_asset[[6]][,4]+
       normed.weights[7]*dat_asset[[7]][,4]
-    plot.xts(weighted.portfolio)
+    
+    #plot.xts(weighted.portfolio)
+    start = last(index(weighted.portfolio))
+    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
+    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
+    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
+    
+    if (b == 1) {
+      ggplot(data = weighted.portfolio, aes(x = Index, y = Close))+
+        geom_point(color = "green4")
+    }
+    else if (b != 1){
+      ggplot(data = weighted.portfolio, aes(x = Index, y = Close)) +
+        geom_line(color = "green4")
+    }
+
   })
   
   
