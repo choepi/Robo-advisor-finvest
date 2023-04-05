@@ -22,7 +22,7 @@ get_data <- function(){
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    r$diffs <- diff(dat_asset[[i]]$Close)
+    r$diffs <- log(diff(dat_asset[[i]]$Close))
     colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted",paste0("diff.", asl[i]))
     l[[i]] <- na_locf(r)
     
