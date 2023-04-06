@@ -130,7 +130,7 @@ server <- function(input, output, session) {
       chartSeries(dat,name=asl[chose],theme = 'white')
     }
   })
-  #Plot Protfolio time series
+  #Plot Protfolio time series/ history of weighted Portfolio
   output$weighted.portfolio <- renderPlot({
     if (input$sliderHistorie=="1D") b <- 1 #2d da am sonntag 1tag == 0
     if (input$sliderHistorie=="5D") b <- 5
@@ -144,28 +144,34 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)){
       input[[paste0("num", as.character(i))]]
     }
+    
+    #weighted portfolio with just close for basic plot
     normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
-      normed.weights[2]*dat_asset[[2]][,4]+
-      normed.weights[3]*dat_asset[[3]][,4]+
-      normed.weights[4]*dat_asset[[4]][,4]+
-      normed.weights[5]*dat_asset[[5]][,4]+
-      normed.weights[6]*dat_asset[[6]][,4]+
-      normed.weights[7]*dat_asset[[7]][,4]
+    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]]+
+      normed.weights[2]*dat_asset[[2]]+
+      normed.weights[3]*dat_asset[[3]]+
+      normed.weights[4]*dat_asset[[4]]+
+      normed.weights[5]*dat_asset[[5]]+
+      normed.weights[6]*dat_asset[[6]]+
+      normed.weights[7]*dat_asset[[7]]
     
     #plot.xts(weighted.portfolio)
+    #in column 4 is "close" of the chosen asset
     start = last(index(weighted.portfolio))
     if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
     else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
     else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
     
-    if (b == 1) {
-      ggplot(data = weighted.portfolio, aes(x = Index, y = Close))+
+    if (input$radioHistorie == 1 & b == 1) {
+      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
         geom_point(color = "green4")
     }
-    else if (b != 1){
-      ggplot(data = weighted.portfolio, aes(x = Index, y = Close)) +
+    else if (input$radioHistorie == 1 & b != 1){
+      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
         geom_line(color = "green4")
+    }
+    else if (input$radioHistorie == 2){
+      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
     }
 
   })

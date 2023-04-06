@@ -108,7 +108,12 @@ ui <- dashboardPage(
                     choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
                     selected = "1D"),
                            br(),
-                         plotOutput("weighted.portfolio",width = 500)
+                  
+                  radioButtons("radioHistorie", h3("Ansicht"),
+                               choices = list("Simpel" = 1, "Erweitert" = 2),
+                               selected = 1),
+                    br(), 
+                  plotOutput("weighted.portfolio",width = 500)
                 ),
                 tabPanel("MVP",
                          fluidRow(column(5,
