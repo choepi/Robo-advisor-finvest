@@ -23,7 +23,7 @@ server <- function(input, output, session) {
   portfolio_s2 <<- c(1,0,0,0,0,0,0)
   portfolio_w <<- 0
   
-  
+  length(dat_asset[[1]])
   #info serverfunktion
   hintjs(session, options = list("hintButtonLabel"="Hope this hint was helpful"),
          events = list("onhintclose"=I('alert("Wasn\'t that hint helpful")')))
@@ -32,6 +32,7 @@ server <- function(input, output, session) {
                introjs(session, options = list("showBullets"="false", "showProgress"="true", 
                                                "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip"))
   )
+
   
   
   output$portfolio1 <- renderPlot({
@@ -114,6 +115,30 @@ server <- function(input, output, session) {
       value=c(dat_v)
     )
     ggplot(dat_mvp, aes(x="", y=value, fill=group)) +
+      geom_bar(stat="identity", width=1, color="white") +
+      coord_polar("y", start=0) +
+      theme_void()
+  })
+  
+  
+  
+  output$tp <- renderPlot({
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    a <- data.frame()
+    for (i in 1:length(portfolio_s)){
+      if (portfolio_s[i]>0) a <- cbind.fill(a,dat_asset[[i]]$diff)
+    }
+    
+    riskfree <<- 0.01
+    dat_v <- tp(a)
+    
+    dat_tp <- data.frame(
+      group=rownames(dat_v),
+      value=c(dat_v)
+    )
+    ggplot(dat_tp, aes(x="", y=value, fill=group)) +
       geom_bar(stat="identity", width=1, color="white") +
       coord_polar("y", start=0) +
       theme_void()

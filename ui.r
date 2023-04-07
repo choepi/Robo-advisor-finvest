@@ -112,7 +112,9 @@ ui <- dashboardPage(
                 tabPanel("MVP",
                          fluidRow(mainPanel(
                                          plotOutput("mvp")))),
-                tabPanel("Tangential")
+                tabPanel("Tangential",
+                         fluidRow(mainPanel(
+                           plotOutput("tp"))))
               ))
       ),
       tabItem(tabName = "kurse",
@@ -143,7 +145,7 @@ ui <- dashboardPage(
                                     selected = 1)
                        ),
                 mainPanel(
-                       plotOutput("historical_data",width = 1000)
+                       plotOutput("historical_data")
                 )),
               
       )
