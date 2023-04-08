@@ -18,10 +18,10 @@ cbind.fill <- function(...) {
 
 rendite_calc <- function(a) {
   kurse <- as.data.frame(a)
-  rendite <- kurse[,-1]
-  t <- length(kurse[,1])
-  differenzen <- kurse[2:t,] - kurse[1:(t - 1),]
-  rendite <- cbind.fill(rendite,differenzen / kurse[1:(t - 1),])
+  rendite <- kurse[, -1]
+  t <- length(kurse[, 1])
+  differenzen <- kurse[2:t, ] - kurse[1:(t - 1), ]
+  rendite <- cbind.fill(rendite, differenzen / kurse[1:(t - 1), ])
   return(as.xts(rendite))
 }
 
@@ -32,11 +32,11 @@ get_data <- function() {
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)) {
     r <- Stocks[[i]]
-    b <- rendite_calc(r[,4])
-    b <- cbind.fill(r[,4],b)[,2]
+    b <- rendite_calc(r[, 4])
+    b <- cbind.fill(r[, 4], b)[, 2]
     r <- as.data.frame(r)
     r$rendite <- b
-    r<- as.xts(r)
+    r <- as.xts(r)
     colnames(r) <-
       c("Open",
         "High",
