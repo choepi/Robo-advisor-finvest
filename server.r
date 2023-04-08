@@ -146,26 +146,26 @@ server <- function(input, output, session) {
   
   
   output$historical_data <- renderPlot({
-    if (input$slider2 == 1)
+    if (input$slider2 == "1D")
       a <- 1 #2d da am sonntag 1tag == 0
-    else if (input$slider2 == 2)
+    if (input$slider2 == "5D")
       a <- 5
-    else if (input$slider2 == 3)
+    if (input$slider2 == "1M")
       a <- 30
-    else if (input$slider2 == 4)
+    if (input$slider2 == "6M")
       a <- 180
-    else if (input$slider2 == 5)
+    if (input$slider2 == "1Y")
       a <- 365
-    else if (input$slider2 == 6)
+    if (input$slider2 == "5Y")
       a <- 5 * 365
-    else if (input$slider2 == 7)
+    if (input$slider2 == "Max.")
       a <- 0
     
     
     
     chose <<- as.numeric(input$select2)
     dat <- as.xts(dat_asset[[chose]])
-    start = last(index(dat))
+    start = as.Date(last(index(dat)))
     if (a == 0)
       dat <- window(dat, start = first(index(dat)), end = start)
     else if (a == 1)
@@ -211,7 +211,7 @@ server <- function(input, output, session) {
       normed.weights[7]*dat_asset[[7]][,4]
     
     #plot.xts(weighted.portfolio)
-    start = last(index(weighted.portfolio))
+    start = as.Date(last(index(weighted.portfolio)))
     if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
     else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
     else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
