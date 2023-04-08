@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   dat_asset <<- readRDS("database.RDS") #database einlesen
   time_now <- Sys.Date()
   #database updaten falls älter als 1,
-  if ((time_now - last(index(dat_asset[[4]]))) >= 1) {
+  if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
     dat_asset <<- get_data()
     saveRDS(dat_asset, file = "database.RDS")
   }
@@ -87,7 +87,7 @@ server <- function(input, output, session) {
     }
     
     for (i in 1:length(asl)) {
-      portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+      portfolio_w[i] <<- portfolio_s[i] * last(dat_asset[[i]]$Close)
     }
     w <- round(sum(portfolio_w), 0)
     paste("Portfolio Value:", w , "$")
@@ -105,9 +105,9 @@ server <- function(input, output, session) {
     }
     dat_v <- mvp(a)
     
-    dat_mvp <- data.frame(group = rownames(dat_v),
-                          value = c(dat_v))
-    ggplot(dat_mvp, aes(x = "", y = value, fill = group)) +
+    dat_mvp <<- data.frame(Asset = rownames(dat_v),
+                           Gewicht = c(dat_v))
+    ggplot(dat_mvp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
                color = "white") +
@@ -129,9 +129,9 @@ server <- function(input, output, session) {
     riskfree <<- 0.01
     dat_v <- tp(a)
     
-    dat_tp <- data.frame(group = rownames(dat_v),
-                         value = c(dat_v))
-    ggplot(dat_tp, aes(x = "", y = value, fill = group)) +
+    dat_tp <<- data.frame(Asset = rownames(dat_v),
+                         Gewicht = c(dat_v))
+    ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
                color = "white") +
@@ -170,6 +170,7 @@ server <- function(input, output, session) {
       dat <- window(dat, start = first(index(dat)), end = start)
     else if (a == 1)
       dat <- window(dat, start = start, end = start)
+    
     else
       dat <- window(dat, start = start - a, end = start)
     
@@ -227,6 +228,39 @@ server <- function(input, output, session) {
 
   })
   
+  output$mvprec <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_mvp_rec <- dat_mvp
+    dat_mvp_rec$Gewicht <- dat_mvp$Gewicht * 100
+    as.data.frame(dat_mvp_rec)
+    g <- c(portfolio_w)
+    g <- g[g != 0]
+    lp <- c(1:length(g))
+    g <- sum(g)
+    g <- g * dat_mvp[lp, 2]
+    dat_mvp_rec$Investiert <- g
+    dat_mvp_rec
+    
+  })
+  
+  
+  output$tprec <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_tp_rec <- dat_tp
+    dat_tp_rec$Gewicht <- dat_tp$Gewicht * 100
+    as.data.frame(dat_tp_rec)
+    g <- c(portfolio_w)
+    g <- g[g != 0]
+    lp <- c(1:length(g))
+    g <- sum(g)
+    g <- g * dat_tp[lp, 2]
+    dat_tp_rec$Investiert <- g
+    dat_tp_rec
+  })
   
 }
 
