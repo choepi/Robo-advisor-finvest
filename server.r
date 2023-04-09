@@ -241,8 +241,13 @@ server <- function(input, output, session) {
     g <- sum(g)
     g <- g * dat_mvp[lp, 2]
     dat_mvp_rec$Investiert <- g
+    pa <- portfolio_w
+    for (i in 1:length(asl)) {
+      pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+    }
+    pa <- pa[pa != 0]
+    dat_mvp_rec$Anzahl <- dat_mvp_rec$Investiert/pa
     dat_mvp_rec
-    
   })
   
   
@@ -259,6 +264,12 @@ server <- function(input, output, session) {
     g <- sum(g)
     g <- g * dat_tp[lp, 2]
     dat_tp_rec$Investiert <- g
+    pa <- portfolio_w
+    for (i in 1:length(asl)) {
+      pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+    }
+    pa <- pa[pa != 0]
+    dat_tp_rec$Anzahl <- dat_tp_rec$Investiert/pa
     dat_tp_rec
   })
   
