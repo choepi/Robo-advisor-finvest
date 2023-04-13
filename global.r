@@ -5,16 +5,6 @@ library(dplyr)
 library(expm)
 library(imputeTS)
 
-#binds data columnwise and fills with NA
-cbind.fill <- function(...){
-  nm <- list(...) 
-  nm <- lapply(nm, as.matrix)
-  n <- max(sapply(nm, nrow)) 
-  do.call(cbind, lapply(nm, function (x) 
-    rbind(x, matrix(,n-nrow(x), ncol(x)))))  #ignore error!
-}
-
-
 get_data <- function(){
   end <- Sys.Date()
   l <- list(rep(NA,length(assets_list)))
@@ -22,42 +12,46 @@ get_data <- function(){
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)){
     r <- Stocks[[i]]
-    r$diffs <- (diff(dat_asset[[i]]$Close))
-    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted",paste0("diff.", asl[i]))
-    l[[i]] <- na.omit(r)
-    
+    colnames(r) <- c("Open","High","Low","Close","Volume","Adjusted")
+    l[[i]] <- na_locf(r)
   }
   return(l)
 }
 
-
-mvp<- function(y){
-  N=dim(y)[1]
-  N2=dim(y)[2]
-  y <- na_locf(y)
-  mittel=t(y)%*%rep(1/N,N)*260
-  Sigma=cov(y,y)
-  MVP1=solve(Sigma)%*%rep(1,N2)
-  MVP=MVP1/sum(MVP1)
-  mvpreturn=t(MVP)%*%mittel
-  mvpvola=sqrt(t(MVP)%*%(Sigma%*%MVP))*sqrt(260)
-  return(as.array((MVP)))
-  } 
+#binds data columnwise and fills with NA
+cbind.fill <- function(...){
+  nm <- list(...) 
+  nm <- lapply(nm, as.matrix)
+  n <- max(sapply(nm, nrow)) 
+  do.call(cbind, lapply(nm, function (x) 
+    rbind(x, matrix(,n-nrow(x), ncol(x))))) 
+}
 
 
-tp<-function(y){N=dim(y)[1]
-  excess=t(y)%*%rep(1/N,N)*260-riskfree
-  Sigma=cov(y,y);
-  TP1=solve(Sigma)%*%excess
-  TP=TP1/sum(TP1); TP=TP[,1]
-  tpreturn=t(TP)%*%(excess+riskfree)
-  tpvola=sqrt(t(TP)%*%(Sigma%*%TP))*sqrt(260)
-  c(TP, tpreturn, tpvola)
-  } 
-
-
-
-
-
-
+mvp <- function(wa){
+  zeithorizont = 365*2
+  var_m <- data.frame()
+  for (i in 1:length(asl)){
+    x <- (dat_asset[[i]])$Close
+    x <- x[1:zeithorizont]
+    var_m <- cbind.fill(var_m,x$Close)
+  }
+  
+  colnames(var_m) <- asl
+  var_m <- na_interpolation(var_m, option = "linear")
+  
+  #m <- matrix(diag(as.vector(var_m)), ncol = sum(wa));m#unkorrelierte assets
+  m <- cov(var_m)
+  #m <- rbind(c(0.04,0.01,0),c(0.01,0.05,0),c(0,0,0.02))
+  m <- round(m,3) 
+  m_inv <- round(solve(m),3)
+  
+  #korreliert?
+  #m <- cor(m)
+  #diag(m) <- var_m
+  
+  s <- (1/(t(rep(1,ncol(m)))%*%m%*%rep(1,ncol(m))))%*%rep(1,ncol(m))%*%m_inv
+  w <- round(s/sum(s),3);w
+  return(w)
+}
 
