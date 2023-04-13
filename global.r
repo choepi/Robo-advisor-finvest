@@ -32,24 +32,31 @@ get_data <- function() {
   Stocks <- setNames(Stocks, asl)
   for (i in 1:length(assets_list)) {
     r <- Stocks[[i]]
-    b <- rendite_calc(r[, 4])
-    b <- cbind.fill(r[, 4], b)[, 2]
-    r <- as.data.frame(r)
-    r$rendite <- b
-    r <- as.xts(r)
     colnames(r) <-
       c("Open",
         "High",
         "Low",
         "Close",
         "Volume",
-        "Adjusted",
-        paste0("r.", asl[i]))
+        "Adjusted")
     l[[i]] <- na.omit(r)
     attributes(l[[i]])$na.action <- NULL
-    
   }
-  return(l)
+  ren <- list(rep(NA, length(assets_list)))
+  for (i in 1:length(assets_list)){
+    r <- Stocks[[i]][,4]
+    b <- rendite_calc(r)
+    b <- cbind.fill(r, b)[, 2]
+    r <- as.data.frame(r)
+    r$rendite <- b
+    r <- as.xts(r)
+    colnames(r) <-
+      c("Close",paste0("r.", asl[i]))
+    ren[[i]] <- na.omit(r)
+    attributes(ren[[i]])$na.action <- NULL
+  }
+  data <- list(l,ren)
+  return(data)
 }
 
 

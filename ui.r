@@ -109,8 +109,13 @@ ui <- dashboardPage(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
                            choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                           selected = "1D"),
+                           selected = "5D"),
                          br(),
+
+                         radioButtons("radioHistorie", h3("Ansicht"),
+                                      choices = list("Simpel" = 1, "Erweitert" = 2),
+                                      selected = 2),
+                         br(), 
                          plotOutput("weighted.portfolio",width = 500)
                 ),
                 tabPanel("MVP",
@@ -134,19 +139,19 @@ ui <- dashboardPage(
                     inputId = "slider2",
                     label = "Choice",
                     choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "1D"
+                    selected = "5D"
                   ),
                   br(), 
-                  selectInput("select2", h3("SMI"),
-                              choices = list("SMI" =1,"SWIBND" = 2,
-                                             "GOLD"=3,"BITCOIN"=4,
+                  selectInput("select2", h3("Asset"),
+                              choices = list("BITCOIN"=4,"SMI" =1,"SWIBND" = 2,
+                                             "GOLD"=3,
                                              "SNP500"=5,"USBND"=6,
-                                             "USD"=7),selected = "SMI"),
+                                             "USD"=7),selected = "BITCOIN"),
                   textOutput("selected_var"),
                   br(), 
                   radioButtons("radio1", h3("Ansicht"),
                                choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 1)
+                               selected = 2)
                 ),
                 mainPanel(
                   plotOutput("historical_data")
