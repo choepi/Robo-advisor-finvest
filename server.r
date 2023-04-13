@@ -13,7 +13,8 @@ server <- function(input, output, session) {
   #data initialization
   assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
-  dat_asset <<- readRDS("database.RDS") #database einlesen
+  dat_asset <<- readRDS("database_price.RDS")#database einlesen
+  ren <<- readRDS("database_ren.RDS")#database einlesen
   time_now <- Sys.Date()
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -33,6 +34,13 @@ server <- function(input, output, session) {
     options = list("hintButtonLabel" = "Hope this hint was helpful"),
     events = list("onhintclose" = I('alert("Wasn\'t that hint helpful")'))
   )
+  
+  observeEvent(c(input$help1,input$help2),
+               introjs(session, options = list("nextLabel"="Next",
+                                               "prevLabel"="Back"),
+                                               events = list())
+  )
+
   
   
   output$portfolio1 <- renderPlot({
@@ -130,7 +138,7 @@ server <- function(input, output, session) {
         a <- cbind.fill(a, ren[[i]][,2])
     }
     
-    riskfree <<- 0.01
+    riskfree <<- 0.01 #anpassen sodass daten aktuell
     dat_v <- tp(a)
     dat_tp <<- data.frame(Asset = rownames(dat_v),
                           Gewicht = c(dat_v))
@@ -256,13 +264,22 @@ server <- function(input, output, session) {
     lp <- c(1:length(g))
     g <- sum(g)
     g <- g * dat_mvp[lp, 2]
-    dat_mvp_rec$Investiert <- g
+    dat_mvp_rec$Investiert <- abs(g)
     pa <- portfolio_w
     for (i in 1:length(asl)) {
       pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
     }
     pa <- pa[pa != 0]
-    dat_mvp_rec$Anzahl <- round(dat_mvp_rec$Investiert/pa,0)
+    dat_mvp_rec$Anzahl <- round(g/pa)
+    n = length(dat_mvp_rec$Anzahl)
+    h = c(rep(NA,n))
+    for (i in 1:n){
+      if (dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
+      else if (dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
+      else if (dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+    }
+    dat_mvp_rec$Handlung <- h
+    dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
     dat_mvp_rec
   })
   
@@ -279,13 +296,22 @@ server <- function(input, output, session) {
     lp <- c(1:length(g))
     g <- sum(g)
     g <- g * dat_tp[lp, 2]
-    dat_tp_rec$Investiert <- g
+    dat_tp_rec$Investiert <- abs(g)
     pa <- portfolio_w
     for (i in 1:length(asl)) {
       pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
     }
     pa <- pa[pa != 0]
-    dat_tp_rec$Anzahl <- round(dat_tp_rec$Investiert/pa,0)
+    dat_tp_rec$Anzahl <- round(g/pa)
+    n = length(dat_tp_rec$Anzahl)
+    h = c(rep(NA,n))
+    for (i in 1:n){
+      if (dat_tp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
+      else if (dat_tp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
+      else if (dat_tp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+    }
+    dat_tp_rec$Handlung <- h
+    dat_tp_rec<-dat_tp_rec[order(dat_tp_rec$Investiert,decreasing = T),]
     dat_tp_rec
   })
   
