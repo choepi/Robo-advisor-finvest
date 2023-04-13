@@ -119,9 +119,14 @@ ui <- dashboardPage(
                          plotOutput("weighted.portfolio",width = 500)
                 ),
                 tabPanel("MVP",
-                         fluidRow(column(5,
-                                         plotOutput("mvp")))),
-                tabPanel("Tangential")
+                         fluidRow(
+                           mainPanel(
+                             tableOutput("mvprec"),
+                             plotOutput("mvp")))),
+                tabPanel("TP",
+                         fluidRow(
+                           tableOutput("tprec"),
+                           plotOutput("tp")))
               ))
       ),
       tabItem(tabName = "kurse",
