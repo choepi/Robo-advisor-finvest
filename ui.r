@@ -35,7 +35,8 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
-      menuItem("Kurse", tabName = "kurse", icon = icon("eye")))),
+      menuItem("Kurse", tabName = "kurse", icon = icon("eye")),
+      menuItem("Über uns", tabName = "about", icon = icon("people-group")))),
   
   body <- dashboardBody( 
     introjsUI(),
@@ -162,7 +163,10 @@ ui <- dashboardPage(
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
                 )),
-      ))
+      ),
+      tabItem(tabName = "about",
+              includeHTML("about.html"))
+    )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")
