@@ -206,28 +206,24 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
-      normed.weights[2]*dat_asset[[2]][,4]+
-      normed.weights[3]*dat_asset[[3]][,4]+
-      normed.weights[4]*dat_asset[[4]][,4]+
-      normed.weights[5]*dat_asset[[5]][,4]+
-      normed.weights[6]*dat_asset[[6]][,4]+
-      normed.weights[7]*dat_asset[[7]][,4]
-    
+    # normed.weights <- portfolio_s/sum(portfolio_s)
+    # weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
+    #   normed.weights[2]*dat_asset[[2]][,4]+
+    #   normed.weights[3]*dat_asset[[3]][,4]+
+    #   normed.weights[4]*dat_asset[[4]][,4]+
+    #   normed.weights[5]*dat_asset[[5]][,4]+
+    #   normed.weights[6]*dat_asset[[6]][,4]+
+    #   normed.weights[7]*dat_asset[[7]][,4]
+    # 
     #plot.xts(weighted.portfolio)
     
     
     #weighted portfolio with just close for basic plot
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]]+
-      normed.weights[2]*dat_asset[[2]]+
-      normed.weights[3]*dat_asset[[3]]+
-      normed.weights[4]*dat_asset[[4]]+
-      normed.weights[5]*dat_asset[[5]]+
-      normed.weights[6]*dat_asset[[6]]+
-      normed.weights[7]*dat_asset[[7]]
-    
+    normed.weights <- portfolio_s
+    weighted.portfolio <- dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
+    }
     #plot.xts(weighted.portfolio)
     #in column 4 is "close" of the chosen asset
     
