@@ -57,6 +57,7 @@ ui <- dashboardPage(
                            column(2,
                                   introBox(
                                     numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+
                                     introBox(
                                       numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
                                       data.step = 1,
