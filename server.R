@@ -250,20 +250,6 @@ server <- function(input, output, session) {
     
   })
   
-  #Gewichtsvektor fuer tp von tenpa
-  dat_tp
-  names.ren <- c()
-  for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
-  
-  weights_tp <- c(0,0,0,0,0,0,0)
-  for (i in 1:length(names.ren)){
-    q = names.ren[i]
-    for(d in 1:length(dat_tp_rec[,1])){
-      r <- dat_tp[,1][d]
-      if (r==q) weights_tp[i] <- dat_tp_rec[d,4]
-    }
-  };print(dat_tp_rec);print(weights_tp)
-  
   
   output$mvprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
@@ -293,9 +279,9 @@ server <- function(input, output, session) {
     }
     dat_mvp_rec$Handlung <- h
     dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
-    dat_mvp_rec
+    dat_mvp_rec<<-dat_mvp_rec
   })
-  
+  dat_mvp_rec
   
   output$tprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
