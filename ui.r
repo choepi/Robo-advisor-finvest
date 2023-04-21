@@ -169,7 +169,10 @@ ui <- dashboardPage(
                 )),
       ),
       tabItem(tabName = "about",
-              includeHTML("about.html"))
+              includeHTML("about.html")),
+      
+      tabItem(tabName = "AssetInfo",
+              includeHTML("AssetInfo.html"))
     )
   ),
 )
