@@ -219,36 +219,6 @@ server <- function(input, output, session) {
     #   normed.weights[7]*dat_asset[[7]][,4]
     # 
     #plot.xts(weighted.portfolio)
-    
-    
-    #weighted portfolio with just close for basic plot
-    normed.weights <- portfolio_s
-    weighted.portfolio <- dat_asset[[1]]
-    for (i in 2:(length(asl)-1)){
-      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
-    }
-    #plot.xts(weighted.portfolio)
-    #in column 4 is "close" of the chosen asset
-    
-    start = as.Date(last(index(weighted.portfolio)))
-    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
-    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
-    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
-    
-    
-    if (input$radioHistorie == 1 & b == 1) {
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
-        geom_point(color = "green4")
-    }
-    else if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        geom_line(color = "green4")
-    }
-    else if (input$radioHistorie == 2){
-      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
-    }
-    
-  })
   
   
   output$mvprec <- renderTable({
@@ -282,7 +252,67 @@ server <- function(input, output, session) {
     dat_mvp_rec
   })
   
-  
+ #MVP-Datentransformation(Patrik)
+    datenliste <- list()
+    datenliste$Spalte1 <- 0
+    datenliste$Spalte2 <- 0
+    datenliste$Spalte3 <- 0
+    datenliste$Spalte4 <- 0
+    datenliste$Spalte5 <- 0
+    datenliste$Spalte6 <- 0
+    datenliste$Spalte7 <- 0
+    datenframe <- as.data.frame(datenliste)
+    colnames(datenframe) <- as.character(c("r.SMI","r.SWIBND","r.GOLD","r.BITCOIN","r.SNP500","r.USBND","r.USDCHF"))
+    
+    for(i in 1:nrow(dat_mvp_rec)){
+      datenframe[,as.character(dat_mvp_rec[i,][1])] = as.integer(dat_mvp_rec[i,][4])
+    }
+    mvp_weights <- as.numeric(datenframe[1,])
+    
+    #weighted portfolio with just close for basic plot
+    normed.weights <- portfolio_s
+    weighted.portfolio <- NULL
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
+    }
+    start = as.Date(last(index(weighted.portfolio)))
+    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
+    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
+    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
+    
+    #plot.xts(weighted.portfolio)
+    #in column 4 is "close" of the chosen asset
+    
+    #Same for MVP
+    #weighted portfolio with just close for basic plot
+    weighted.portfolio_mvp <- dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio_mvp <- weighted.portfolio_mvp + mvp_weights[i]*dat_asset[[i]]
+    }
+    start = as.Date(last(index(weighted.portfolio_mvp)))
+    if (b == 0) dat <- window(weighted.portfolio_mvp, start = first(index(weighted.portfolio_mvp)), end=start)
+    else if (b == 1 ) weighted.portfolio_mvp <- window(weighted.portfolio_mvp, start = start, end=start)
+    else weighted.portfolio_mvp <- window(weighted.portfolio_mvp, start = start-b, end=start)
+    
+    
+    if (input$radioHistorie == 1 & b == 1) {
+      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
+        geom_point(color = "green4")
+    }
+    else if (input$radioHistorie == 1 & b != 1){
+      plot <- ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
+        geom_line(color = "green4")
+      plot + geom_line(data = weighted.portfolio_mvp[,4], aes(x = Index, y = Close))
+    }
+    else if (input$radioHistorie == 2){
+      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
+    }
+    
+  }) 
+    
+    
+    
+    
   output$tprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
@@ -315,3 +345,4 @@ server <- function(input, output, session) {
   })
   
 }
+
