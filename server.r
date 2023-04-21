@@ -1,5 +1,5 @@
 server <- function(input, output, session) {
-
+  
   
   # Histogram of the Old Faithful Geyser Data ----
   # with requested number of bins
@@ -15,18 +15,23 @@ server <- function(input, output, session) {
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
-  time_now <- Sys.Date()
+  riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
+  time_now <- Sys.Date() 
+  portfolio_s <<- c(2, 3, 10, 1, 1, 1, 0)
+  portfolio_s2 <<- c(1, 0, 1, 0, 0, 0, 0)
+  portfolio_w <<- 0
+  
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
     cache <- get_data()
     dat_asset <<- cache[[1]]
     ren <<- cache[[2]]
+    riskfree<<- get_rf()
+    saveRDS(riskfree, file = "riskfree.RDS")
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
   }
-  portfolio_s <<- c(1, 0, 1, 0, 0, 0, 0)
-  portfolio_s2 <<- c(1, 0, 0, 0, 0, 0, 0)
-  portfolio_w <<- 0
+  
   
   #info serverfunktion
   hintjs(
@@ -38,9 +43,9 @@ server <- function(input, output, session) {
   observeEvent(c(input$help1,input$help2),
                introjs(session, options = list("nextLabel"="Next",
                                                "prevLabel"="Back"),
-                                               events = list())
+                       events = list())
   )
-
+  
   
   
   output$portfolio1 <- renderPlot({
@@ -50,7 +55,7 @@ server <- function(input, output, session) {
     for (i in 1:length(asl)) {
       portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
     }
-    portfolio_w <- round((portfolio_w), 0)
+    portfolio_w <<- round((portfolio_w), 0)
     
     dat_v <- as.matrix(t(portfolio_w))
     colnames(dat_v) <- asl
@@ -93,16 +98,11 @@ server <- function(input, output, session) {
   
   output$portfolio_worth1 <- renderText({
     #reactive auf inputs
-    portfolio_w <<- portfolio_s
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
-    for (i in 1:length(asl)) {
-      portfolio_w[i] <<- portfolio_s[i] * last(dat_asset[[i]]$Close)
-    }
     w <- round(sum(portfolio_w), 0)
-    paste("Portfolio Value:", w , "$")
+    paste("Portfolio Value:", w , "CHF")
   })
   
   
@@ -138,7 +138,7 @@ server <- function(input, output, session) {
         a <- cbind.fill(a, ren[[i]][,2])
     }
     
-    riskfree <<- 0.01 #anpassen sodass daten aktuell
+    
     dat_v <- tp(a)
     dat_tp <<- data.frame(Asset = rownames(dat_v),
                           Gewicht = c(dat_v))
@@ -191,73 +191,12 @@ server <- function(input, output, session) {
   })
   
   
-  #Plot Protfolio time series
-  output$weighted.portfolio <- renderPlot({
-    if (input$sliderHistorie=="1D") b <- 1 #2d da am sonntag 1tag == 0
-    if (input$sliderHistorie=="5D") b <- 5
-    if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 180
-    if (input$sliderHistorie=="1Y") b <- 365
-    if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="Max.") b <- 0
-    
-    
-    for (i in 1:length(portfolio_s)){
-      input[[paste0("num", as.character(i))]]
-    }
-
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
-      normed.weights[2]*dat_asset[[2]][,4]+
-      normed.weights[3]*dat_asset[[3]][,4]+
-      normed.weights[4]*dat_asset[[4]][,4]+
-      normed.weights[5]*dat_asset[[5]][,4]+
-      normed.weights[6]*dat_asset[[6]][,4]+
-      normed.weights[7]*dat_asset[[7]][,4]
-    
-    #plot.xts(weighted.portfolio)
-
-    
-    #weighted portfolio with just close for basic plot
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]]+
-      normed.weights[2]*dat_asset[[2]]+
-      normed.weights[3]*dat_asset[[3]]+
-      normed.weights[4]*dat_asset[[4]]+
-      normed.weights[5]*dat_asset[[5]]+
-      normed.weights[6]*dat_asset[[6]]+
-      normed.weights[7]*dat_asset[[7]]
-    
-    #plot.xts(weighted.portfolio)
-    #in column 4 is "close" of the chosen asset
-
-    start = as.Date(last(index(weighted.portfolio)))
-    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
-    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
-    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
-    
-
-    if (input$radioHistorie == 1 & b == 1) {
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
-        geom_point(color = "green4")
-    }
-    else if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        geom_line(color = "green4")
-    }
-    else if (input$radioHistorie == 2){
-      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
-    }
-    
-  })
-  
-
   output$mvprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
     dat_mvp_rec <- dat_mvp
-    dat_mvp_rec$Gewicht <- dat_mvp$Gewicht * 100
+    dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht,2) 
     as.data.frame(dat_mvp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
@@ -274,12 +213,13 @@ server <- function(input, output, session) {
     n = length(dat_mvp_rec$Anzahl)
     h = c(rep(NA,n))
     for (i in 1:n){
-      if (dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
-      else if (dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
-      else if (dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+      if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
+      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
+      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Halten"
     }
     dat_mvp_rec$Handlung <- h
     dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
+    dat_mvp_rec<<-dat_mvp_rec
     dat_mvp_rec
   })
   
@@ -289,7 +229,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_tp_rec <- dat_tp
-    dat_tp_rec$Gewicht <- dat_tp$Gewicht * 100
+    dat_tp_rec$Gewicht <- round(dat_tp$Gewicht,2)
     as.data.frame(dat_tp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
@@ -306,13 +246,107 @@ server <- function(input, output, session) {
     n = length(dat_tp_rec$Anzahl)
     h = c(rep(NA,n))
     for (i in 1:n){
-      if (dat_tp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
-      else if (dat_tp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
-      else if (dat_tp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+      if (portfolio_s[i]-dat_tp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
+      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
+      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] == 0) h[i] <- "Halten"
     }
     dat_tp_rec$Handlung <- h
     dat_tp_rec<-dat_tp_rec[order(dat_tp_rec$Investiert,decreasing = T),]
+    dat_tp_rec<<-dat_tp_rec
     dat_tp_rec
   })
   
+  
+  #Plot Protfolio time series
+  output$weighted.portfolio <- renderPlot({
+    if (input$sliderHistorie=="1D") b <- 1 #2d da am sonntag 1tag == 0
+    if (input$sliderHistorie=="5D") b <- 5
+    if (input$sliderHistorie=="1M") b <- 30
+    if (input$sliderHistorie=="6M") b <- 180
+    if (input$sliderHistorie=="1Y") b <- 365
+    if (input$sliderHistorie=="5Y") b <- 5*365
+    if (input$sliderHistorie=="Max.") b <- 0
+    
+    
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    
+    # normed.weights <- portfolio_s/sum(portfolio_s)
+    # weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
+    #   normed.weights[2]*dat_asset[[2]][,4]+
+    #   normed.weights[3]*dat_asset[[3]][,4]+
+    #   normed.weights[4]*dat_asset[[4]][,4]+
+    #   normed.weights[5]*dat_asset[[5]][,4]+
+    #   normed.weights[6]*dat_asset[[6]][,4]+
+    #   normed.weights[7]*dat_asset[[7]][,4]
+    # 
+    #plot.xts(weighted.portfolio)
+    dat_mvp_rec
+    
+    #weighted portfolio with just close for basic plot
+    normed.weights <- portfolio_s
+    weighted.portfolio <- dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
+    }
+    #plot.xts(weighted.portfolio)
+    #in column 4 is "close" of the chosen asset
+    
+    ##############################################
+    names.ren <- c()
+    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    
+    weights_tp <- c(0,0,0,0,0,0,0)
+    for (i in 1:length(names.ren)){
+      q = names.ren[i]
+      for(d in 1:length(dat_tp_rec[,1])){
+        r <- dat_tp[,1][d]
+        if (r==q) weights_tp[i] <- dat_tp_rec[d,4]
+      }
+    };print(dat_tp_rec);print(weights_tp)
+    ###############################################
+    
+    
+    start = as.Date(last(index(weighted.portfolio)))
+    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
+    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
+    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
+    
+    
+    if (input$radioHistorie == 1 & b == 1) {
+      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
+        geom_point(color = "green4")
+    }
+    else if (input$radioHistorie == 1 & b != 1){
+      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
+        geom_line(color = "green4")
+    }
+    else if (input$radioHistorie == 2){
+      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
+    }
+    
+  })
+  
+  
+  
+  
+  
+  # output$vorschlag_diag({
+  #   alpha = (-100:100) / 10 #alpha = 1 => tp, alpha get band von 0-1.5 durch
+  #   walpha = (alpha %o% TP) + ((1 - alpha) %o% as.numeric(MVP))
+  #   preturn = walpha %*% mittel
+  #   pvola = c()
+  #   for (i in 1:16) pvola[i] = sqrt(walpha[i,] %*% (Sigma_t %*% walpha[i,])) * sqrt(260);pvola
+  #   portfolio_s2 <- portfolio_s2/sum(portfolio_s2)
+  #   risk
+  #   zu_invest_verm
+  #   
+  #   calculate_alpha(portfolio_s2,ren)
+  #   
+  #   
+  # 
+  # })
+  
 }
+
