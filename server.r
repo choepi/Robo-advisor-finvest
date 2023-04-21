@@ -223,7 +223,7 @@ server <- function(input, output, session) {
     
     #weighted portfolio with just close for basic plot
     normed.weights <- portfolio_s
-    weighted.portfolio <- dat_asset[[1]]
+    weighted.portfolio <- 0 #dat_asset[[1]]
     for (i in 2:(length(asl)-1)){
       weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
     }
