@@ -38,7 +38,7 @@ ui <- dashboardPage(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
       menuItem("Kurse", tabName = "kurse", icon = icon("eye")),
-      menuItem("AssetInfo", tabName = "AssetInfo", icon = icon("folder-open")),
+      menuItem("Mehr Infos", tabName = "AssetInfo", icon = icon("folder-open")),
       menuItem("Über uns", tabName = "about", icon = icon("people-group")))),
   
   body <- dashboardBody( 
