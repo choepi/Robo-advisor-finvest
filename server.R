@@ -279,9 +279,9 @@ server <- function(input, output, session) {
     }
     dat_mvp_rec$Handlung <- h
     dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
-    dat_mvp_rec<<-dat_mvp_rec
+    dat_mvp_rec
   })
-  dat_mvp_rec
+  
   
   output$tprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
