@@ -18,6 +18,8 @@ library(shinycssloaders)
 library(timevis)
 library(shinyWidgets)
 library(rintrojs)
+library(xml2)
+library(rvest)
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------

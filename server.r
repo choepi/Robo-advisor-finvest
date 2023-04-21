@@ -15,12 +15,15 @@ server <- function(input, output, session) {
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
-  time_now <- Sys.Date()
+  riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
+  time_now <- Sys.Date() 
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
     cache <- get_data()
     dat_asset <<- cache[[1]]
     ren <<- cache[[2]]
+    riskfree<<- get_rf()
+    saveRDS(riskfree, file = "riskfree.RDS")
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
   }
@@ -138,7 +141,7 @@ server <- function(input, output, session) {
         a <- cbind.fill(a, ren[[i]][,2])
     }
     
-    riskfree <<- 0.01 #anpassen sodass daten aktuell
+   
     dat_v <- tp(a)
     dat_tp <<- data.frame(Asset = rownames(dat_v),
                           Gewicht = c(dat_v))
@@ -253,7 +256,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_mvp_rec <- dat_mvp
-    dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht,1) 
+    dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht,2) 
     as.data.frame(dat_mvp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
@@ -285,7 +288,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_tp_rec <- dat_tp
-    dat_tp_rec$Gewicht <- round(dat_tp$Gewicht,1)
+    dat_tp_rec$Gewicht <- round(dat_tp$Gewicht,2)
     as.data.frame(dat_tp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
