@@ -15,12 +15,15 @@ server <- function(input, output, session) {
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
-  time_now <- Sys.Date()
+  riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
+  time_now <- Sys.Date() 
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
     cache <- get_data()
     dat_asset <<- cache[[1]]
     ren <<- cache[[2]]
+    riskfree<<- get_rf()
+    saveRDS(riskfree, file = "riskfree.RDS")
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
   }
@@ -138,7 +141,7 @@ server <- function(input, output, session) {
         a <- cbind.fill(a, ren[[i]][,2])
     }
     
-    riskfree <<- 0.01 #anpassen sodass daten aktuell
+   
     dat_v <- tp(a)
     dat_tp <<- data.frame(Asset = rownames(dat_v),
                           Gewicht = c(dat_v))
@@ -206,28 +209,24 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
-      normed.weights[2]*dat_asset[[2]][,4]+
-      normed.weights[3]*dat_asset[[3]][,4]+
-      normed.weights[4]*dat_asset[[4]][,4]+
-      normed.weights[5]*dat_asset[[5]][,4]+
-      normed.weights[6]*dat_asset[[6]][,4]+
-      normed.weights[7]*dat_asset[[7]][,4]
-    
+    # normed.weights <- portfolio_s/sum(portfolio_s)
+    # weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
+    #   normed.weights[2]*dat_asset[[2]][,4]+
+    #   normed.weights[3]*dat_asset[[3]][,4]+
+    #   normed.weights[4]*dat_asset[[4]][,4]+
+    #   normed.weights[5]*dat_asset[[5]][,4]+
+    #   normed.weights[6]*dat_asset[[6]][,4]+
+    #   normed.weights[7]*dat_asset[[7]][,4]
+    # 
     #plot.xts(weighted.portfolio)
     
     
     #weighted portfolio with just close for basic plot
-    normed.weights <- portfolio_s/sum(portfolio_s)
-    weighted.portfolio <<- normed.weights[1]*dat_asset[[1]]+
-      normed.weights[2]*dat_asset[[2]]+
-      normed.weights[3]*dat_asset[[3]]+
-      normed.weights[4]*dat_asset[[4]]+
-      normed.weights[5]*dat_asset[[5]]+
-      normed.weights[6]*dat_asset[[6]]+
-      normed.weights[7]*dat_asset[[7]]
-    
+    normed.weights <- portfolio_s
+    weighted.portfolio <- dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
+    }
     #plot.xts(weighted.portfolio)
     #in column 4 is "close" of the chosen asset
     
@@ -257,7 +256,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_mvp_rec <- dat_mvp
-    dat_mvp_rec$Gewicht <- dat_mvp$Gewicht * 100
+    dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht,2) 
     as.data.frame(dat_mvp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
@@ -274,9 +273,9 @@ server <- function(input, output, session) {
     n = length(dat_mvp_rec$Anzahl)
     h = c(rep(NA,n))
     for (i in 1:n){
-      if (dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
-      else if (dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
-      else if (dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+      if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
+      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
+      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Halten"
     }
     dat_mvp_rec$Handlung <- h
     dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
@@ -289,7 +288,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_tp_rec <- dat_tp
-    dat_tp_rec$Gewicht <- dat_tp$Gewicht * 100
+    dat_tp_rec$Gewicht <- round(dat_tp$Gewicht,2)
     as.data.frame(dat_tp_rec)
     g <- c(portfolio_w)
     g <- g[g != 0]
@@ -306,9 +305,9 @@ server <- function(input, output, session) {
     n = length(dat_tp_rec$Anzahl)
     h = c(rep(NA,n))
     for (i in 1:n){
-      if (dat_tp_rec$Anzahl[i] < 0) h[i] <- "Shorten"
-      else if (dat_tp_rec$Anzahl[i] > 0) h[i] <- "Kaufen"
-      else if (dat_tp_rec$Anzahl[i] == 0) h[i] <- "Nicht Kaufen"
+      if (portfolio_s[i]-dat_tp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
+      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
+      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] == 0) h[i] <- "Halten"
     }
     dat_tp_rec$Handlung <- h
     dat_tp_rec<-dat_tp_rec[order(dat_tp_rec$Investiert,decreasing = T),]
