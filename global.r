@@ -16,8 +16,13 @@ cbind.fill <- function(...) {
     ))))  #ignore error!
 }
 
+usdchf <- function(){
+  usd_chf <- getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4]
+  colnames(usd_chf) <- "Close"
+  usd_chf <<- usd_chf**-1
+}
+
 get_data <- function() {
-  end <- Sys.Date()
   l <- list(rep(NA, length(assets_list)))
   Stocks <- suppressWarnings(lapply(assets_list, getSymbols, auto.assign = FALSE))
   Stocks <- setNames(Stocks, asl)
@@ -34,38 +39,39 @@ get_data <- function() {
     attributes(l[[i]])$na.action <- NULL
   }
   
-  # #interpolate usd to everyday
-  # times.init <-index(l[[7]])
-  # data2 <-zoo(l[[7]],times.init)
-  # data3 <-merge(data2, zoo(, seq(min(times.init), max(times.init), "day")))
-  # l[[7]] <-na.approx(data3)
-  # 
+  #remove weekend from bitcoin
+  x <- l[[4]]
+  x <-x[.indexwday(x) %in% 1:5]
+  replace(l, 4, x)
+  l[[4]] <- x
+  
+  
   # #change usd to chf
   # usd = c(0,0,1,1,1,1) # 1 if asset is usd
   # for (p in length(usd)){
   #   if (usd[p] ==1){
-  #     usd_ts <- l[[p]]
-  #     chf_ts <- usd_ts
+  #     usd_ts <- as.data.frame(l[[p]])
+  #     chf_ts <- as.data.frame(usd_ts)
   #       for (i in 1:length(usd_ts[,1])) {
   #         id <- index(usd_ts)[i]
-  #         fx_rate <- as.numeric(l[[7]]$Close[id]);fx_rate
-  #         chf_ts[id] <- usd_ts[id]*fx_rate
+  #         fx_rate <- as.numeric(usd_chf[id,]);fx_rate
+  #         chf_ts[id,] <- usd_ts[id,]*fx_rate
   #       }
-  #     l[[p]] <- chf_ts
+  #     l[[p]] <- na.omit(chf_ts)
   #   }
   # }
   
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(Stocks[[i]][,4])
-    b <- suppressWarnings(dailyReturn(Stocks[[i]],type='log'))
+    b <- suppressWarnings(dailyReturn(Stocks[[i]],type='arithmetic'))
     r <- as.data.frame(r)
     r$rendite <- b
     r <- as.xts(r)
     colnames(r) <-
       c("Close",paste0("r.", asl[i]))
     ren[[i]] <- na.omit(r)
-    attributes(ren[[i]])$na.action <- NUL-L
+    attributes(ren[[i]])$na.action <- NULL
   }
   data <- list(l,ren)
   return(data)
@@ -90,14 +96,14 @@ calculate_alpha <- function(weights, returns_list) {
 mvp <- function(y) {
   N = dim(y)[1]
   N2 = dim(y)[2]
-  y <- na_locf(y)#!!!!!wichtig
+  y <- na_locf(y)#!!!!!wichtig1
   mittel <<- t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
   MVP1 <<- solve(Sigma) %*% rep(1, N2)
   MVP <<- MVP1 / sum(MVP1)
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
-  return(as.array((MVP)))
+  return(as.array(MVP))
 }
 
 
@@ -111,7 +117,7 @@ tp <- function(y) {
   TP <<- TP[, 1]
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma_t %*% TP)) * sqrt(260)
-  return(as.array((TP)))
+  return(as.array(TP))
 }
 
 
@@ -127,7 +133,7 @@ get_rf <- function() {
       x = pagecode_clean[1],
       start = 1,
       stop = nchar(pagecode_clean[1]) - 1
-    )) # rf return yourmoney return(rf)
+    ))/100 # rf return yourmoney return(rf)
 }
 
 portfolio_w_F <- function() {
@@ -171,7 +177,7 @@ dat_mvp_rec_F <- function() {
   lp <- c(1:length(g))
   g <- sum(g)
   g <- g * dat_mvp[lp, 2]
-  dat_mvp_rec$Investiert <- abs(g)
+  dat_mvp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
@@ -190,7 +196,7 @@ dat_mvp_rec_F <- function() {
   }
   dat_mvp_rec$Handlung <- h
   dat_mvp_rec <-
-    dat_mvp_rec[order(dat_mvp_rec$Investiert, decreasing = T), ]
+    dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
 }
 
@@ -204,7 +210,7 @@ dat_tp_rec_F <- function() {
   lp <- c(1:length(g))
   g <- sum(g)
   g <- g * dat_tp[lp, 2]
-  dat_tp_rec$Investiert <- abs(g)
+  dat_tp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
@@ -223,7 +229,7 @@ dat_tp_rec_F <- function() {
   }
   dat_tp_rec$Handlung <- h
   dat_tp_rec <-
-    dat_tp_rec[order(dat_tp_rec$Investiert, decreasing = T), ]
+    dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
 }
 

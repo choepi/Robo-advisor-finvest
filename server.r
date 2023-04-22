@@ -3,8 +3,9 @@ server <- function(input, output, session) {
   #data initialization
   assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX")
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND")
-  fx <<-c("CHF=X")
-  fxl <<-c("USDCHF")
+  fx <<-"CHF=X"
+  fxn <<-"USDCHF"
+  usdchf()
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
@@ -175,6 +176,25 @@ server <- function(input, output, session) {
     
     dat_mvp_rec_F()
     dat_mvp_rec
+  })
+  
+  
+  output$mvprec_inf <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    mvprec_inf <- data.frame("Volatilität"=round(mvpvola,2),
+                                "Rendite"=round(mvpreturn,2))
+    mvprec_inf
+  })
+  
+  output$tprec_inf <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
+                             "Rendite"=round(tpreturn,2))
+    tprec_inf
   })
   
   
