@@ -71,8 +71,6 @@ ui <- dashboardPage(
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)),
-                           column(2,
-                                  numericInput("num7", label = h5("USDCHF"), value = 0, width = 100, min = 0)),
                            
                            mainPanel(
                              introBox(
@@ -106,8 +104,7 @@ ui <- dashboardPage(
                                     checkboxInput("checkbox4", "BITCOIN", value = F)),
                              column(5,
                                     checkboxInput("checkbox5", "SNP500", value = F),
-                                    checkboxInput("checkbox6", "USBND", value = F),
-                                    checkboxInput("checkbox7", "USD", value = F))),
+                                    checkboxInput("checkbox6", "USBND", value = F))),
                          )),
               ))
       ),
