@@ -65,7 +65,7 @@ get_data <- function() {
     colnames(r) <-
       c("Close",paste0("r.", asl[i]))
     ren[[i]] <- na.omit(r)
-    attributes(ren[[i]])$na.action <- NULL
+    attributes(ren[[i]])$na.action <- NUL-L
   }
   data <- list(l,ren)
   return(data)
@@ -129,3 +129,102 @@ get_rf <- function() {
       stop = nchar(pagecode_clean[1]) - 1
     )) # rf return yourmoney return(rf)
 }
+
+portfolio_w_F <- function() {
+  portfolio_w <- c()
+  for (i in 1:length(portfolio_s)) {
+    portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+  }
+  portfolio_w <<- round((portfolio_w), 0)
+}
+
+dat_mvp_F <- function() {
+  a <- data.frame()
+  for (i in 1:length(portfolio_s)) {
+    if (portfolio_s[i] > 0)
+      a <- cbind.fill(a, ren[[i]][, 2])
+  }
+  dat_v <- mvp(a)
+  
+  dat_mvp <<- data.frame(Asset = rownames(dat_v),
+                         Gewicht = c(dat_v))
+}
+
+
+dat_tp_F <- function() {
+  a <- data.frame()
+  for (i in 1:length(portfolio_s)) {
+    if (portfolio_s[i] > 0)
+      a <- cbind.fill(a, ren[[i]][, 2])
+  }
+  dat_v <- tp(a)
+  dat_tp <<- data.frame(Asset = rownames(dat_v),
+                        Gewicht = c(dat_v))
+}
+
+dat_mvp_rec_F <- function() {
+  dat_mvp_rec <- dat_mvp
+  dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht, 2)
+  as.data.frame(dat_mvp_rec)
+  g <- c(portfolio_w)
+  g <- g[g != 0]
+  lp <- c(1:length(g))
+  g <- sum(g)
+  g <- g * dat_mvp[lp, 2]
+  dat_mvp_rec$Investiert <- abs(g)
+  pa <- portfolio_w
+  for (i in 1:length(asl)) {
+    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+  }
+  pa <- pa[pa != 0]
+  dat_mvp_rec$Anzahl <- round(g / pa)
+  n = length(dat_mvp_rec$Anzahl)
+  h = c(rep(NA, n))
+  for (i in 1:n) {
+    if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] < 0)
+      h[i] <- "Kaufen"
+    else if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] > 0)
+      h[i] <- "Verkaufen"
+    else if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] == 0)
+      h[i] <- "Halten"
+  }
+  dat_mvp_rec$Handlung <- h
+  dat_mvp_rec <-
+    dat_mvp_rec[order(dat_mvp_rec$Investiert, decreasing = T), ]
+  dat_mvp_rec <<- dat_mvp_rec
+}
+
+
+dat_tp_rec_F <- function() {
+  dat_tp_rec <- dat_tp
+  dat_tp_rec$Gewicht <- round(dat_tp$Gewicht, 2)
+  as.data.frame(dat_tp_rec)
+  g <- c(portfolio_w)
+  g <- g[g != 0]
+  lp <- c(1:length(g))
+  g <- sum(g)
+  g <- g * dat_tp[lp, 2]
+  dat_tp_rec$Investiert <- abs(g)
+  pa <- portfolio_w
+  for (i in 1:length(asl)) {
+    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+  }
+  pa <- pa[pa != 0]
+  dat_tp_rec$Anzahl <- round(g / pa)
+  n = length(dat_tp_rec$Anzahl)
+  h = c(rep(NA, n))
+  for (i in 1:n) {
+    if (portfolio_s[i] - dat_tp_rec$Anzahl[i] < 0)
+      h[i] <- "Kaufen"
+    else if (portfolio_s[i] - dat_tp_rec$Anzahl[i] > 0)
+      h[i] <- "Verkaufen"
+    else if (portfolio_s[i] - dat_tp_rec$Anzahl[i] == 0)
+      h[i] <- "Halten"
+  }
+  dat_tp_rec$Handlung <- h
+  dat_tp_rec <-
+    dat_tp_rec[order(dat_tp_rec$Investiert, decreasing = T), ]
+  dat_tp_rec <<- dat_tp_rec
+}
+
+

@@ -111,8 +111,8 @@ ui <- dashboardPage(
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
               h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-              mainPanel(tabsetPanel(
-                id = "tabsetPanelID",
+              tabsetPanel(
+                id = "ergebnis",
                 type = "tabs",
                 tabPanel("Historie",
                          sliderTextInput(
@@ -135,7 +135,7 @@ ui <- dashboardPage(
                          fluidRow(
                            tableOutput("tprec"),
                            plotOutput("tp", width = "60%")))
-              ))
+              )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
