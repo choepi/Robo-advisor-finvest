@@ -1,22 +1,22 @@
 server <- function(input, output, session) {
   
-  
-  # Histogram of the Old Faithful Geyser Data ----
-  # with requested number of bins
-  # This expression that generates a histogram is wrapped in a call
-  # to renderPlot to indicate that:
-  #
-  # 1. It is "reactive" and therefore should be automatically
-  #    re-executed when inputs (input$bins) change
-  # 2. Its output type is a plot
-  
   #data initialization
-  assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX","CHF=X")
-  asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND","USDCHF")
+  assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX")
+  asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND")
+  fx <<-c("CHF=X")
+  fxl <<-c("USDCHF")
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
+  portfolio_s <<- c(1, 0, 1, 0, 0, 0)
+  portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
+  portfolio_w_F()
+  dat_mvp_F()
+  dat_tp_F()
+  dat_mvp_rec_F()
+  dat_tp_rec_F()
+  
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
     cache <- get_data()
@@ -27,10 +27,7 @@ server <- function(input, output, session) {
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
   }
-  portfolio_s <<- c(1, 0, 1, 0, 0, 0, 0)
-  portfolio_s2 <<- c(1, 0, 0, 0, 0, 0, 0)
-  portfolio_w <<- 0
-  
+
   #info serverfunktion
   hintjs(
     session,
@@ -47,13 +44,9 @@ server <- function(input, output, session) {
   
   
   output$portfolio1 <- renderPlot({
-    for (i in 1:length(portfolio_s)) {
+    for (i in 1:length(asl)) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
-    for (i in 1:length(asl)) {
-      portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
-    }
-    portfolio_w <- round((portfolio_w), 0)
     
     dat_v <- as.matrix(t(portfolio_w))
     colnames(dat_v) <- asl
@@ -69,7 +62,7 @@ server <- function(input, output, session) {
   
   
   output$portfolio2 <-  renderPlot({
-    for (i in 1:(length(portfolio_s2))) {
+    for (i in 1:(length(asl))) {
       portfolio_s2[i] <<- if (input[[paste0("checkbox", as.character(i))]]) 1
     }
     
@@ -100,12 +93,9 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
-    for (i in 1:length(asl)) {
-      portfolio_w[i] <<- portfolio_s[i] * last(dat_asset[[i]]$Close)
-    }
+    portfolio_w_F()
     w <- round(sum(portfolio_w), 0)
-    paste("Portfolio Value:", w , "$")
+    paste("Portfolio Value:", w , "CHF")
   })
   
   
@@ -113,15 +103,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    a <- data.frame()
-    for (i in 1:length(portfolio_s)) {
-      if (portfolio_s[i] > 0)
-        a <- cbind.fill(a, ren[[i]][,2])
-    }
-    dat_v <- mvp(a)
-    
-    dat_mvp <<- data.frame(Asset = rownames(dat_v),
-                           Gewicht = c(dat_v))
+    dat_mvp_F()
     ggplot(dat_mvp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
@@ -135,16 +117,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    a <- data.frame()
-    for (i in 1:length(portfolio_s)) {
-      if (portfolio_s[i] > 0)
-        a <- cbind.fill(a, ren[[i]][,2])
-    }
     
-   
-    dat_v <- tp(a)
-    dat_tp <<- data.frame(Asset = rownames(dat_v),
-                          Gewicht = c(dat_v))
+    dat_tp_F()
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
@@ -255,30 +229,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    dat_mvp_rec <- dat_mvp
-    dat_mvp_rec$Gewicht <- round(dat_mvp$Gewicht,2) 
-    as.data.frame(dat_mvp_rec)
-    g <- c(portfolio_w)
-    g <- g[g != 0]
-    lp <- c(1:length(g))
-    g <- sum(g)
-    g <- g * dat_mvp[lp, 2]
-    dat_mvp_rec$Investiert <- abs(g)
-    pa <- portfolio_w
-    for (i in 1:length(asl)) {
-      pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
-    }
-    pa <- pa[pa != 0]
-    dat_mvp_rec$Anzahl <- round(g/pa)
-    n = length(dat_mvp_rec$Anzahl)
-    h = c(rep(NA,n))
-    for (i in 1:n){
-      if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
-      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
-      else if (portfolio_s[i]-dat_mvp_rec$Anzahl[i] == 0) h[i] <- "Halten"
-    }
-    dat_mvp_rec$Handlung <- h
-    dat_mvp_rec<-dat_mvp_rec[order(dat_mvp_rec$Investiert,decreasing = T),]
+    
+    dat_mvp_rec_F()
     dat_mvp_rec
   })
   
@@ -287,30 +239,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    dat_tp_rec <- dat_tp
-    dat_tp_rec$Gewicht <- round(dat_tp$Gewicht,2)
-    as.data.frame(dat_tp_rec)
-    g <- c(portfolio_w)
-    g <- g[g != 0]
-    lp <- c(1:length(g))
-    g <- sum(g)
-    g <- g * dat_tp[lp, 2]
-    dat_tp_rec$Investiert <- abs(g)
-    pa <- portfolio_w
-    for (i in 1:length(asl)) {
-      pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
-    }
-    pa <- pa[pa != 0]
-    dat_tp_rec$Anzahl <- round(g/pa)
-    n = length(dat_tp_rec$Anzahl)
-    h = c(rep(NA,n))
-    for (i in 1:n){
-      if (portfolio_s[i]-dat_tp_rec$Anzahl[i] < 0) h[i] <- "Kaufen"
-      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] > 0) h[i] <- "Verkaufen"
-      else if (portfolio_s[i]-dat_tp_rec$Anzahl[i] == 0) h[i] <- "Halten"
-    }
-    dat_tp_rec$Handlung <- h
-    dat_tp_rec<-dat_tp_rec[order(dat_tp_rec$Investiert,decreasing = T),]
+    dat_tp_rec_F()
     dat_tp_rec
   })
   
