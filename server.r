@@ -94,7 +94,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    w <- round(sum(portfolio_w), 0)
+    w <- round(sum(portfolio_w), 1)
     paste("Portfolio Value:", w , "CHF")
   })
   
