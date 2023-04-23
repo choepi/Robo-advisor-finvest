@@ -131,11 +131,13 @@ ui <- dashboardPage(
                 tabPanel("MVP",
                          fluidRow(
                            tableOutput("mvprec"),
-                           plotOutput("mvp",width = "60%"))),
+                           plotOutput("mvp",width = "60%"),
+                           tableOutput("mvprec_inf"))),
                 tabPanel("TP",
                          fluidRow(
                            tableOutput("tprec"),
-                           plotOutput("tp", width = "60%")))
+                           plotOutput("tp", width = "60%"),
+                           tableOutput("tprec_inf")))
               ))
       ),
       tabItem(tabName = "kurse",

@@ -16,8 +16,13 @@ cbind.fill <- function(...) {
     ))))  #ignore error!
 }
 
+usdchf <- function(){
+  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4])
+  colnames(usd_chf) <- "usd_chf"
+  usd_chf <<- usd_chf
+}
+
 get_data <- function() {
-  end <- Sys.Date()
   l <- list(rep(NA, length(assets_list)))
   Stocks <- suppressWarnings(lapply(assets_list, getSymbols, auto.assign = FALSE))
   Stocks <- setNames(Stocks, asl)
@@ -34,31 +39,36 @@ get_data <- function() {
     attributes(l[[i]])$na.action <- NULL
   }
   
-  # #interpolate usd to everyday
-  # times.init <-index(l[[7]])
-  # data2 <-zoo(l[[7]],times.init)
-  # data3 <-merge(data2, zoo(, seq(min(times.init), max(times.init), "day")))
-  # l[[7]] <-na.approx(data3)
-  # 
-  # #change usd to chf
-  # usd = c(0,0,1,1,1,1) # 1 if asset is usd
-  # for (p in length(usd)){
-  #   if (usd[p] ==1){
-  #     usd_ts <- l[[p]]
-  #     chf_ts <- usd_ts
-  #       for (i in 1:length(usd_ts[,1])) {
-  #         id <- index(usd_ts)[i]
-  #         fx_rate <- as.numeric(l[[7]]$Close[id]);fx_rate
-  #         chf_ts[id] <- usd_ts[id]*fx_rate
-  #       }
-  #     l[[p]] <- chf_ts
-  #   }
-  # }
+  #remove weekend from bitcoin
+  x <- l[[4]]
+  l[[4]] <- NA
+  x <-x[.indexwday(x) %in% 1:5]
+  l[[4]] <- x
+  
+  
+  #change usd to chf
+  usd = c(0,0,1,1,1,1) # 1 if asset is usd
+  for (p in 1:length(usd)){
+    q <- usd[p]
+    if(q>=1){
+      usd_ts <- l[[p]]
+      chf_ts <- na.omit(merge(usd_ts,usd_chf, all=F))
+      attributes(chf_ts)$na.action <- NULL
+      for (i in 1:length(colnames(usd_ts))) {
+        chf_ts[,i] <- chf_ts[,i]*chf_ts[,7]
+      }
+      chf_ts <- chf_ts[,-7]
+      l[[p]] <- NA
+      l[[p]] <- as.xts(na.omit(chf_ts))
+    }
+  }
+  
+  
   
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(Stocks[[i]][,4])
-    b <- suppressWarnings(dailyReturn(Stocks[[i]],type='log'))
+    b <- suppressWarnings(dailyReturn(Stocks[[i]],type='arithmetic'))
     r <- as.data.frame(r)
     r$rendite <- b
     r <- as.xts(r)
@@ -90,14 +100,14 @@ calculate_alpha <- function(weights, returns_list) {
 mvp <- function(y) {
   N = dim(y)[1]
   N2 = dim(y)[2]
-  y <- na_locf(y)#!!!!!wichtig
+  y <- na_locf(y)#!!!!!wichtig1
   mittel <<- t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
   MVP1 <<- solve(Sigma) %*% rep(1, N2)
   MVP <<- MVP1 / sum(MVP1)
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
-  return(as.array((MVP)))
+  return(as.array(MVP))
 }
 
 
@@ -111,7 +121,7 @@ tp <- function(y) {
   TP <<- TP[, 1]
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma_t %*% TP)) * sqrt(260)
-  return(as.array((TP)))
+  return(as.array(TP))
 }
 
 
@@ -127,7 +137,7 @@ get_rf <- function() {
       x = pagecode_clean[1],
       start = 1,
       stop = nchar(pagecode_clean[1]) - 1
-    )) # rf return yourmoney return(rf)
+    ))/100 # rf return yourmoney return(rf)
 }
 
 portfolio_w_F <- function() {
@@ -135,7 +145,7 @@ portfolio_w_F <- function() {
   for (i in 1:length(portfolio_s)) {
     portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
-  portfolio_w <<- round((portfolio_w), 0)
+  portfolio_w <<- round((portfolio_w), 1)
 }
 
 dat_mvp_F <- function() {
@@ -171,7 +181,7 @@ dat_mvp_rec_F <- function() {
   lp <- c(1:length(g))
   g <- sum(g)
   g <- g * dat_mvp[lp, 2]
-  dat_mvp_rec$Investiert <- abs(g)
+  dat_mvp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
@@ -189,7 +199,8 @@ dat_mvp_rec_F <- function() {
       h[i] <- "Halten"
   }
   dat_mvp_rec$Handlung <- h
-  dat_mvp_rec <-dat_mvp_rec[order(dat_mvp_rec$Investiert, decreasing = T), ]
+  dat_mvp_rec <-
+    dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
 }
 
@@ -203,7 +214,7 @@ dat_tp_rec_F <- function() {
   lp <- c(1:length(g))
   g <- sum(g)
   g <- g * dat_tp[lp, 2]
-  dat_tp_rec$Investiert <- abs(g)
+  dat_tp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
@@ -222,6 +233,7 @@ dat_tp_rec_F <- function() {
   }
   dat_tp_rec$Handlung <- h
   dat_tp_rec <-
-    dat_tp_rec[order(dat_tp_rec$Investiert, decreasing = T), ]
+    dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
 }
+
