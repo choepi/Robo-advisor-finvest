@@ -17,9 +17,9 @@ cbind.fill <- function(...) {
 }
 
 usdchf <- function(){
-  usd_chf <- getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4]
-  colnames(usd_chf) <- "Close"
-  usd_chf <<- usd_chf**-1
+  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4])
+  colnames(usd_chf) <- "usd_chf"
+  usd_chf <<- usd_chf
 }
 
 get_data <- function() {
@@ -46,20 +46,24 @@ get_data <- function() {
   l[[4]] <- x
   
   
-  # #change usd to chf
-  # usd = c(0,0,1,1,1,1) # 1 if asset is usd
-  # for (p in length(usd)){
-  #   if (usd[p] ==1){
-  #     usd_ts <- as.data.frame(l[[p]])
-  #     chf_ts <- as.data.frame(usd_ts)
-  #       for (i in 1:length(usd_ts[,1])) {
-  #         id <- index(usd_ts)[i]
-  #         fx_rate <- as.numeric(usd_chf[id,]);fx_rate
-  #         chf_ts[id,] <- usd_ts[id,]*fx_rate
-  #       }
-  #     l[[p]] <- na.omit(chf_ts)
-  #   }
-  # }
+  #change usd to chf
+  usd = c(0,0,1,1,1,1) # 1 if asset is usd
+  for (p in 1:length(usd)){
+    q <- usd[p]
+      if(q>=1){
+      usd_ts <- l[[p]]
+      chf_ts <- na.omit(merge(usd_ts,usd_chf, all=F))
+      attributes(chf_ts)$na.action <- NULL
+      for (i in 1:length(colnames(usd_ts))) {
+        chf_ts[,i] <- chf_ts[,i]*chf_ts[,7]
+      }
+      chf_ts <- chf_ts[,-7]
+      l[[p]] <- NA
+      l[[p]] <- as.xts(na.omit(chf_ts))
+    }
+  }
+  
+  
   
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
@@ -141,7 +145,7 @@ portfolio_w_F <- function() {
   for (i in 1:length(portfolio_s)) {
     portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
-  portfolio_w <<- round((portfolio_w), 0)
+  portfolio_w <<- round((portfolio_w), 1)
 }
 
 dat_mvp_F <- function() {
@@ -232,4 +236,5 @@ dat_tp_rec_F <- function() {
     dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
 }
+
 
