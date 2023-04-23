@@ -3,13 +3,14 @@ server <- function(input, output, session) {
   #data initialization
   assets_list <<- c("^SSMI","CSBGC0.SW","GC=F","BTC-USD","^GSPC","^TNX")
   asl <<- c("SMI","SWIBND","GOLD","BITCOIN","SNP500","USBND")
-  fx <<-c("CHF=X")
-  fxl <<-c("USDCHF")
+  fx <<-"CHF=X"
+  fxn <<-"USDCHF"
+  usdchf()
   dat_asset <<- readRDS("database_price.RDS")#database einlesen
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
-  portfolio_s <<- c(1, 0, 1, 0, 0, 0)
+  portfolio_s <<- c(1, 1, 1, 1, 1, 1)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
   dat_mvp_F()
@@ -27,7 +28,7 @@ server <- function(input, output, session) {
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
   }
-
+  
   #info serverfunktion
   hintjs(
     session,
@@ -48,6 +49,7 @@ server <- function(input, output, session) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
     
+    portfolio_w_F()
     dat_v <- as.matrix(t(portfolio_w))
     colnames(dat_v) <- asl
     dat_port <- data.frame(group = colnames(dat_v),
@@ -62,7 +64,7 @@ server <- function(input, output, session) {
   
   
   output$portfolio2 <-  renderPlot({
-    for (i in 1:(length(asl))) {
+    for (i in 1:(length(portfolio_s2))) {
       portfolio_s2[i] <<- if (input[[paste0("checkbox", as.character(i))]]) 1
     }
     
@@ -89,11 +91,9 @@ server <- function(input, output, session) {
   
   output$portfolio_worth1 <- renderText({
     #reactive auf inputs
-    portfolio_w <<- portfolio_s
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    portfolio_w_F()
     w <- round(sum(portfolio_w), 0)
     paste("Portfolio Value:", w , "CHF")
   })
@@ -239,8 +239,31 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
+    
     dat_tp_rec_F()
     dat_tp_rec
   })
+  
+  
+  output$mvprec_inf <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    mvprec_inf <- data.frame("Volatilität"=round(mvpvola,2),
+                             "Rendite"=round(mvpreturn,2))
+    mvprec_inf
+  })
+  
+  output$tprec_inf <- renderTable({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
+                            "Rendite"=round(tpreturn,2))
+    tprec_inf
+  })
+  
+  
+
   
 }
