@@ -38,6 +38,7 @@ ui <- dashboardPage(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
       menuItem("Kurse", tabName = "kurse", icon = icon("eye")),
+      menuItem("Mehr Infos", tabName = "AssetInfo", icon = icon("folder-open")),
       menuItem("Über uns", tabName = "about", icon = icon("people-group")))),
   
   body <- dashboardBody( 
@@ -111,8 +112,8 @@ ui <- dashboardPage(
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
               h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-              tabsetPanel(
-                id = "ergebnis",
+              mainPanel(tabsetPanel(
+                id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
                          sliderTextInput(
@@ -137,7 +138,7 @@ ui <- dashboardPage(
                            tableOutput("tprec"),
                            plotOutput("tp", width = "60%"),
                            tableOutput("tprec_inf")))
-              )
+              ))
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
@@ -167,7 +168,10 @@ ui <- dashboardPage(
                 )),
       ),
       tabItem(tabName = "about",
-              includeHTML("about.html"))
+              includeHTML("about.html")),
+      
+      tabItem(tabName = "AssetInfo",
+              includeHTML("AssetInfo.html"))
     )
   ),
 )
