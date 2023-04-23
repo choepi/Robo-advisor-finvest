@@ -41,8 +41,8 @@ get_data <- function() {
   
   #remove weekend from bitcoin
   x <- l[[4]]
+  l[[4]] <- NA
   x <-x[.indexwday(x) %in% 1:5]
-  replace(l, 4, x)
   l[[4]] <- x
   
   
