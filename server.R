@@ -10,7 +10,7 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
-  portfolio_s <<- c(1, 1, 1, 1, 1, 1)
+  portfolio_s <<- c(1, 0, 1, 0, 0, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
   dat_mvp_F()
@@ -117,8 +117,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
-    dat_tp_F()
+    input$shortpara
+    dat_tp_F(input$shortpara)
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
@@ -183,6 +183,10 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     
+    for (i in 1:length(dat_mvp_rec)){
+      input[[paste0("num", as.character(i))]]
+    }
+    
     # normed.weights <- portfolio_s/sum(portfolio_s)
     # weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
     #   normed.weights[2]*dat_asset[[2]][,4]+
@@ -206,10 +210,6 @@ server <- function(input, output, session) {
     else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
     else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
     
-    
-    
-    
-    
     #weighted portfolio TP
     names.ren <- c()
     for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
@@ -230,17 +230,25 @@ server <- function(input, output, session) {
     else if (b == 1 ) weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
     else weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    #weighted portfolio MVP
+    names.ren <- c()
+    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    weights_mvp <- c(0,0,0,0,0,0,0)
+    for (i in 1:length(names.ren)){
+      q = names.ren[i]
+      for(d in 1:length(dat_mvp_rec[,1])){
+        r <- dat_tp[,1][d]
+        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,4]
+      }
+    };print(dat_mvp_rec);print(weights_mvp)
+    weighted.portfolio.mvp <- 0 #dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio.mvp  <- weighted.portfolio.mvp  + weights_mvp[i]*dat_asset[[i]]
+    }
+    start = as.Date(last(index(weighted.portfolio.mvp)))
+    if (b == 0) dat <- window(weighted.portfolio.mvp, start = first(index(weighted.portfolio.mvp)), end=start)
+    else if (b == 1 ) weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
+    else weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
     
     
     if (input$radioHistorie == 1 & b == 1) {
@@ -249,8 +257,9 @@ server <- function(input, output, session) {
     }
     else if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        geom_line(color = "green4")+
-        geom_line(data = weighted.portfolio.tp[,4], aes(x = Index, y = Close))
+        #geom_line(color = "green4")+
+        geom_line(data = weighted.portfolio.mvp[,4], aes(x = Index, y = Close))
+        #geom_line(data = weighted.portfolio.tp[,4], aes(x = Index, y = Close), color = "red")
     }
     else if (input$radioHistorie == 2){
       chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
