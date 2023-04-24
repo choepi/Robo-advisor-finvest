@@ -176,76 +176,125 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="Max.") b <- 0
-    
+    if (input$sliderHistorie=="10Y") b <- 10*365
+    dat_mvp_F()
+    dat_tp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
     
     for (i in 1:length(portfolio_s)){
       input[[paste0("num", as.character(i))]]
     }
     
-    # normed.weights <- portfolio_s/sum(portfolio_s)
-    # weighted.portfolio <<- normed.weights[1]*dat_asset[[1]][,4]+
-    #   normed.weights[2]*dat_asset[[2]][,4]+
-    #   normed.weights[3]*dat_asset[[3]][,4]+
-    #   normed.weights[4]*dat_asset[[4]][,4]+
-    #   normed.weights[5]*dat_asset[[5]][,4]+
-    #   normed.weights[6]*dat_asset[[6]][,4]+
-    #   normed.weights[7]*dat_asset[[7]][,4]
-    # 
-    #plot.xts(weighted.portfolio)
-    
+    start = Sys.Date()  #gewünschter zeit horizont
+    if (b == 1 ){
+      w = start
+    }else{
+      w = start-b
+    }
     
     #weighted portfolio basic
-    normed.weights <- portfolio_s
-    weighted.portfolio <- 0 #dat_asset[[1]]
-    for (i in 2:(length(asl)-1)){
-      weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
+    ######################
+
+    c.old <- rep(0,length(portfolio_w))
+    for(s in 1:length(portfolio_w)){
+      if (portfolio_w[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
+    };c.old
+    weight <- portfolio_w
+    for (i in 1:length(portfolio_w)){
+      if (portfolio_w[i]>0){
+        weight[i] <- weight[i]/c.old[i]
+      }
     }
-    start = as.Date(last(index(weighted.portfolio)))
-    if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
-    else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
-    else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
+    ######################
+    weighted.portfolio <- 0 #dat_asset[[1]]
+    for (i in 1:(length(asl))){
+      weighted.portfolio <- weighted.portfolio + weight[i]*dat_asset[[i]]
+    }
+    weighted.portfolio <- na.omit(weighted.portfolio)
+    
+    
+    if (b == 1 ){
+      weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
+    }else{
+      weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
+    }
     
     #weighted portfolio TP
-    names.ren <- c()
-    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    names.ren.tp <- c()
+    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,2]))
     weights_tp <- c(0,0,0,0,0,0,0)
-    for (i in 1:length(names.ren)){
-      q = names.ren[i]
+    
+    for (i in 1:length(names.ren.tp)){
+      q = names.ren.tp[i]
       for(d in 1:length(dat_tp_rec[,1])){
         r <- dat_tp[,1][d]
-        if (r==q) weights_tp[i] <- dat_tp_rec[d,4]
+        if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
       }
     };print(dat_tp_rec);print(weights_tp)
+    
+    ######################
+    c.old <- rep(0,length(weights_tp))
+    for(s in 1:length(names.ren.tp)){
+      if (weights_tp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
+    };c.old
+    
+    for (i in 1:length(weights_tp)){
+        if (weights_tp[i]>0){
+          weights_tp[i] <- weights_tp[i]/c.old[i]
+        }
+    }
+    ######################
+    
     weighted.portfolio.tp <- 0 #dat_asset[[1]]
-    for (i in 2:(length(asl)-1)){
+    for (i in 1:(length(asl))){
       weighted.portfolio.tp <- weighted.portfolio.tp + weights_tp[i]*dat_asset[[i]]
     }
-    start = as.Date(last(index(weighted.portfolio.tp)))
-    if (b == 0) dat <- window(weighted.portfolio.tp, start = first(index(weighted.portfolio.tp)), end=start)
-    else if (b == 1 ) weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
-    else weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
-    
+    weighted.portfolio.tp <- na.omit(weighted.portfolio.tp)
+
+    if (b == 1 ){
+      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
+    }else{
+      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
+    }
     #weighted portfolio MVP
-    names.ren <- c()
-    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    names.ren.mvp <- c()
+    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,2]))
     weights_mvp <- c(0,0,0,0,0,0,0)
-    for (i in 1:length(names.ren)){
-      q = names.ren[i]
+    for (i in 1:length(names.ren.mvp)){
+      q = names.ren.mvp[i]
       for(d in 1:length(dat_mvp_rec[,1])){
-        r <- dat_tp[,1][d]
-        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,4]
+        r <- dat_mvp[,1][d]
+        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
       }
     };print(dat_mvp_rec);print(weights_mvp)
+    
+    
+    ######################
+    c.old <- rep(0,length(weights_mvp))
+    for(s in 1:length(names.ren.mvp)){
+      if (weights_mvp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
+    };c.old
+    
+    for (i in 1:length(weights_mvp)){
+      if (weights_mvp[i]>0){
+        weights_mvp[i] <- weights_mvp[i]/c.old[i]
+      }
+    }
+    ######################
+    
+    
     weighted.portfolio.mvp <- 0 #dat_asset[[1]]
-    for (i in 2:(length(asl)-1)){
+    for (i in 1:(length(asl))){
       weighted.portfolio.mvp  <- weighted.portfolio.mvp  + weights_mvp[i]*dat_asset[[i]]
     }
-    start = as.Date(last(index(weighted.portfolio.mvp)))
-    if (b == 0) dat <- window(weighted.portfolio.mvp, start = first(index(weighted.portfolio.mvp)), end=start)
-    else if (b == 1 ) weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
-    else weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
+    weighted.portfolio.mvp <- na.omit(weighted.portfolio.mvp)
     
+    if (b == 1 ){
+      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
+    }else {
+      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
+    }
     
     if (input$radioHistorie == 1 & b == 1) {
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+

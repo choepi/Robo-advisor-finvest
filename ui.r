@@ -122,7 +122,7 @@ ui <- dashboardPage(
                          sliderTextInput(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
                            selected = "5D"),
                          br(),
                          radioButtons("radioHistorie", h3("Ansicht"),
