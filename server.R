@@ -257,8 +257,8 @@ server <- function(input, output, session) {
     }
     else if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        #geom_line(color = "green4")+
-        geom_line(data = weighted.portfolio.mvp[,4], aes(x = Index, y = Close))
+        geom_line(color = "green4")
+        #geom_line(data = weighted.portfolio.mvp[,4], aes(x = Index, y = Close))
         #geom_line(data = weighted.portfolio.tp[,4], aes(x = Index, y = Close), color = "red")
     }
     else if (input$radioHistorie == 2){
