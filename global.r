@@ -203,6 +203,7 @@ dat_mvp_rec_F <- function() {
   dat_mvp_rec <-
     dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
+  dat_mvp_rec
 }
 
 
@@ -237,6 +238,7 @@ dat_tp_rec_F <- function() {
   dat_tp_rec <-
     dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
+  dat_tp_rec
 }
 
 

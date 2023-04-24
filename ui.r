@@ -20,7 +20,8 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
-library(IntroCompFinR) #install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org")
+#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
+library(IntroCompFinR)
 
 
 ## build ui.R -----------------------------------
