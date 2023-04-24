@@ -179,8 +179,9 @@ dat_mvp_rec_F <- function() {
   g <- c(portfolio_w)
   g <- g[g != 0]
   lp <- c(1:length(g))
-  g <- sum(g)
-  g <- g * dat_mvp[lp, 2]
+  sg <- sum(g)
+  abssum<- sum(abs(dat_mvp[lp, 2]))
+  g <- sg/abssum*dat_mvp[lp, 2]
   dat_mvp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
