@@ -212,8 +212,9 @@ dat_tp_rec_F <- function() {
   g <- c(portfolio_w)
   g <- g[g != 0]
   lp <- c(1:length(g))
-  g <- sum(g)
-  g <- g * dat_tp[lp, 2]
+  sg <- sum(g)
+  abssum<- sum(abs(dat_tp[lp, 2]))
+  g <- sg/abssum*dat_tp[lp, 2]
   dat_tp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
