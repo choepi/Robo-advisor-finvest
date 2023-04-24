@@ -195,28 +195,69 @@ server <- function(input, output, session) {
     #plot.xts(weighted.portfolio)
     
     
-    #weighted portfolio with just close for basic plot
+    #weighted portfolio basic
     normed.weights <- portfolio_s
     weighted.portfolio <- 0 #dat_asset[[1]]
     for (i in 2:(length(asl)-1)){
       weighted.portfolio <- weighted.portfolio + normed.weights[i]*dat_asset[[i]]
     }
-    #plot.xts(weighted.portfolio)
-    #in column 4 is "close" of the chosen asset
-    
     start = as.Date(last(index(weighted.portfolio)))
     if (b == 0) dat <- window(weighted.portfolio, start = first(index(weighted.portfolio)), end=start)
     else if (b == 1 ) weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
     else weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
     
+    #weighted portfolio TP
+    names.ren <- c()
+    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    weights_tp <- c(0,0,0,0,0,0,0)
+    for (i in 1:length(names.ren)){
+      q = names.ren[i]
+      for(d in 1:length(dat_tp_rec[,1])){
+        r <- dat_tp[,1][d]
+        if (r==q) weights_tp[i] <- dat_tp_rec[d,4]
+      }
+    };print(dat_tp_rec);print(weights_tp)
+    weighted.portfolio.tp <- 0 #dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio.tp <- weighted.portfolio.tp + weights_tp[i]*dat_asset[[i]]
+    }
+    start = as.Date(last(index(weighted.portfolio.tp)))
+    if (b == 0) dat <- window(weighted.portfolio.tp, start = first(index(weighted.portfolio.tp)), end=start)
+    else if (b == 1 ) weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
+    else weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
+    
+    #weighted portfolio MVP
+    names.ren <- c()
+    for (i in ren) names.ren <- rbind(names.ren,colnames(i[,2]))
+    weights_mvp <- c(0,0,0,0,0,0,0)
+    for (i in 1:length(names.ren)){
+      q = names.ren[i]
+      for(d in 1:length(dat_mvp_rec[,1])){
+        r <- dat_tp[,1][d]
+        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,4]
+      }
+    };print(dat_mvp_rec);print(weights_mvp)
+    weighted.portfolio.mvp <- 0 #dat_asset[[1]]
+    for (i in 2:(length(asl)-1)){
+      weighted.portfolio.mvp  <- weighted.portfolio.mvp  + weights_mvp[i]*dat_asset[[i]]
+    }
+    start = as.Date(last(index(weighted.portfolio.mvp)))
+    if (b == 0) dat <- window(weighted.portfolio.mvp, start = first(index(weighted.portfolio.mvp)), end=start)
+    else if (b == 1 ) weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
+    else weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
+    
     
     if (input$radioHistorie == 1 & b == 1) {
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
-        geom_point(color = "green4")
+        geom_point(color = "green4")+
+        geom_point(data = weighted.portfolio.mvp[,4], color = "blue")+
+        geom_point(data = weighted.portfolio.mvp[,4], color = "red")
     }
     else if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        geom_line(color = "green4")
+        geom_line(color = "green4")+
+        geom_line(data = weighted.portfolio.mvp[,4], aes(x = Index, y = Close), color = "blue")+
+        geom_line(data = weighted.portfolio.tp[,4], aes(x = Index, y = Close), color = "red")
     }
     else if (input$radioHistorie == 2){
       chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
