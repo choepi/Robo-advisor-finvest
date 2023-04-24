@@ -251,7 +251,7 @@ server <- function(input, output, session) {
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
         geom_point(color = "green4")+
         geom_point(data = weighted.portfolio.mvp[,4], color = "blue")+
-        geom_point(data = weighted.portfolio.mvp[,4], color = "red")
+        geom_point(data = weighted.portfolio.tp[,4], color = "red")
     }
     else if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
