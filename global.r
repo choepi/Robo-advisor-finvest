@@ -188,7 +188,7 @@ dat_mvp_rec_F <- function() {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
   pa <- pa[pa != 0]
-  dat_mvp_rec$Anzahl <- round(g / pa)
+  dat_mvp_rec$Anzahl <- round(g / pa,1)
   n = length(dat_mvp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
@@ -222,7 +222,7 @@ dat_tp_rec_F <- function() {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
   pa <- pa[pa != 0]
-  dat_tp_rec$Anzahl <- round(g / pa)
+  dat_tp_rec$Anzahl <- round(g / pa,1)
   n = length(dat_tp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
@@ -240,3 +240,5 @@ dat_tp_rec_F <- function() {
 }
 
 
+
+                                          
