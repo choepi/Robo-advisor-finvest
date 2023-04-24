@@ -20,6 +20,9 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
+#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
+library(IntroCompFinR)
+
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -136,6 +139,7 @@ ui <- dashboardPage(
                 tabPanel("TP",
                          fluidRow(
                            tableOutput("tprec"),
+                           checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            plotOutput("tp", width = "60%"),
                            tableOutput("tprec_inf")))
               ))

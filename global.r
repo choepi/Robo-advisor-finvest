@@ -98,29 +98,29 @@ calculate_alpha <- function(weights, returns_list) {
 
 
 mvp <- function(y) {
-  N = dim(y)[1]
-  N2 = dim(y)[2]
-  y <- na_locf(y)#!!!!!wichtig1
-  mittel <<- t(y) %*% rep(1 / N, N) * 260
-  Sigma = cov(y, y)
-  MVP1 <<- solve(Sigma) %*% rep(1, N2)
-  MVP <<- MVP1 / sum(MVP1)
-  mvpreturn <<- t(MVP) %*% mittel
-  mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
+  ret.mat <- as.matrix(na.omit(y))
+  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
+  COV <-cov(ret.mat)
+  MVP_v <-globalMin.portfolio(exp.rets, COV)
+  MVP <<- MVP_v$weights
+  mvpreturn <<- MVP_v$er
+  mvpvola <<- MVP_v$sd
   return(as.array(MVP))
 }
 
 
-tp <- function(y) {
-  N = dim(y)[1]
-  y <- na_locf(y)#!!!!!wichtig
-  excess = t(y) %*% rep(1 / N, N) * 260 - riskfree
+tp <- function(y,shortpara=F) {
+  
+  ret.mat <- as.matrix(na.omit(y))
+  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
+  COV <-cov(ret.mat)
+  risk.free <- 0.00001
+  
+  TP_v <- tangency.portfolio(exp.rets,COV,risk.free=risk.free,shorts = shortpara)
+  TP <<- TP_v$weights
+  tpreturn <<- TP_v$er
+  tpvola <<- TP_v$sd
   Sigma_t <<- cov(y, y)
-  TP1 = solve(Sigma_t) %*% excess
-  TP = TP1 / sum(TP1)
-  TP <<- TP[, 1]
-  tpreturn <<- t(TP) %*% (excess + riskfree)
-  tpvola <<- sqrt(t(TP) %*% (Sigma_t %*% TP)) * sqrt(260)
   return(as.array(TP))
 }
 
@@ -161,13 +161,13 @@ dat_mvp_F <- function() {
 }
 
 
-dat_tp_F <- function() {
+dat_tp_F <- function(shortpara=F) {
   a <- data.frame()
   for (i in 1:length(portfolio_s)) {
     if (portfolio_s[i] > 0)
       a <- cbind.fill(a, ren[[i]][, 2])
   }
-  dat_v <- tp(a)
+  dat_v <- tp(a,shortpara)
   dat_tp <<- data.frame(Asset = rownames(dat_v),
                         Gewicht = c(dat_v))
 }
@@ -179,15 +179,16 @@ dat_mvp_rec_F <- function() {
   g <- c(portfolio_w)
   g <- g[g != 0]
   lp <- c(1:length(g))
-  g <- sum(g)
-  g <- g * dat_mvp[lp, 2]
+  sg <- sum(g)
+  abssum<- sum(abs(dat_mvp[lp, 2]))
+  g <- sg/abssum*dat_mvp[lp, 2]
   dat_mvp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
   pa <- pa[pa != 0]
-  dat_mvp_rec$Anzahl <- round(g / pa)
+  dat_mvp_rec$Anzahl <- round(g / pa,1)
   n = length(dat_mvp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
@@ -202,6 +203,7 @@ dat_mvp_rec_F <- function() {
   dat_mvp_rec <-
     dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
+  dat_mvp_rec
 }
 
 
@@ -212,15 +214,16 @@ dat_tp_rec_F <- function() {
   g <- c(portfolio_w)
   g <- g[g != 0]
   lp <- c(1:length(g))
-  g <- sum(g)
-  g <- g * dat_tp[lp, 2]
+  sg <- sum(g)
+  abssum<- sum(abs(dat_tp[lp, 2]))
+  g <- sg/abssum*dat_tp[lp, 2]
   dat_tp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
     pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
   }
   pa <- pa[pa != 0]
-  dat_tp_rec$Anzahl <- round(g / pa)
+  dat_tp_rec$Anzahl <- round(g / pa,1)
   n = length(dat_tp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
@@ -235,6 +238,9 @@ dat_tp_rec_F <- function() {
   dat_tp_rec <-
     dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
+  dat_tp_rec
 }
 
 
+
+                                          

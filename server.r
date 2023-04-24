@@ -10,7 +10,7 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
-  portfolio_s <<- c(1, 1, 1, 1, 1, 1)
+  portfolio_s <<- c(1, 0, 1, 0, 0, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
   dat_mvp_F()
@@ -117,8 +117,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
-    dat_tp_F()
+    input$shortpara
+    dat_tp_F(input$shortpara)
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
