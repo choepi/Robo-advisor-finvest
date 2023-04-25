@@ -88,7 +88,7 @@ get_data <- function() {
 }
 
 
-mvp <- function(y,age = 5*365) {
+mvp <- function(y) {
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # assets <- dim(ret)[2]
@@ -102,20 +102,21 @@ mvp <- function(y,age = 5*365) {
   # mvpreturn <<-getTargetReturn(mvp)
   # MVP<<-getWeights(mvp)
   # Sigma = cov(y, y)
+  
+  mvp <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
+  MVP <- getWeights(mvp)
   N = dim(y)[1]
-  N2 = dim(y)[2]
   mittel = t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
-  MVP1 = solve(Sigma) %*% rep(1, N2)
-  MVP = MVP1 / sum(MVP1)
-  MVP = MVP[, 1]
+
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
   return(as.array(MVP))
 }
 
 
-tp <- function(y,shortpara=F,age = 5*365, risk=0.12) {
+tp <- function(y) {
+  print(shortpara)
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # assets <- dim(ret)[2]
@@ -147,19 +148,34 @@ tp <- function(y,shortpara=F,age = 5*365, risk=0.12) {
   # TP <<- getWeights(tp)
   # Sigma = cov(y, y)
   # tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
+  
   N = dim(y)[1]
   excess = t(y) %*% rep(1 / N, N) * 260 - riskfree
   Sigma = cov(y, y)
   Portfolio1 <- as.timeSeries(y)
-  tanPort1 <- tangencyPortfolio(Portfolio1, spec=portfolioSpec(), constraints="LongOnly")
+  
+  
+  cons <- "LongOnly"
+  if (shortpara==T) {
+    spec <- portfolioSpec()
+    setSolver(spec) <- "solveRshortExact"
+    setRiskFreeRate(spec) <- riskfree
+    tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="Short")
+    }else if (shortpara==F){
+      spec <- portfolioSpec()
+      setRiskFreeRate(spec) <- 0.0 #???
+      tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
+    }
+
   TP<<-getWeights(tanPort1)
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
+  
   return(as.array(TP))
 }
 
 
-max <- function(y,age = 5*365, risk=0.12) {
+max <- function(y, risk=0.12) {
   ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
   assets <- dim(ret)[2]
   return.ts <- as.timeSeries(ret)
@@ -210,6 +226,7 @@ dat_mvp_F <- function() {
   
   dat_mvp <<- data.frame(Asset = rownames(dat_v),
                          Gewicht = c(dat_v))
+
 }
 
 
@@ -219,9 +236,12 @@ dat_tp_F <- function(shortpara=F) {
     if (portfolio_s[i] > 0)
       a <- na.omit(merge(a, ren[[i]]))
   }
-  dat_v <- tp(a,shortpara)
+  shortpara <<- shortpara 
+  
+  dat_v <- tp(a)
   dat_tp <<- data.frame(Asset = rownames(dat_v),
                         Gewicht = c(dat_v))
+  
 }
 
 dat_mvp_rec_F <- function() {

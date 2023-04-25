@@ -71,7 +71,7 @@ ui <- dashboardPage(
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
                                   numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
                            column(2,
-                                  numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                                  numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)),
                            
                            mainPanel(

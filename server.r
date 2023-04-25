@@ -10,6 +10,7 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
+  age <<- 5*365 #gedächtnis mvp/tp
   portfolio_s <<- c(1, 0, 1, 0, 0, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
@@ -117,7 +118,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    input$shortpara
+    
     dat_tp_F(input$shortpara)
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
@@ -319,7 +320,6 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
     dat_mvp_rec_F()
     dat_mvp_rec
   })
@@ -329,7 +329,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
+ 
+    dat_tp_F(input$shortpara)
     dat_tp_rec_F()
     dat_tp_rec
   })
@@ -348,6 +349,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
+    input$shortpara
     tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
                             "Rendite"=round(tpreturn,2))
     tprec_inf
