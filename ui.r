@@ -20,7 +20,8 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
-#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
+library(PerformanceAnalytics)
+#install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org")
 library(IntroCompFinR)
 
 
