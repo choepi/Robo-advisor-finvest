@@ -20,8 +20,7 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
-#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
-library(IntroCompFinR)
+
 
 
 ## build ui.R -----------------------------------
@@ -49,7 +48,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "profil",
               h1("Profil"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
@@ -109,16 +108,17 @@ ui <- dashboardPage(
                                     checkboxInput("checkbox5", "SNP500", value = F),
                                     checkboxInput("checkbox6", "USBND", value = F))),
                          )),
-              ))
+              )
       ),
       
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
               h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+                         fluidPage(sidebarPanel(
                          sliderTextInput(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
@@ -127,9 +127,9 @@ ui <- dashboardPage(
                          br(),
                          radioButtons("radioHistorie", h3("Ansicht"),
                                       choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 2),
+                                      selected = 2),width = 2),
                          br(), 
-                         plotOutput("weighted.portfolio",width = "60%")
+                         mainPanel(plotOutput("weighted.portfolio",width = "60%")))
                 ),
                 tabPanel("MVP",
                          fluidRow(
@@ -142,7 +142,7 @@ ui <- dashboardPage(
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            plotOutput("tp", width = "60%"),
                            tableOutput("tprec_inf")))
-              ))
+              )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
@@ -153,7 +153,7 @@ ui <- dashboardPage(
                     inputId = "slider2",
                     label = "Choice",
                     choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "5D"
+                    selected = "6M"
                   ),
                   br(), 
                   selectInput("select2", h3("Asset"),
@@ -165,7 +165,7 @@ ui <- dashboardPage(
                   br(), 
                   radioButtons("radio1", h3("Ansicht"),
                                choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 2)
+                               selected = 1)
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
