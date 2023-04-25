@@ -20,6 +20,9 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
+#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
+library(IntroCompFinR)
+
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -60,7 +63,7 @@ ui <- dashboardPage(
                            column(2,
                                   introBox(
                                     numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-                                    
+
                                     introBox(
                                       numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
                                       data.step = 1,
@@ -119,7 +122,7 @@ ui <- dashboardPage(
                          sliderTextInput(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
                            selected = "5D"),
                          br(),
                          radioButtons("radioHistorie", h3("Ansicht"),
@@ -136,6 +139,7 @@ ui <- dashboardPage(
                 tabPanel("TP",
                          fluidRow(
                            tableOutput("tprec"),
+                           checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            plotOutput("tp", width = "60%"),
                            tableOutput("tprec_inf")))
               ))
