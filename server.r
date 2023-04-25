@@ -222,7 +222,7 @@ server <- function(input, output, session) {
     
     #weighted portfolio TP
     names.ren.tp <- c()
-    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,2]))
+    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,1]))
     weights_tp <- c(0,0,0,0,0,0,0)
     
     for (i in 1:length(names.ren.tp)){
@@ -259,7 +259,7 @@ server <- function(input, output, session) {
     }
     #weighted portfolio MVP
     names.ren.mvp <- c()
-    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,2]))
+    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
     weights_mvp <- c(0,0,0,0,0,0,0)
     for (i in 1:length(names.ren.mvp)){
       q = names.ren.mvp[i]
@@ -354,24 +354,6 @@ server <- function(input, output, session) {
   })
   
   
-  
-  
-  
-  # output$vorschlag_diag({
-  #   alpha = (-100:100) / 10 #alpha = 1 => tp, alpha get band von 0-1.5 durch
-  #   walpha = (alpha %o% TP) + ((1 - alpha) %o% as.numeric(MVP))
-  #   preturn = walpha %*% mittel
-  #   pvola = c()
-  #   for (i in 1:16) pvola[i] = sqrt(walpha[i,] %*% (Sigma_t %*% walpha[i,])) * sqrt(260);pvola
-  #   portfolio_s2 <- portfolio_s2/sum(portfolio_s2)
-  #   risk
-  #   zu_invest_verm
-  #   
-  #   calculate_alpha(portfolio_s2,ren)
-  #   
-  #   
-  # 
-  # })
+
   
 }
-
