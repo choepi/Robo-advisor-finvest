@@ -366,11 +366,11 @@ server <- function(input, output, session) {
 
 
   helptext <- data.frame(
-    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2")
-    , step = c(3,3)
-    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#slider3","#checkbox1")
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2")
+    , step = c(3,2)
+    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#checkbox1")
     , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
-                "Gib dein zu investierendes Vermögen ein","Hier hast du die Möglichkeit deine Risikobereitschaft einzugeben",
+                "Gib dein zu investierendes Vermögen ein",
                 "Wähle die Assets die du in deinem Portfolio haben möchtest")
   )
 }
