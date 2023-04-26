@@ -10,10 +10,7 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
-<<<<<<< HEAD
   age <<- 5*365 #gedächtnis mvp/tp
-=======
->>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
   portfolio_s <<- c(1, 0, 1, 0, 0, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
@@ -121,11 +118,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-<<<<<<< HEAD
     
-=======
-    input$shortpara
->>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
     dat_tp_F(input$shortpara)
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
@@ -203,26 +196,6 @@ server <- function(input, output, session) {
     
     #weighted portfolio basic
     ######################
-<<<<<<< HEAD
-=======
-
-    c.old <- rep(0,length(portfolio_w))
-    for(s in 1:length(portfolio_w)){
-      if (portfolio_w[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    weight <- portfolio_w
-    for (i in 1:length(portfolio_w)){
-      if (portfolio_w[i]>0){
-        weight[i] <- weight[i]/c.old[i]
-      }
-    }
-    ######################
-    weighted.portfolio <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio <- weighted.portfolio + weight[i]*dat_asset[[i]]
-    }
-    weighted.portfolio <- na.omit(weighted.portfolio)
->>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
     
     c.old <- rep(0,length(portfolio_w))
     for(s in 1:length(portfolio_w)){
@@ -288,88 +261,6 @@ server <- function(input, output, session) {
     #weighted portfolio MVP
     names.ren.mvp <- c()
     for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
-    weights_mvp <- c(0,0,0,0,0,0,0)
-    for (i in 1:length(names.ren.mvp)){
-      q = names.ren.mvp[i]
-      for(d in 1:length(dat_mvp_rec[,1])){
-        r <- dat_mvp[,1][d]
-        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
-      }
-    };print(dat_mvp_rec);print(weights_mvp)
-    
-    
-    ######################
-    c.old <- rep(0,length(weights_mvp))
-    for(s in 1:length(names.ren.mvp)){
-      if (weights_mvp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    
-    for (i in 1:length(weights_mvp)){
-      if (weights_mvp[i]>0){
-        weights_mvp[i] <- weights_mvp[i]/c.old[i]
-      }
-    }
-    ######################
-    
-    
-    weighted.portfolio.mvp <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio.mvp  <- weighted.portfolio.mvp  + weights_mvp[i]*dat_asset[[i]]
-    }
-    weighted.portfolio.mvp <- na.omit(weighted.portfolio.mvp)
-    
-    if (b == 1 ){
-      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
-    }else {
-      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
-    }
-    
-    if (b == 1 ){
-      weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
-    }else{
-      weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
-    }
-    
-    #weighted portfolio TP
-    names.ren.tp <- c()
-    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,2]))
-    weights_tp <- c(0,0,0,0,0,0,0)
-    
-    for (i in 1:length(names.ren.tp)){
-      q = names.ren.tp[i]
-      for(d in 1:length(dat_tp_rec[,1])){
-        r <- dat_tp[,1][d]
-        if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
-      }
-    };print(dat_tp_rec);print(weights_tp)
-    
-    ######################
-    c.old <- rep(0,length(weights_tp))
-    for(s in 1:length(names.ren.tp)){
-      if (weights_tp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    
-    for (i in 1:length(weights_tp)){
-        if (weights_tp[i]>0){
-          weights_tp[i] <- weights_tp[i]/c.old[i]
-        }
-    }
-    ######################
-    
-    weighted.portfolio.tp <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio.tp <- weighted.portfolio.tp + weights_tp[i]*dat_asset[[i]]
-    }
-    weighted.portfolio.tp <- na.omit(weighted.portfolio.tp)
-
-    if (b == 1 ){
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
-    }else{
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
-    }
-    #weighted portfolio MVP
-    names.ren.mvp <- c()
-    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,2]))
     weights_mvp <- c(0,0,0,0,0,0,0)
     for (i in 1:length(names.ren.mvp)){
       q = names.ren.mvp[i]
