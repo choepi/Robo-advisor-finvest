@@ -196,7 +196,7 @@ server <- function(input, output, session) {
     
     #weighted portfolio basic
     ######################
-
+    
     c.old <- rep(0,length(portfolio_w))
     for(s in 1:length(portfolio_w)){
       if (portfolio_w[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
@@ -241,9 +241,9 @@ server <- function(input, output, session) {
     };c.old
     
     for (i in 1:length(weights_tp)){
-        if (weights_tp[i]>0){
-          weights_tp[i] <- weights_tp[i]/c.old[i]
-        }
+      if (weights_tp[i]>0){
+        weights_tp[i] <- weights_tp[i]/c.old[i]
+      }
     }
     ######################
     
@@ -252,7 +252,7 @@ server <- function(input, output, session) {
       weighted.portfolio.tp <- weighted.portfolio.tp + weights_tp[i]*dat_asset[[i]]
     }
     weighted.portfolio.tp <- na.omit(weighted.portfolio.tp)
-
+    
     if (b == 1 ){
       weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
     }else{
@@ -329,7 +329,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
- 
+    
     dat_tp_F(input$shortpara)
     dat_tp_rec_F()
     dat_tp_rec
@@ -356,6 +356,6 @@ server <- function(input, output, session) {
   })
   
   
-
+  
   
 }

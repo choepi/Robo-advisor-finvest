@@ -62,7 +62,7 @@ ui <- dashboardPage(
                            column(2,
                                   introBox(
                                     numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-
+                                    
                                     introBox(
                                       numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
                                       data.step = 1,
@@ -119,17 +119,17 @@ ui <- dashboardPage(
                 type = "tabs",
                 tabPanel("Historie",
                          fluidPage(sidebarPanel(
-                         sliderTextInput(
-                           inputId = "sliderHistorie",
-                           label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
-                           selected = "5D"),
-                         br(),
-                         radioButtons("radioHistorie", h3("Ansicht"),
-                                      choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 2),width = 2),
-                         br(), 
-                         mainPanel(plotOutput("weighted.portfolio",width = "60%")))
+                           sliderTextInput(
+                             inputId = "sliderHistorie",
+                             label = "Zeitraum",
+                             choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
+                             selected = "5D"),
+                           br(),
+                           radioButtons("radioHistorie", h3("Ansicht"),
+                                        choices = list("Simpel" = 1, "Erweitert" = 2),
+                                        selected = 2),width = 2),
+                           br(), 
+                           mainPanel(plotOutput("weighted.portfolio",width = "60%")))
                 ),
                 tabPanel("MVP",
                          fluidRow(
