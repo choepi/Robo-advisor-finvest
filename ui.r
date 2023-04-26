@@ -21,6 +21,8 @@ library(rintrojs)
 library(xml2)
 library(rvest)
 
+
+
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -46,7 +48,7 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "profil",
               h1("Profil"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
@@ -60,7 +62,7 @@ ui <- dashboardPage(
                            column(2,
                                   introBox(
                                     numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-
+                                    
                                     introBox(
                                       numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
                                       data.step = 1,
@@ -69,7 +71,7 @@ ui <- dashboardPage(
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
                                   numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
                            column(2,
-                                  numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
+                                  numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)),
                            
                            mainPanel(
@@ -106,27 +108,28 @@ ui <- dashboardPage(
                                     checkboxInput("checkbox5", "SNP500", value = F),
                                     checkboxInput("checkbox6", "USBND", value = F))),
                          )),
-              ))
+              )
       ),
       
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
               h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
-                         sliderTextInput(
-                           inputId = "sliderHistorie",
-                           label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                           selected = "5D"),
-                         br(),
-                         radioButtons("radioHistorie", h3("Ansicht"),
-                                      choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 2),
-                         br(), 
-                         plotOutput("weighted.portfolio",width = "60%")
+                         fluidPage(sidebarPanel(
+                           sliderTextInput(
+                             inputId = "sliderHistorie",
+                             label = "Zeitraum",
+                             choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
+                             selected = "5D"),
+                           br(),
+                           radioButtons("radioHistorie", h3("Ansicht"),
+                                        choices = list("Simpel" = 1, "Erweitert" = 2),
+                                        selected = 2),width = 2),
+                           br(), 
+                           mainPanel(plotOutput("weighted.portfolio",width = "60%")))
                 ),
                 tabPanel("MVP",
                          fluidRow(
@@ -136,9 +139,10 @@ ui <- dashboardPage(
                 tabPanel("TP",
                          fluidRow(
                            tableOutput("tprec"),
+                           checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            plotOutput("tp", width = "60%"),
                            tableOutput("tprec_inf")))
-              ))
+              )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
@@ -149,7 +153,7 @@ ui <- dashboardPage(
                     inputId = "slider2",
                     label = "Choice",
                     choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "5D"
+                    selected = "6M"
                   ),
                   br(), 
                   selectInput("select2", h3("Asset"),
@@ -161,7 +165,7 @@ ui <- dashboardPage(
                   br(), 
                   radioButtons("radio1", h3("Ansicht"),
                                choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 2)
+                               selected = 1)
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
