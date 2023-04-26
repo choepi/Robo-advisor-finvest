@@ -52,7 +52,7 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
-                         actionButton("help1", "About this Page"),
+                         actionButton("help_tab1", "About this Page"),
                          h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
                             Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
                             Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
@@ -60,29 +60,25 @@ ui <- dashboardPage(
                          fluidRow(
                            
                            column(2,
-                                  introBox(
-                                    numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-
-                                    introBox(
-                                      numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
-                                      data.step = 1,
-                                      data.intro = "Auswahl welches zu Ihnen passt"))),
+                                  numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                  ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
-                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
+                                  ),
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
-                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)),
-                           
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
+                                  ),
                            mainPanel(
-                             introBox(
                                h4(textOutput("portfolio_worth1")),
-                               data.step = 2,
-                               data.intro = "Hier sehen sie den aktuellen Wert ihres Portfolios"),
-                             plotOutput("portfolio1", width = "100%")),
-                         )),
+                               plotOutput("portfolio1", width = "100%")
+                               ),
+                           )
+                         ),
                 tabPanel("Kein Portfolio",
-                         actionButton("help2", "About this Page"),
+                         actionButton("help_tab2", "About this Page"),
                          fluidPage(
                            h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
                             welches du dann nach bedarf anpassen kannst."),

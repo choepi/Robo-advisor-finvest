@@ -31,20 +31,6 @@ server <- function(input, output, session) {
   }
   
   #info serverfunktion
-  hintjs(
-    session,
-    options = list("hintButtonLabel" = "Hope this hint was helpful"),
-    events = list("onhintclose" = I('alert("Wasn\'t that hint helpful")'))
-  )
-  
-  observeEvent(c(input$help1,input$help2),
-               introjs(session, options = list("nextLabel"="Next",
-                                               "prevLabel"="Back"),
-                       events = list())
-  )
-  
-  
-  
   output$portfolio1 <- renderPlot({
     for (i in 1:length(asl)) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
@@ -355,7 +341,36 @@ server <- function(input, output, session) {
     tprec_inf
   })
   
+  help_text <- reactive({
+    if (input$help_tab1) whichtab <- "help_tab1"
+    if (input$help_tab2) whichtab <- "help_tab2"
+    # if (input$help_tab3) whichtab <- "help_tab3"
+    subset(helptext, tab == whichtab)
+  })
+  
+  observeEvent(input$help_tab1,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab2,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  # observeEvent(input$help_tab3,
+  #              introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  # )
   
 
-  
+
+  helptext <- data.frame(
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2")
+    , step = c(3,3)
+    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#slider3","#checkbox1")
+    , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
+                "Gib dein zu investierendes Vermögen ein","Hier hast du die Möglichkeit deine Risikobereitschaft einzugeben",
+                "Wähle die Assets die du in deinem Portfolio haben möchtest")
+  )
 }
