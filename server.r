@@ -10,6 +10,7 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
+  age <<- 5*365 #gedächtnis mvp/tp
   portfolio_s <<- c(1, 0, 1, 0, 0, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
   portfolio_w_F()
@@ -117,7 +118,7 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    input$shortpara
+    
     dat_tp_F(input$shortpara)
     
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
@@ -222,7 +223,7 @@ server <- function(input, output, session) {
     
     #weighted portfolio TP
     names.ren.tp <- c()
-    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,2]))
+    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,1]))
     weights_tp <- c(0,0,0,0,0,0,0)
     
     for (i in 1:length(names.ren.tp)){
@@ -231,7 +232,7 @@ server <- function(input, output, session) {
         r <- dat_tp[,1][d]
         if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
       }
-    }
+    };print(dat_tp_rec);print(weights_tp)
     
     ######################
     c.old <- rep(0,length(weights_tp))
@@ -259,7 +260,7 @@ server <- function(input, output, session) {
     }
     #weighted portfolio MVP
     names.ren.mvp <- c()
-    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,2]))
+    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
     weights_mvp <- c(0,0,0,0,0,0,0)
     for (i in 1:length(names.ren.mvp)){
       q = names.ren.mvp[i]
@@ -267,7 +268,7 @@ server <- function(input, output, session) {
         r <- dat_mvp[,1][d]
         if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
       }
-    }
+    };print(dat_mvp_rec);print(weights_mvp)
     
     
     ######################
@@ -319,7 +320,6 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
     dat_mvp_rec_F()
     dat_mvp_rec
   })
@@ -329,7 +329,8 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
+ 
+    dat_tp_F(input$shortpara)
     dat_tp_rec_F()
     dat_tp_rec
   })
@@ -348,30 +349,13 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
+    input$shortpara
     tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
                             "Rendite"=round(tpreturn,2))
     tprec_inf
   })
   
   
-  
-  
-  
-  # output$vorschlag_diag({
-  #   alpha = (-100:100) / 10 #alpha = 1 => tp, alpha get band von 0-1.5 durch
-  #   walpha = (alpha %o% TP) + ((1 - alpha) %o% as.numeric(MVP))
-  #   preturn = walpha %*% mittel
-  #   pvola = c()
-  #   for (i in 1:16) pvola[i] = sqrt(walpha[i,] %*% (Sigma_t %*% walpha[i,])) * sqrt(260);pvola
-  #   portfolio_s2 <- portfolio_s2/sum(portfolio_s2)
-  #   risk
-  #   zu_invest_verm
-  #   
-  #   calculate_alpha(portfolio_s2,ren)
-  #   
-  #   
-  # 
-  # })
+
   
 }
-

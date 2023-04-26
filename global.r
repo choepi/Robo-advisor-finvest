@@ -7,6 +7,15 @@ library(imputeTS)
 library(DEoptim)
 library(shinyjs)
 library(scales)
+<<<<<<< HEAD
+=======
+library(pROC)
+library(fPortfolio)
+library(PortfolioAnalytics)
+library(tidyverse)
+library(tidyquant)
+
+>>>>>>> 3932d151ff2cb3dda779fca76681f0f3cce61c88
 
  # Installieren Sie die Bibliothek pROC
 # library(pROC) 
@@ -59,7 +68,7 @@ get_data <- function() {
     q <- usd[p]
       if(q>=1){
       usd_ts <- l[[p]]
-      chf_ts <- na.omit(merge(usd_ts,usd_chf, all=F))
+      chf_ts <- na.omit(merge(usd_ts,usd_chf))
       attributes(chf_ts)$na.action <- NULL
       for (i in 1:length(colnames(usd_ts))) {
         chf_ts[,i] <- chf_ts[,i]*chf_ts[,7]
@@ -74,63 +83,122 @@ get_data <- function() {
   roc
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
-    r <- na.omit(Stocks[[i]][,4])
-    b <- suppressWarnings(dailyReturn(Stocks[[i]],type='arithmetic'))
-    r <- as.data.frame(r)
-    r$rendite <- b
-    r <- as.xts(r)
+    r <- na.omit(l[[i]][,4])
+    r <- na.omit(ROC(r))
     colnames(r) <-
-      c("Close",paste0("r.", asl[i]))
-    ren[[i]] <- na.omit(r)
+      c(paste0("r.", asl[i]))
+    ren[[i]] <- r
     attributes(ren[[i]])$na.action <- NULL
   }
   data <- list(l,ren)
   return(data)
 }
 
-calculate_alpha <- function(weights, returns_list) {
-  
-  # Calculate portfolio return
-  portfolio_returns <- Reduce(`+`, lapply(seq_along(weights), function(i) weights[i] * returns_list[[i]]))
-  
-  # Fit linear regression model
-  model <- lm(portfolio_returns ~ returns_list[[7]])
-  
-  # Extract alpha from model coefficients
-  alpha <- coef(model)[1]
-  
-  return(alpha)
-}
-
-
 
 mvp <- function(y) {
-  ret.mat <- as.matrix(na.omit(y))
-  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
-  COV <-cov(ret.mat)
-  MVP_v <-globalMin.portfolio(exp.rets, COV)
-  MVP <<- MVP_v$weights
-  mvpreturn <<- MVP_v$er
-  mvpvola <<- MVP_v$sd
+  y <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  # assets <- dim(ret)[2]
+  # return.ts <- as.timeSeries(ret)
+  # 
+  # spec <- portfolioSpec()
+  # setSolver(spec) <- "solveRquadprog"
+  # setNFrontierPoints(spec) <-dim(ret)[2]+1
+  # constraints <- "LongOnly"
+  # mvp <- minvariancePortfolio(return.ts,spec =spec , constraints)
+  # mvpreturn <<-getTargetReturn(mvp)
+  # MVP<<-getWeights(mvp)
+  # Sigma = cov(y, y)
+  
+  mvp <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
+  MVP <- getWeights(mvp)
+  N = dim(y)[1]
+  mittel = t(y) %*% rep(1 / N, N) * 260
+  Sigma = cov(y, y)
+
+  mvpreturn <<- t(MVP) %*% mittel
+  mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
   return(as.array(MVP))
 }
 
 
-tp <- function(y,shortpara=F) {
+tp <- function(y) {
+  print(shortpara)
+  y <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  # assets <- dim(ret)[2]
+  # return.ts <- as.timeSeries(ret)
+  # if (shortpara==T) {
+  #   cons <- "Short"
+  #   sol <- "solveRshortExact"}else{
+  #     cons <- "LongOnly"
+  #     sol <- "solveRquadprog"
+  #   } 
+  # 
+  # 
+  # spec <- portfolioSpec()
+  # setSolver(spec) <- sol
+  # setNFrontierPoints(spec) <-dim(ret)[2]+1
+  # setRiskFreeRate(spec) <- riskfree
+  # constraints <- cons
+  # tp <- tangencyPortfolio(return.ts,spec =spec , constraints);tp
+  # 
+  # spec <- portfolioSpec()
+  # setSolver(spec) <- "solveRshortExact"
+  # setNFrontierPoints(spec) <-dim(ret)[2]+1
+  # setTargetRisk(spec) <- risk
+  # constraints <- cons
+  # max <- maxreturnPortfolio(return.ts,spec =spec ,"LongOnly")
+  # 
+  # 
+  # tpreturn <<- getTargetReturn(tp)
+  # TP <<- getWeights(tp)
+  # Sigma = cov(y, y)
+  # tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
   
-  ret.mat <- as.matrix(na.omit(y))
-  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
-  COV <-cov(ret.mat)
-  risk.free <- 0.00001
+  N = dim(y)[1]
+  excess = t(y) %*% rep(1 / N, N) * 260 - riskfree
+  Sigma = cov(y, y)
+  Portfolio1 <- as.timeSeries(y)
   
-  TP_v <- tangency.portfolio(exp.rets,COV,risk.free=risk.free,shorts = shortpara)
-  TP <<- TP_v$weights
-  tpreturn <<- TP_v$er
-  tpvola <<- TP_v$sd
-  Sigma_t <<- cov(y, y)
+  
+  cons <- "LongOnly"
+  if (shortpara==T) {
+    spec <- portfolioSpec()
+    setSolver(spec) <- "solveRshortExact"
+    setRiskFreeRate(spec) <- riskfree
+    tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="Short")
+    }else if (shortpara==F){
+      spec <- portfolioSpec()
+      setRiskFreeRate(spec) <- 0.0 #???
+      tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
+    }
+
+  TP<<-getWeights(tanPort1)
+  tpreturn <<- t(TP) %*% (excess + riskfree)
+  tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
+  
   return(as.array(TP))
 }
 
+
+max <- function(y, risk=0.12) {
+  ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  assets <- dim(ret)[2]
+  return.ts <- as.timeSeries(ret)
+  
+  spec <- portfolioSpec()
+  setSolver(spec) <- "solveRshortExact"
+  setNFrontierPoints(spec) <-dim(ret)[2]+1
+  setTargetRisk(spec) <- risk
+  constraints <- "LongOnly"
+  max <- maxreturnPortfolio(return.ts,spec =spec ,constraints)
+
+  maxreturn <<- getTargetReturn(max)
+  MAX <<-getWeights(max)
+
+  return(as.array(MAX))
+}
 
 get_rf <- function() {
   URL <-
@@ -156,27 +224,31 @@ portfolio_w_F <- function() {
 }
 
 dat_mvp_F <- function() {
-  a <- data.frame()
+  a <- xts()
   for (i in 1:length(portfolio_s)) {
     if (portfolio_s[i] > 0)
-      a <- cbind.fill(a, ren[[i]][, 2])
+      a <- na.omit(merge(a, ren[[i]]))
   }
   dat_v <- mvp(a)
   
   dat_mvp <<- data.frame(Asset = rownames(dat_v),
                          Gewicht = c(dat_v))
+
 }
 
 
 dat_tp_F <- function(shortpara=F) {
-  a <- data.frame()
+  a <- xts()
   for (i in 1:length(portfolio_s)) {
     if (portfolio_s[i] > 0)
-      a <- cbind.fill(a, ren[[i]][, 2])
+      a <- na.omit(merge(a, ren[[i]]))
   }
-  dat_v <- tp(a,shortpara)
+  shortpara <<- shortpara 
+  
+  dat_v <- tp(a)
   dat_tp <<- data.frame(Asset = rownames(dat_v),
                         Gewicht = c(dat_v))
+  
 }
 
 dat_mvp_rec_F <- function() {
@@ -210,7 +282,6 @@ dat_mvp_rec_F <- function() {
   dat_mvp_rec <-
     dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
-  dat_mvp_rec
 }
 
 
@@ -245,7 +316,6 @@ dat_tp_rec_F <- function() {
   dat_tp_rec <-
     dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
-  dat_tp_rec
 }
 
 
