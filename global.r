@@ -13,6 +13,15 @@ library(PortfolioAnalytics)
 library(tidyverse)
 library(tidyquant)
 
+#closest index 
+which.closest <- function(x,invect,index=T) {
+  pick <- which.min(abs(invect-x))
+  if (index) {
+    return(pick)
+  } else {
+    return(invect[pick])
+  }
+} 
 
 #binds data columnwise and fills with NA
 cbind.fill <- function(...) {
