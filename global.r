@@ -4,8 +4,15 @@ library(xts)
 library(dplyr)
 library(expm)
 library(imputeTS)
+library(DEoptim)
+library(shinyjs)
+library(scales)
 
-#binds data columnwise and fills with NA
+ # Installieren Sie die Bibliothek pROC
+# library(pROC) 
+# roc <- ROC(dat_asset[[1]][,4])
+
+install.packages("ROCR")#binds data columnwise and fills with NA
 cbind.fill <- function(...) {
   nm <- list(...)
   nm <- lapply(nm, as.matrix)
@@ -64,7 +71,7 @@ get_data <- function() {
   }
   
   
-  
+  roc
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(Stocks[[i]][,4])
