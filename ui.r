@@ -96,12 +96,12 @@ ui <- dashboardPage(
                                selected = "Geringes Risiko"
                              ),
                              column(5,
-                                    checkboxInput("checkbox1", "SMI", value = F),
+                                    checkboxInput("checkbox1", "SMI", value = T),
                                     checkboxInput("checkbox2", "SWIBND", value = F),
-                                    checkboxInput("checkbox3", "GOLD", value = F),
+                                    checkboxInput("checkbox3", "GOLD", value = T),
                                     checkboxInput("checkbox4", "BITCOIN", value = F)),
                              column(5,
-                                    checkboxInput("checkbox5", "SNP500", value = F),
+                                    checkboxInput("checkbox5", "SNP500", value = T),
                                     checkboxInput("checkbox6", "USBND", value = F))),
                          )),
               )
@@ -118,14 +118,14 @@ ui <- dashboardPage(
                          sliderTextInput(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
-                           selected = "5D"),
+                           choices = c("1M","6M","1Y","5Y","10Y"),
+                           selected = "1M"),
                          br(),
                          radioButtons("radioHistorie", h3("Ansicht"),
                                       choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 2),width = 2),
+                                      selected = 1),width = 2),
                          br(), 
-                         mainPanel(plotOutput("weighted.portfolio",width = "60%")))
+                         mainPanel(plotOutput("weightened.portfolio",width = "60%")))
                 ),
                 tabPanel("MVP",
                          fluidRow(
