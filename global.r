@@ -13,6 +13,15 @@ library(PortfolioAnalytics)
 library(tidyverse)
 library(tidyquant)
 
+#closest index 
+which.closest <- function(x,invect,index=T) {
+  pick <- which.min(abs(invect-x))
+  if (index) {
+    return(pick)
+  } else {
+    return(invect[pick])
+  }
+} 
 
 #binds data columnwise and fills with NA
 cbind.fill <- function(...) {
@@ -59,7 +68,7 @@ get_data <- function() {
   usd = c(0,0,1,1,1,1) # 1 if asset is usd
   for (p in 1:length(usd)){
     q <- usd[p]
-    if(q>=1){
+      if(q>=1){
       usd_ts <- l[[p]]
       chf_ts <- na.omit(merge(usd_ts,usd_chf))
       attributes(chf_ts)$na.action <- NULL
@@ -108,7 +117,7 @@ mvp <- function(y) {
   N = dim(y)[1]
   mittel = t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
-  
+
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
   return(as.array(MVP))
@@ -161,12 +170,12 @@ tp <- function(y) {
     setSolver(spec) <- "solveRshortExact"
     setRiskFreeRate(spec) <- riskfree
     tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="Short")
-  }else if (shortpara==F){
-    spec <- portfolioSpec()
-    setRiskFreeRate(spec) <- 0.0 #???
-    tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
-  }
-  
+    }else if (shortpara==F){
+      spec <- portfolioSpec()
+      setRiskFreeRate(spec) <- 0.0 #???
+      tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
+    }
+
   TP<<-getWeights(tanPort1)
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
@@ -186,10 +195,10 @@ max <- function(y, risk=0.12) {
   setTargetRisk(spec) <- risk
   constraints <- "LongOnly"
   max <- maxreturnPortfolio(return.ts,spec =spec ,constraints)
-  
+
   maxreturn <<- getTargetReturn(max)
   MAX <<-getWeights(max)
-  
+
   return(as.array(MAX))
 }
 
@@ -226,7 +235,7 @@ dat_mvp_F <- function() {
   
   dat_mvp <<- data.frame(Asset = rownames(dat_v),
                          Gewicht = c(dat_v))
-  
+
 }
 
 
@@ -313,3 +322,4 @@ dat_tp_rec_F <- function() {
 
 
 
+                                          
