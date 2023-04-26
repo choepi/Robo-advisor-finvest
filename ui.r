@@ -169,7 +169,7 @@ ui <- dashboardPage(
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                )),
+                )), 
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
