@@ -20,6 +20,9 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
+#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
+library(IntroCompFinR)
+
 
 
 
@@ -118,6 +121,7 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+<<<<<<< HEAD
                          fluidPage(sidebarPanel(
                            sliderTextInput(
                              inputId = "sliderHistorie",
@@ -130,6 +134,19 @@ ui <- dashboardPage(
                                         selected = 2),width = 2),
                            br(), 
                            mainPanel(plotOutput("weighted.portfolio",width = "60%")))
+=======
+                         sliderTextInput(
+                           inputId = "sliderHistorie",
+                           label = "Zeitraum",
+                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
+                           selected = "5D"),
+                         br(),
+                         radioButtons("radioHistorie", h3("Ansicht"),
+                                      choices = list("Simpel" = 1, "Erweitert" = 2),
+                                      selected = 2),
+                         br(), 
+                         plotOutput("weighted.portfolio",width = "60%")
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
                 ),
                 tabPanel("MVP",
                          fluidRow(

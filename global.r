@@ -89,6 +89,7 @@ get_data <- function() {
 
 
 mvp <- function(y) {
+<<<<<<< HEAD
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # assets <- dim(ret)[2]
@@ -111,10 +112,20 @@ mvp <- function(y) {
   
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
+=======
+  ret.mat <- as.matrix(na.omit(y))
+  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
+  COV <-cov(ret.mat)
+  MVP_v <-globalMin.portfolio(exp.rets, COV)
+  MVP <<- MVP_v$weights
+  mvpreturn <<- MVP_v$er
+  mvpvola <<- MVP_v$sd
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
   return(as.array(MVP))
 }
 
 
+<<<<<<< HEAD
 tp <- function(y) {
   print(shortpara)
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
@@ -171,6 +182,20 @@ tp <- function(y) {
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
   
+=======
+tp <- function(y,shortpara=F) {
+  
+  ret.mat <- as.matrix(na.omit(y))
+  exp.rets<-colMeans(exp(ret.mat)) - 1;exp.rets
+  COV <-cov(ret.mat)
+  risk.free <- 0.00001
+  
+  TP_v <- tangency.portfolio(exp.rets,COV,risk.free=risk.free,shorts = shortpara)
+  TP <<- TP_v$weights
+  tpreturn <<- TP_v$er
+  tpvola <<- TP_v$sd
+  Sigma_t <<- cov(y, y)
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
   return(as.array(TP))
 }
 
@@ -231,14 +256,22 @@ dat_mvp_F <- function() {
 
 
 dat_tp_F <- function(shortpara=F) {
+<<<<<<< HEAD
   a <- xts()
+=======
+  a <- data.frame()
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
   for (i in 1:length(portfolio_s)) {
     if (portfolio_s[i] > 0)
       a <- na.omit(merge(a, ren[[i]]))
   }
+<<<<<<< HEAD
   shortpara <<- shortpara 
   
   dat_v <- tp(a)
+=======
+  dat_v <- tp(a,shortpara)
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
   dat_tp <<- data.frame(Asset = rownames(dat_v),
                         Gewicht = c(dat_v))
   
@@ -275,6 +308,7 @@ dat_mvp_rec_F <- function() {
   dat_mvp_rec <-
     dat_mvp_rec[order(abs(dat_mvp_rec$Investiert), decreasing = T), ]
   dat_mvp_rec <<- dat_mvp_rec
+  dat_mvp_rec
 }
 
 
@@ -309,7 +343,12 @@ dat_tp_rec_F <- function() {
   dat_tp_rec <-
     dat_tp_rec[order(abs(dat_tp_rec$Investiert), decreasing = T), ]
   dat_tp_rec <<- dat_tp_rec
+  dat_tp_rec
 }
 
 
 
+<<<<<<< HEAD
+=======
+                                          
+>>>>>>> 0a5b0a07135fc5260d40a300f4da0a953fc098ca
