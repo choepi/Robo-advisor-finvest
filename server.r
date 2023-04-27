@@ -226,7 +226,7 @@ server <- function(input, output, session) {
         r <- dat_tp[,1][d]
         if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
       }
-    };print(dat_tp_rec);print(weights_tp)
+    }#;print(dat_tp_rec);print(weights_tp)
     
     ######################
     c.old <- rep(0,length(weights_tp))
@@ -258,7 +258,7 @@ server <- function(input, output, session) {
         r <- dat_mvp[,1][d]
         if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
       }
-    };print(dat_mvp_rec);print(weights_mvp)
+    }#;print(dat_mvp_rec);print(weights_mvp)
     
     
     ######################

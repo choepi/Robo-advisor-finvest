@@ -86,7 +86,7 @@ get_data <- function() {
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(l[[i]][,4])
-    r <- na.omit(ROC(r))
+    r <- na.omit(ROC(r))*260/100
     colnames(r) <-
       c(paste0("r.", asl[i]))
     ren[[i]] <- r
@@ -113,9 +113,9 @@ mvp <- function(y) {
   # Sigma = cov(y, y)
   
   mvp <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
-  MVP <- getWeights(mvp)
+  MVP <<- getWeights(mvp)
   N = dim(y)[1]
-  mittel = t(y) %*% rep(1 / N, N) * 260
+  mittel <<- t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
   
   mvpreturn <<- t(MVP) %*% mittel
@@ -125,7 +125,6 @@ mvp <- function(y) {
 
 
 tp <- function(y) {
-  print(shortpara)
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
   # assets <- dim(ret)[2]
@@ -172,9 +171,32 @@ tp <- function(y) {
     tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="Short")
   }else if (shortpara==F){
     spec <- portfolioSpec()
-    setRiskFreeRate(spec) <- 0.0 #???
+    setRiskFreeRate(spec) <- 0 #???
     tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
   }
+  
+  #################################
+  library(fPortfolio)
+  y <- as.timeSeries(a)
+  Frontier<-portfolioFrontier(y)
+  plot(Frontier,1) # Plot EF
+  plot(Frontier,2) # Min. Risk Portfolio
+  plot(Frontier,3) # Tangency Portfolio
+  plot(Frontier,4) # Risk/Return of Single Assets
+  plot(Frontier,5) # Equal Weights Portfolio
+  plot(Frontier,6) # Two Asset Frontiers(Long Only)
+  plot(Frontier,7) # Monte Carlo Portfolios
+  plot(Frontier,8) # MArkowitz PF Only
+  riskReturnPoints<-frontierPoints(Frontier) #risk and return points on the EF
+  annualizedPoints<-data.frame(targetRisk=riskReturnPoints[,"targetRisk"]*sqrt(252),
+                               targetReturn=riskReturnPoints[,"targetReturn"]*252)
+  plot(annualizedPoints)
+
+  riskFreeRate<-riskfree
+  plot((annualizedPoints[,"targetReturn"]-riskFreeRate)/annualizedPoints[,"targetRisk"], xlab="point on EF", ylab="Sharpe Ratio")
+
+  weightsPlot(Frontier)
+  #################################
   
   TP<<-getWeights(tanPort1)
   tpreturn <<- t(TP) %*% (excess + riskfree)
@@ -185,19 +207,33 @@ tp <- function(y) {
 
 
 max <- function(y, risk=0.12) {
-  ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  assets <- dim(ret)[2]
-  return.ts <- as.timeSeries(ret)
+  # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
+  # assets <- dim(ret)[2]
+  # return.ts <- as.timeSeries(ret)
+  # 
+  # spec <- portfolioSpec()
+  # setSolver(spec) <- "solveRshortExact"
+  # setNFrontierPoints(spec) <-dim(ret)[2]+1
+  # setTargetRisk(spec) <- risk
+  # constraints <- "LongOnly"
+  # max <- maxreturnPortfolio(return.ts,spec =spec ,constraints)
+  # 
+  # maxreturn <<- getTargetReturn(max)
+  # MAX <<-getWeights(max)
+  alpha = seq(-1e2,1e2,0.2)/10 #alpha = 1 => tp, alpha get ban von 0-1.5 durch
+  walpha = (alpha %o% TP) + ((1 - alpha) %o% as.numeric(MVP))
+  preturn <- walpha%*%mittel
+  pvola <- c()
+  for (i in 1:length(alpha)){
+    pvola[i] <- sqrt(walpha[i,] %*%(Sigma %*% walpha[i,]))*sqrt(260)
+  }
+  walpha <- as.data.frame(walpha)
+  walpha$alpha <- as.matrix(alpha)
+  walpha$preturn <- as.matrix(preturn)
+  walpha$pvola <- c(pvola)
+  walpha <- walpha/100
+  plot(x = walpha$pvola,y <- walpha$preturn, xlim=c(0.3,0.4))
   
-  spec <- portfolioSpec()
-  setSolver(spec) <- "solveRshortExact"
-  setNFrontierPoints(spec) <-dim(ret)[2]+1
-  setTargetRisk(spec) <- risk
-  constraints <- "LongOnly"
-  max <- maxreturnPortfolio(return.ts,spec =spec ,constraints)
-  
-  maxreturn <<- getTargetReturn(max)
-  MAX <<-getWeights(max)
   
   return(as.array(MAX))
 }
