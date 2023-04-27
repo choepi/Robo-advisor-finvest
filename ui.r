@@ -20,6 +20,7 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
+library(leaflet)
 
 
 
@@ -222,14 +223,24 @@ ui <- dashboardPage(
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                )),
+                  )
+                ),
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
       
       tabItem(tabName = "AssetInfo",
-              includeHTML("AssetInfo.html"))
-    )
+              tabsetPanel(
+                id = "tabsetPanelID",
+                type = "tabs",
+                tabPanel("AssetInfo",
+                         includeHTML("AssetInfo.html")),
+                tabPanel("Miscellaneous",
+                         tabPanel("Map", leafletOutput("map"))
+                         )
+                )
+              )
+      )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")

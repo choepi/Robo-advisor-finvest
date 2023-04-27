@@ -14,6 +14,7 @@ server <- function(input, output, session) {
   portfolio_s <<- c(1, 0, 1, 0, 1, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 1, 0)
   zu_invest_verm <<- 1000
+  risk_F("Geringes Risiko")
   portfolio_w_F()
   dat_mvp_F()
   dat_mvp_rec_F()
@@ -21,7 +22,7 @@ server <- function(input, output, session) {
   dat_tp_rec_F()
   dat_max_F()
   dat_max_rec_F()
-  risk_F("Geringes Risiko")
+
   
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -324,6 +325,28 @@ server <- function(input, output, session) {
     maxrec_inf
   })
   
+  output$map <- renderLeaflet({
+    data <- data.frame(
+      asset = c("Bitcoin (digital currency)",
+                "Swiss Market Index",
+                "S&P 500 Index",
+                "Swiss government bond",
+                "U.S. government bond", "Gold"),
+      lat = c(40, 47, 38, 46, 37, 51),
+      lng = c(-100, 8, -97, 8, -95, -0.1)
+    )
+    leaflet(data) %>%
+      addTiles() %>%
+      addMarkers(
+        ~lng, ~lat,
+        popup = ~asset,
+        label = ~asset
+      )
+  })
+  
+  
+  
+  ####################################Help-Box##################################
   help_text <- reactive({
     if (input$help_tab1) whichtab <- "help_tab1"
     if (input$help_tab2) whichtab <- "help_tab2"
