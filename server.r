@@ -121,9 +121,21 @@ server <- function(input, output, session) {
     }
     dat_mvp_F()
     dat_mvp_rec_F()
-    ggplot(dat_mvp, aes(x = Gewicht, y = Asset)) +
-      geom_col(fill = "#0099f9") +
-      coord_flip()
+    
+    ggplot(dat_mvp, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    
+    
+    
+    # ggplot(dat_mvp, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
   })
   
   output$selected_var <- renderText({ 
@@ -139,9 +151,17 @@ server <- function(input, output, session) {
     zu_invest_verm <<- input$num15
     dat_max_F()
     dat_max_rec_F()
-    ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
-      geom_col(fill = "#0099f9") +
-      coord_flip()
+    ggplot(dat_max, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    # ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
   })
   
   output$tp2 <- renderPlot({
@@ -152,10 +172,17 @@ server <- function(input, output, session) {
     dat_mvp_F()
     dat_mvp_rec_F()
     dat_tp_rec_F()
-
-    ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
-      geom_col(fill = "#0099f9") +
-      coord_flip()
+    ggplot(dat_tp, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    # ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
   })
   
   
