@@ -86,7 +86,7 @@ ui <- dashboardPage(
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
                              introBox(
-                               numericInput("num15", label = h6(""), value = 0, width = 100, min = 0),
+                               numericInput("num15", label = h6(""), value = 1000, width = 100, min = 0),
                                data.step = 1,
                                data.intro = "Eingabe"),
                              sliderTextInput(
@@ -135,7 +135,10 @@ ui <- dashboardPage(
                                       choices = list("Simpel" = 1, "Erweitert" = 2),
                                       selected = 1),width = 2),
                          br(), 
-                         mainPanel(plotOutput("weightened.portfolio",width = "60%")))
+                         mainPanel(
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                           )
+                         )
                 ),
                 tabPanel("MVP",
                          h5("Lorem ipsum dolor sit amet, 
