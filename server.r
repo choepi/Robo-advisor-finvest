@@ -192,12 +192,8 @@ server <- function(input, output, session) {
     }
     #weightened portfolio basic
     ######################
-
-    c.old <- rep(0,length(portfolio_w))
-
-
+    
     c.old <- rep(0,length(b))
-
     for(s in 1:length(portfolio_w)){
       n <- which.closest(w,index(dat[[s]]),index = F)
       if (portfolio_w[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
@@ -239,29 +235,20 @@ server <- function(input, output, session) {
       if (weights_tp[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
     };c.old
     for (i in 1:length(weights_tp)){
-      if (weights_tp[i]>0){
+      if (weights_tp[i]!=0){
         weights_tp[i] <- weights_tp[i]/c.old[i]
       }
-
+    }
     ######################
     
     weightened.portfolio.tp <- 0 #dat[[1]]
     for (i in 1:(length(asl))){
       weightened.portfolio.tp <- weightened.portfolio.tp + weights_tp[i]*dat[[i]]
     }
-
-    weighted.portfolio.tp <- na.omit(weighted.portfolio.tp)
-    
-    if (b == 1 ){
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
-    }else{
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
-    }
-    #weighted portfolio MVP
-
     weightened.portfolio.tp <- na.omit(weightened.portfolio.tp)
     weightened.portfolio.tp <- window(weightened.portfolio.tp, start = end, end=start)
-
+    
+    #weightened portfolio MVP
     names.ren.mvp <- c()
     for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
     weights_mvp <- c(0,0,0,0,0,0,0)
@@ -308,7 +295,7 @@ server <- function(input, output, session) {
         geom_line(color = "green4")+
         geom_line(data = weightened.portfolio.mvp[,4], aes(x = Index, y = Close), color = "blue")+
         geom_line(data = weightened.portfolio.tp[,4], aes(x = Index, y = Close), color = "red")
-
+      
     }
     else if (input$radioHistorie == 2){
       chartSeries(weightened.portfolio ,name="Historie",theme = 'white')
@@ -378,9 +365,8 @@ server <- function(input, output, session) {
   #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
   # )
   
-
-
-
+  
+  
   helptext <- data.frame(
     tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2")
     , step <- c(3, 3, 3, 2, 2)
@@ -388,5 +374,4 @@ server <- function(input, output, session) {
     , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
                 "Gib dein zu investierendes Vermögen ein","Wähle die Assets die du in deinem Portfolio haben möchtest")
   )
-
 }
