@@ -13,11 +13,15 @@ server <- function(input, output, session) {
   age <<- 5*365 #gedächtnis mvp/tp
   portfolio_s <<- c(1, 0, 1, 0, 1, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 1, 0)
+  zu_invest_verm <<- 0
   portfolio_w_F()
   dat_mvp_F()
-  dat_tp_F()
   dat_mvp_rec_F()
+  dat_tp_F()
   dat_tp_rec_F()
+  dat_max_F()
+  dat_max_rec_F()
+  risk_F("Geringes Risiko")
   
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -50,32 +54,6 @@ server <- function(input, output, session) {
   })
   
   
-  output$portfolio2 <-  renderPlot({
-    for (i in 1:(length(portfolio_s2))) {
-      portfolio_s2[i] <<- if (input[[paste0("checkbox", as.character(i))]]) 1
-    }
-    
-    if (input$slider3 == "Geringes Risiko")
-      risk <<- 1
-    else if (input$slider3 == "Mittleres Risiko")
-      risk <<- 2
-    else if (input$slider3 == "Hohes Risiko")
-      risk <<- 3
-    
-    zu_invest_verm <<- input$num15
-    
-    dat_v <- as.matrix(t(portfolio_s2))
-    colnames(dat_v) <- asl
-    dat_port <- data.frame(group = colnames(dat_v),
-                           value = c(dat_v))
-    ggplot(dat_port, aes(x = "", y = value, fill = group)) +
-      geom_bar(stat = "identity",
-               width = 1) +
-      coord_polar("y", start = 0) +
-      theme_void() # remove background, grid, numeric labels
-  })
-  
-  
   output$portfolio_worth1 <- renderText({
     #reactive auf inputs
     for (i in 1:length(portfolio_s)) {
@@ -91,6 +69,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_mvp_F()
+    dat_mvp_rec_F()
     ggplot(dat_mvp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
@@ -106,7 +85,9 @@ server <- function(input, output, session) {
     }
     
     dat_tp_F(input$shortpara)
-    
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
@@ -115,9 +96,65 @@ server <- function(input, output, session) {
       theme_void()
   })
   
+  output$max <-  renderPlot({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    dat_max_F()
+    dat_max_rec_F()
+    input$slider3
+    risk_F(input$slider3)
+    zu_invest_verm <<- input$num15
+    
+    ggplot(dat_max, aes(x = "", y = Gewicht, fill = Asset)) +
+      geom_bar(stat = "identity",
+               width = 1,
+               color = "white") +
+      coord_polar("y", start = 0) +
+      theme_void()
+  })
+  
+  output$mvp2 <- renderPlot({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    ggplot(dat_mvp, aes(x = Gewicht, y = Asset)) +
+      geom_col(fill = "#0099f9") +
+      coord_flip()
+  })
   
   output$selected_var <- renderText({ 
     paste("You have selected", asl[as.numeric(input$select2)])
+  })
+  
+  output$max2 <-  renderPlot({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    zu_invest_verm <<- input$num15
+    dat_max_F()
+    dat_max_rec_F()
+    ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
+      geom_col(fill = "#0099f9") +
+      coord_flip()
+  })
+  
+  output$tp2 <- renderPlot({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_tp_F(input$shortpara)
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
+
+    ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
+      geom_col(fill = "#0099f9") +
+      coord_flip()
   })
   
   
@@ -218,7 +255,7 @@ server <- function(input, output, session) {
     #weightened portfolio TP
     names.ren.tp <- c()
     for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,1]))
-    weights_tp <- c(0,0,0,0,0,0,0)
+    weights_tp <- c(0,0,0,0,0,0)
     
     for (i in 1:length(names.ren.tp)){
       q = names.ren.tp[i]
@@ -251,7 +288,7 @@ server <- function(input, output, session) {
     #weightened portfolio MVP
     names.ren.mvp <- c()
     for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
-    weights_mvp <- c(0,0,0,0,0,0,0)
+    weights_mvp <- c(0,0,0,0,0,0)
     for (i in 1:length(names.ren.mvp)){
       q = names.ren.mvp[i]
       for(d in 1:length(dat_mvp_rec[,1])){
@@ -324,6 +361,20 @@ server <- function(input, output, session) {
   })
   
   
+  output$maxrec <- renderTable({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    
+    zu_invest_verm <<- input$num15
+    
+    dat_max_rec_F()
+    dat_max_rec
+  })
+  
+  
   output$mvprec_inf <- renderTable({
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
@@ -341,6 +392,18 @@ server <- function(input, output, session) {
     tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
                             "Rendite"=round(tpreturn,2))
     tprec_inf
+  })
+  
+  output$maxrec_inf <- renderTable({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    
+    maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
+                            "Rendite"=round(max_return,2))
+    maxrec_inf
   })
   
   help_text <- reactive({

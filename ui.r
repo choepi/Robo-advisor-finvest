@@ -77,7 +77,7 @@ ui <- dashboardPage(
                                ),
                            )
                          ),
-                tabPanel("Kein Portfolio",
+                tabPanel("Individuelles Portfolio",
                          actionButton("help_tab2", "About this Page"),
                          fluidPage(
                            h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
@@ -114,6 +114,16 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidPage(sidebarPanel(
                          sliderTextInput(
                            inputId = "sliderHistorie",
@@ -128,21 +138,65 @@ ui <- dashboardPage(
                          mainPanel(plotOutput("weightened.portfolio",width = "60%")))
                 ),
                 tabPanel("MVP",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidRow(
                            tableOutput("mvprec"),
-                           plotOutput("mvp",width = "60%"),
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("mvp"), plotOutput("mvp2")),
                            tableOutput("mvprec_inf"))),
                 tabPanel("TP",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidRow(
                            tableOutput("tprec"),
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
-                           plotOutput("tp", width = "60%"),
-                           tableOutput("tprec_inf")))
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("tp"), plotOutput("tp2")),
+                           tableOutput("tprec_inf"))),
+                tabPanel("Individuelles Portfolio",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         fluidRow(
+                           tableOutput("maxrec"),
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("max"), plotOutput("max2")),
+                           tableOutput("maxrec_inf")))
               )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
-              h5("Aktuelle Kursangaben"),
+              h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
               fluidPage(
                 sidebarPanel(
                   sliderTextInput(
