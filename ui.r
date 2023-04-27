@@ -20,6 +20,7 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
+library(leaflet)
 
 
 
@@ -86,7 +87,7 @@ ui <- dashboardPage(
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
                              introBox(
-                               numericInput("num15", label = h6(""), value = 0, width = 100, min = 0),
+                               numericInput("num15", label = h6(""), value = 1000, width = 100, min = 0),
                                data.step = 1,
                                data.intro = "Eingabe"),
                              sliderTextInput(
@@ -135,7 +136,10 @@ ui <- dashboardPage(
                                       choices = list("Simpel" = 1, "Erweitert" = 2),
                                       selected = 1),width = 2),
                          br(), 
-                         mainPanel(plotOutput("weightened.portfolio",width = "60%")))
+                         mainPanel(
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                           )
+                         )
                 ),
                 tabPanel("MVP",
                          h5("Lorem ipsum dolor sit amet, 
@@ -219,14 +223,24 @@ ui <- dashboardPage(
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                )),
+                  )
+                ),
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
       
       tabItem(tabName = "AssetInfo",
-              includeHTML("AssetInfo.html"))
-    )
+              tabsetPanel(
+                id = "tabsetPanelID",
+                type = "tabs",
+                tabPanel("AssetInfo",
+                         includeHTML("AssetInfo.html")),
+                tabPanel("Miscellaneous",
+                         tabPanel("Map", leafletOutput("map"))
+                         )
+                )
+              )
+      )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")
