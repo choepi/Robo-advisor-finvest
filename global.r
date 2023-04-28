@@ -1,7 +1,7 @@
 
 
 #Adjustedst index 
-which.Adjustedst <- function(x,invect,index=T) {
+which.closest <- function(x,invect,index=T) {
   pick <- which.min(abs(invect-x))
   if (index) {
     return(pick)
@@ -29,7 +29,7 @@ cbind.fill <- function(...) {
 }
 
 usdchf <- function(){
-  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4])
+  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,6])
   colnames(usd_chf) <- "usd_chf"
   usd_chf <<- usd_chf
 }
@@ -44,7 +44,7 @@ get_data <- function() {
       c("Open",
         "High",
         "Low",
-        "Adjusted",
+        "Close",
         "Volume",
         "Adjusted")
     l[[i]] <- (r)
@@ -78,7 +78,7 @@ get_data <- function() {
   
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
-    r <- na.omit(l[[i]][,4])
+    r <- na.omit(l[[i]][,6])
     r <- na.omit(ROC(r))*260/100
     colnames(r) <-
       c(paste0("r.", asl[i]))
@@ -410,7 +410,7 @@ weightened.portfolio_F <- function(b){
   
   c.old <- rep(0,length(b))
   for(s in 1:length(portfolio_w)){
-    n <- which.Adjustedst(w,index(dat[[s]]),index = F)
+    n <- which.closest(w,index(dat[[s]]),index = F)
     if (portfolio_w[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
   };c.old
   weight <- portfolio_w
@@ -446,7 +446,7 @@ weightened.portfolio_F <- function(b){
   ######################
   c.old <- rep(0,length(weights_tp))
   for(s in 1:length(names.ren.tp)){
-    n <- which.Adjustedst(w,index(dat[[s]]),index = F)
+    n <- which.closest(w,index(dat[[s]]),index = F)
     if (weights_tp[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
   };c.old
   for (i in 1:length(weights_tp)){
@@ -479,7 +479,7 @@ weightened.portfolio_F <- function(b){
   ######################
   c.old <- rep(0,length(weights_mvp))
   for(s in 1:length(names.ren.mvp)){
-    n <- which.Adjustedst(w,index(dat[[s]]),index = F)
+    n <- which.closest(w,index(dat[[s]]),index = F)
     if (weights_mvp[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
   };c.old
   
@@ -535,7 +535,7 @@ weightened.portfolio2_F <- function(b){
   ######################
   c.old <- rep(0,length(weights_max))
   for(s in 1:length(names.ren.max)){
-    n <- which.Adjustedst(w,index(dat[[s]]),index = F)
+    n <- which.closest(w,index(dat[[s]]),index = F)
     if (weights_max[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
   };c.old
   
