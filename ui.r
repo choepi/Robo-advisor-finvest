@@ -40,22 +40,36 @@ library(tidyquant)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
-  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
+  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=100),
+                                      tags$style(".navbar {min-height: 100px !important;}"),
+                                      tags$style(".main-header {min-height: 100px !important;}"),
+                                      tags$style(".logo img {height: 100px !important;}"),
+                                      tags$li(
+                                        class = "dropdown",
+                                        tags$style(".main-header .logo {height: 100px !important;}"),
+                                        tags$style(".sidebar-toggle {font-size: 28px !important;}"))
+
   ),
   
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
-    message = (img(src="support.jpg", height=180))
+    message = (img(src="support.jpg", height=180)),
+    tags$li(
+      tags$head(
+        class = "dropdown",
+        tags$style(".dropdown-menu .fa-circle-info { font-size: 28px !important; }")))
   ))
   ),
   sidebar <- dashboardSidebar(
+    tags$head(tags$style(".sidebar { margin-top: 70px; }")),
     sidebarMenu(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
       menuItem("Kurse", tabName = "kurse", icon = icon("eye")),
       menuItem("Mehr Infos", tabName = "AssetInfo", icon = icon("folder-open")),
-      menuItem("Über uns", tabName = "about", icon = icon("people-group")))),
+      menuItem("Über uns", tabName = "about", icon = icon("people-group")),
+      tags$style(".sidebar-menu li a {font-size: 20px;}"))),
   
   body <- dashboardBody( 
     introjsUI(),
