@@ -245,16 +245,16 @@ server <- function(input, output, session) {
   })
   
   
-  #Plot Protfolio time series
+  #Plot Protfolio time series#############################
   output$weightened.portfolio <- renderPlot({
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
     if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 180
+    if (input$sliderHistorie=="6M") b <- 182
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 10*365
+    if (input$sliderHistorie=="8Y") b <- 8*365
     dat_mvp_F()
     dat_tp_F()
     dat_mvp_rec_F()
@@ -290,7 +290,7 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 9*365
+    if (input$sliderHistorie=="8Y") b <- 8*365
     dat_max_F()
     dat_max_rec_F()
     for (i in 1:length(portfolio_s)){
