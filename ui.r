@@ -33,7 +33,6 @@ library(scales)
 library(pROC)
 library(fPortfolio)
 library(PortfolioAnalytics)
-library(tidyverse)
 library(tidyquant)
 
 

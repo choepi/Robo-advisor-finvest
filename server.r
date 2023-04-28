@@ -76,7 +76,7 @@ server <- function(input, output, session) {
     
     output[[output_name]] <- renderText({
       
-      paste("Asset", i, "value:", v[[i]])
+      paste("CHF",format(v[[i]], big.mark = "'", decimal.mark = ".", nsmall = 2))
     })
 
     output_name
