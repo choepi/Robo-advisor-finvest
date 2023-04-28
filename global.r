@@ -22,7 +22,14 @@ which.closest <- function(x,invect,index=T) {
     return(invect[pick])
   }
 } 
-
+risk_F<-function(o){
+  if (o == "Geringes Risiko")
+    risk <<- 0.07
+  else if (o == "Mittleres Risiko")
+    risk <<- 0.1
+  else if (o == "Hohes Risiko")
+    risk <<- 0.5
+}
 #binds data columnwise and fills with NA
 cbind.fill <- function(...) {
   nm <- list(...)
@@ -68,7 +75,7 @@ get_data <- function() {
   usd = c(0,0,1,1,1,1) # 1 if asset is usd
   for (p in 1:length(usd)){
     q <- usd[p]
-      if(q>=1){
+    if(q>=1){
       usd_ts <- l[[p]]
       chf_ts <- na.omit(merge(usd_ts,usd_chf))
       attributes(chf_ts)$na.action <- NULL
@@ -82,11 +89,10 @@ get_data <- function() {
   }
   
   
-  
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(l[[i]][,4])
-    r <- na.omit(ROC(r))
+    r <- na.omit(ROC(r))*260/100
     colnames(r) <-
       c(paste0("r.", asl[i]))
     ren[[i]] <- r
@@ -99,25 +105,12 @@ get_data <- function() {
 
 mvp <- function(y) {
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  # assets <- dim(ret)[2]
-  # return.ts <- as.timeSeries(ret)
-  # 
-  # spec <- portfolioSpec()
-  # setSolver(spec) <- "solveRquadprog"
-  # setNFrontierPoints(spec) <-dim(ret)[2]+1
-  # constraints <- "LongOnly"
-  # mvp <- minvariancePortfolio(return.ts,spec =spec , constraints)
-  # mvpreturn <<-getTargetReturn(mvp)
-  # MVP<<-getWeights(mvp)
-  # Sigma = cov(y, y)
-  
   mvp <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
-  MVP <- getWeights(mvp)
+  MVP <<- getWeights(mvp)
   N = dim(y)[1]
-  mittel = t(y) %*% rep(1 / N, N) * 260
+  mittel <<- t(y) %*% rep(1 / N, N) * 260
   Sigma = cov(y, y)
-
+  
   mvpreturn <<- t(MVP) %*% mittel
   mvpvola <<- sqrt(t(MVP) %*% (Sigma %*% MVP)) * sqrt(260)
   return(as.array(MVP))
@@ -125,39 +118,7 @@ mvp <- function(y) {
 
 
 tp <- function(y) {
-  print(shortpara)
   y <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  # ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  # assets <- dim(ret)[2]
-  # return.ts <- as.timeSeries(ret)
-  # if (shortpara==T) {
-  #   cons <- "Short"
-  #   sol <- "solveRshortExact"}else{
-  #     cons <- "LongOnly"
-  #     sol <- "solveRquadprog"
-  #   } 
-  # 
-  # 
-  # spec <- portfolioSpec()
-  # setSolver(spec) <- sol
-  # setNFrontierPoints(spec) <-dim(ret)[2]+1
-  # setRiskFreeRate(spec) <- riskfree
-  # constraints <- cons
-  # tp <- tangencyPortfolio(return.ts,spec =spec , constraints);tp
-  # 
-  # spec <- portfolioSpec()
-  # setSolver(spec) <- "solveRshortExact"
-  # setNFrontierPoints(spec) <-dim(ret)[2]+1
-  # setTargetRisk(spec) <- risk
-  # constraints <- cons
-  # max <- maxreturnPortfolio(return.ts,spec =spec ,"LongOnly")
-  # 
-  # 
-  # tpreturn <<- getTargetReturn(tp)
-  # TP <<- getWeights(tp)
-  # Sigma = cov(y, y)
-  # tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
-  
   N = dim(y)[1]
   excess = t(y) %*% rep(1 / N, N) * 260 - riskfree
   Sigma = cov(y, y)
@@ -170,12 +131,35 @@ tp <- function(y) {
     setSolver(spec) <- "solveRshortExact"
     setRiskFreeRate(spec) <- riskfree
     tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="Short")
-    }else if (shortpara==F){
-      spec <- portfolioSpec()
-      setRiskFreeRate(spec) <- 0.0 #???
-      tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
-    }
-
+  }else if (shortpara==F){
+    spec <- portfolioSpec()
+    setRiskFreeRate(spec) <- 0 #???
+    tanPort1 <- tangencyPortfolio(Portfolio1, spec=spec, constraints="LongOnly")
+  }
+  
+  #################################
+  # library(fPortfolio)
+  # y <- as.timeSeries(a)
+  # Frontier<-portfolioFrontier(y)
+  # plot(Frontier,1) # Plot EF
+  # plot(Frontier,2) # Min. Risk Portfolio
+  # plot(Frontier,3) # Tangency Portfolio
+  # plot(Frontier,4) # Risk/Return of Single Assets
+  # plot(Frontier,5) # Equal Weights Portfolio
+  # plot(Frontier,6) # Two Asset Frontiers(Long Only)
+  # plot(Frontier,7) # Monte Carlo Portfolios
+  # plot(Frontier,8) # MArkowitz PF Only
+  # riskReturnPoints<-frontierPoints(Frontier) #risk and return points on the EF
+  # annualizedPoints<-data.frame(targetRisk=riskReturnPoints[,"targetRisk"]*sqrt(252),
+  #                              targetReturn=riskReturnPoints[,"targetReturn"]*252)
+  # plot(annualizedPoints)
+  # 
+  # riskFreeRate<-riskfree
+  # plot((annualizedPoints[,"targetReturn"]-riskFreeRate)/annualizedPoints[,"targetRisk"], xlab="point on EF", ylab="Sharpe Ratio")
+  # 
+  # weightsPlot(Frontier)
+  #################################
+  
   TP<<-getWeights(tanPort1)
   tpreturn <<- t(TP) %*% (excess + riskfree)
   tpvola <<- sqrt(t(TP) %*% (Sigma %*% TP)) * sqrt(260)
@@ -184,22 +168,55 @@ tp <- function(y) {
 }
 
 
-max <- function(y, risk=0.12) {
-  ret <-window(y, start=Sys.Date()-age, end=Sys.Date())
-  assets <- dim(ret)[2]
-  return.ts <- as.timeSeries(ret)
+max <- function() {
+  #risk = risik0, 5,9,14
+  #worth sum == zu_invest_verm
+  a <- xts()
+  for (i in 1:length(portfolio_s2)) {
+    if (portfolio_s2[i] > 0)
+      a <- na.omit(merge(a, ren[[i]]))
+  }
+  y <-window(a, start=Sys.Date()-age, end=Sys.Date())
+  mvp_m <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
+  MVP_m <<- getWeights(mvp_m)
+  N = dim(y)[1]
+  mittel_m <<- t(y) %*% rep(1 / N, N) * 260
+  Sigma_m = cov(y, y)
+  mvpreturn <<- t(MVP_m) %*% mittel_m
+  mvpvola <<- sqrt(t(MVP_m) %*% (Sigma_m %*% MVP_m)) * sqrt(260)
   
+  Portfolio2 <- as.timeSeries(y)
+  excess_m = t(y) %*% rep(1 / N, N) * 260 - riskfree
   spec <- portfolioSpec()
-  setSolver(spec) <- "solveRshortExact"
-  setNFrontierPoints(spec) <-dim(ret)[2]+1
-  setTargetRisk(spec) <- risk
-  constraints <- "LongOnly"
-  max <- maxreturnPortfolio(return.ts,spec =spec ,constraints)
-
-  maxreturn <<- getTargetReturn(max)
-  MAX <<-getWeights(max)
-
-  return(as.array(MAX))
+  setRiskFreeRate(spec) <- riskfree #???
+  tanPort2 <- tangencyPortfolio(Portfolio2, spec=spec, constraints="LongOnly")
+  TP_m<<-getWeights(tanPort2)
+  tpreturn_m <<- t(TP_m) %*% (excess_m + riskfree)
+  tpvola_m <<- sqrt(t(TP_m) %*% (Sigma_m %*% TP_m)) * sqrt(260)
+  
+  
+  alpha = seq(-1e4,1e3,1)/10 #alpha = 1 => tp, alpha get ban von 0-1.5 durch
+  walpha = (alpha %o% TP_m) + ((1 - alpha) %o% as.numeric(MVP_m))
+  preturn <- walpha%*%mittel_m
+  pvola <- c()
+  for (i in 1:length(alpha)){
+    pvola[i] <- sqrt(walpha[i,] %*%(Sigma_m %*% walpha[i,]))*sqrt(260)
+  }
+  walpha <- as.data.frame(walpha)
+  walpha$alpha <- as.matrix(alpha)
+  walpha$preturn <- as.matrix(preturn)
+  walpha$pvola <- c(pvola)
+  walpha <- walpha/100
+  #plot(x = walpha$pvola,y <- walpha$preturn)
+  df <- walpha[which.min(abs((risk-walpha$preturn))),]
+  max_return <<- df$preturn
+  max_vola<<- df$pvola
+  m<-(df[ , -which(names(df) %in% c("alpha","pvola","preturn"))])
+  MAXX<<-as.matrix(m)
+  rownames(MAXX) <- NULL
+  
+  
+  return(t(MAXX))
 }
 
 get_rf <- function() {
@@ -225,6 +242,14 @@ portfolio_w_F <- function() {
   portfolio_w <<- round((portfolio_w), 1)
 }
 
+portfolio_w_max_F <- function() {
+  portfolio_w_max <- c()
+  for (i in 1:length(portfolio_s2)) {
+    portfolio_w_max[i] <- portfolio_s2[i] * last(dat_asset[[i]]$Close)
+  }
+  portfolio_w_max <<- round((portfolio_w_max), 1)
+}
+
 dat_mvp_F <- function() {
   a <- xts()
   for (i in 1:length(portfolio_s)) {
@@ -235,7 +260,7 @@ dat_mvp_F <- function() {
   
   dat_mvp <<- data.frame(Asset = rownames(dat_v),
                          Gewicht = c(dat_v))
-
+  
 }
 
 
@@ -252,6 +277,15 @@ dat_tp_F <- function(shortpara=F) {
                         Gewicht = c(dat_v))
   
 }
+
+
+dat_max_F <- function() {
+  dat_v <- max()
+  dat_max <<- data.frame(Asset = rownames(dat_v),
+                        Gewicht = c(dat_v))
+  
+}
+
 
 dat_mvp_rec_F <- function() {
   dat_mvp_rec <- dat_mvp
@@ -320,6 +354,219 @@ dat_tp_rec_F <- function() {
   dat_tp_rec <<- dat_tp_rec
 }
 
+dat_max_rec_F <- function() {
+  dat_max_rec <- dat_max
+  dat_max_rec$Gewicht <- round(dat_max$Gewicht, 2)
+  as.data.frame(dat_max_rec)
+  g <- c(portfolio_s2)
+  g <- g[g != 0]
+  lp <- c(1:length(g))
+  sg <- zu_invest_verm
+  abssum<- sum(abs(dat_max[lp, 2]))
+  g <- sg/abssum*dat_max[lp, 2]
+  dat_max_rec$Investiert <- (g)
+  
+  names.max <- c()
+  for (i in ren) names.max <- rbind(names.max,colnames(i))
+  weights_max <- c(0,0,0,0,0,0)
+  for (i in 1:length(names.max)){
+    q = names.max[i]
+    for(d in 1:length(dat_max[,1])){
+      r <- dat_max[,1][d]
+      if (r==q) weights_max[i] <- dat_max[d,2]
+    }
+  }#;print(g);print(weights_max)
+  
+  pa <- weights_max
+  for (i in 1:length(asl)) {
+    pa[i] <- weights_max[i] * last(dat_asset[[i]]$Close)
+  }
+  
+  pa <- pa[pa != 0]
+  dat_max_rec$Anzahl <- round(g / pa,3)
+  n = length(dat_max_rec$Anzahl)
+  h = c(rep(NA, n))
+  for (i in 1:n) {
+    if (dat_max_rec$Gewicht[i] > 0)
+      h[i] <- "Kaufen"
+    else if (dat_max_rec$Gewicht[i] < 0)
+      h[i] <- "Verkaufen"
+    else if (dat_max_rec$Gewicht[i] == 0)
+      h[i] <- "Nicht Kaufen"
+  }
+  dat_max_rec$Handlung <- h
+  dat_max_rec <-
+    dat_max_rec[order(abs(dat_max_rec$Investiert), decreasing = T), ]
+  dat_max_rec <<- dat_max_rec
+}
 
 
-                                          
+weightened.portfolio_F <- function(b){
+  start = Sys.Date()
+  end = start-b
+  if (wday(start, label = T) == "Sa")start <- start-1
+  if (wday(start, label = T) == "So")start <- start-2
+  
+  #gewünschter zeit horizont
+  if (b == 1 ){
+    w = start
+  }else{
+    w = end
+  }
+  
+  dat <- list()
+  for (i in 1:length(asl)){
+    dat[[i]] <- window(dat_asset[[i]],start=end,end=start)
+  }
+  #weightened portfolio basic
+  ######################
+  
+  c.old <- rep(0,length(b))
+  for(s in 1:length(portfolio_w)){
+    n <- which.closest(w,index(dat[[s]]),index = F)
+    if (portfolio_w[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
+  };c.old
+  weight <- portfolio_w
+  for (i in 1:length(portfolio_w)){
+    if (portfolio_w[i]!=0){
+      weight[i] <- weight[i]/c.old[i]
+    }
+  }
+  ######################
+  weightened.portfolio <- 0 #dat[[1]]
+  for (i in 1:(length(asl))){
+    weightened.portfolio <- weightened.portfolio + weight[i]*dat[[i]]
+  }
+  weightened.portfolio <- na.omit(weightened.portfolio)
+  
+  
+  weightened.portfolio <<- window(weightened.portfolio, start = end, end=start)
+  
+  
+  #weightened portfolio TP
+  names.ren.tp <- c()
+  for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,1]))
+  weights_tp <- c(0,0,0,0,0,0)
+  
+  for (i in 1:length(names.ren.tp)){
+    q = names.ren.tp[i]
+    for(d in 1:length(dat_tp_rec[,1])){
+      r <- dat_tp[,1][d]
+      if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
+    }
+  }#;print(dat_tp_rec);print(weights_tp)
+  
+  ######################
+  c.old <- rep(0,length(weights_tp))
+  for(s in 1:length(names.ren.tp)){
+    n <- which.closest(w,index(dat[[s]]),index = F)
+    if (weights_tp[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
+  };c.old
+  for (i in 1:length(weights_tp)){
+    if (weights_tp[i]!=0){
+      weights_tp[i] <- weights_tp[i]/c.old[i]
+    }
+  }
+  ######################
+  
+  weightened.portfolio.tp <- 0 #dat[[1]]
+  for (i in 1:(length(asl))){
+    weightened.portfolio.tp <- weightened.portfolio.tp + weights_tp[i]*dat[[i]]
+  }
+  weightened.portfolio.tp <- na.omit(weightened.portfolio.tp)
+  weightened.portfolio.tp <<- window(weightened.portfolio.tp, start = end, end=start)
+  
+  #weightened portfolio MVP
+  names.ren.mvp <- c()
+  for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,1]))
+  weights_mvp <- c(0,0,0,0,0,0)
+  for (i in 1:length(names.ren.mvp)){
+    q = names.ren.mvp[i]
+    for(d in 1:length(dat_mvp_rec[,1])){
+      r <- dat_mvp[,1][d]
+      if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
+    }
+  }#;print(dat_mvp_rec);print(weights_mvp)
+  
+  
+  ######################
+  c.old <- rep(0,length(weights_mvp))
+  for(s in 1:length(names.ren.mvp)){
+    n <- which.closest(w,index(dat[[s]]),index = F)
+    if (weights_mvp[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
+  };c.old
+  
+  for (i in 1:length(weights_mvp)){
+    if (weights_mvp[i]!=0){
+      weights_mvp[i] <- weights_mvp[i]/c.old[i]
+    }
+  }
+  ######################
+  
+  
+  weightened.portfolio.mvp <- 0 #dat[[1]]
+  for (i in 1:(length(asl))){
+    weightened.portfolio.mvp  <- weightened.portfolio.mvp  + weights_mvp[i]*dat[[i]]
+  }
+  weightened.portfolio.mvp <- na.omit(weightened.portfolio.mvp)
+  
+  weightened.portfolio.mvp <<- window(weightened.portfolio.mvp, start = end, end=start)
+}
+
+
+weightened.portfolio2_F <- function(b){
+  
+  start = Sys.Date()
+  end = start-b
+  if (wday(start, label = T) == "Sa")start <- start-1
+  if (wday(start, label = T) == "So")start <- start-2
+  
+  #gewünschter zeit horizont
+  if (b == 1 ){
+    w = start
+  }else{
+    w = end
+  }
+  
+  dat <- list()
+  for (i in 1:length(asl)){
+    dat[[i]] <- window(dat_asset[[i]],start=end,end=start)
+  }
+  #weightened portfolio MAXX
+  names.ren.max <- c()
+  for (i in ren) names.ren.max <- rbind(names.ren.max,colnames(i[,1]))
+  weights_max <- c(0,0,0,0,0,0)
+  for (i in 1:length(names.ren.max)){
+    q = names.ren.max[i]
+    for(d in 1:length(dat_max_rec[,1])){
+      r <- dat_mvp[,1][d]
+      if (r==q) weights_max[i] <- dat_max_rec[d,3]
+    }
+  }#;print(dat_max_rec);print(weights_max)
+  
+  
+  ######################
+  c.old <- rep(0,length(weights_max))
+  for(s in 1:length(names.ren.max)){
+    n <- which.closest(w,index(dat[[s]]),index = F)
+    if (weights_max[s]!=0) c.old[s] <- coredata(dat[[s]][n,4]) 
+  };c.old
+  
+  for (i in 1:length(weights_max)){
+    if (weights_max[i]!=0){
+      weights_max[i] <- weights_max[i]/c.old[i]
+    }
+  }
+  ######################
+  
+  
+  weightened.portfolio.max <- 0 #dat[[1]]
+  for (i in 1:(length(asl))){
+    weightened.portfolio.max  <- weightened.portfolio.max  + weights_max[i]*dat[[i]]
+  }
+  weightened.portfolio.max <- na.omit(weightened.portfolio.max)
+  
+  weightened.portfolio.max <<- window(weightened.portfolio.max, start = end, end=start)
+}
+
+
