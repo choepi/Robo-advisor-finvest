@@ -235,7 +235,7 @@ ui <- dashboardPage(
                 type = "tabs",
                 tabPanel("AssetInfo",
                          includeHTML("AssetInfo.html")),
-                tabPanel("Miscellaneous",
+                tabPanel("Geografische Verteilung",
                          tabPanel("Map", leafletOutput("map"))
                          )
                 )
