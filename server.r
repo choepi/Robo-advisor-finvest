@@ -22,7 +22,7 @@ server <- function(input, output, session) {
   dat_tp_rec_F()
   dat_max_F()
   dat_max_rec_F()
-
+  
   
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -348,7 +348,7 @@ server <- function(input, output, session) {
     risk_F(input$slider3)
     
     maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
-                            "Rendite"=round(max_return,2))
+                             "Rendite"=round(max_return,2))
     maxrec_inf
   })
   
