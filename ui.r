@@ -75,16 +75,30 @@ ui <- dashboardPage(
                            
                            column(2,
                                   numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  textOutput("Asset1"),
+                                  br(),
+                                  br(),
                                   numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset2")
                            ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
-                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
+                                  textOutput("Asset3"),
+                                  br(),
+                                  br(),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset4")
                            ),
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
-                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
+                                  textOutput("Asset5"),
+                                  br(),
+                                  br(),
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset6")
                            ),
+                           br(),
+                           br(),
                            mainPanel(
                              h4(textOutput("portfolio_worth1")),
                              plotOutput("portfolio1", width = "100%")

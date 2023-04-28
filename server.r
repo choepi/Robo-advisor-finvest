@@ -61,8 +61,33 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     w <- round(sum(portfolio_w), 1)
-    paste("Portfolio Value:", w , "CHF")
+    paste("Portfolio Value:", "CHF", w )
   })
+  
+
+  v <- list()
+  for (i in 1:length(asl)) {
+    z <- portfolio_s[i]
+    v[[i]] <- as.numeric(last(dat_asset[[i]]$Close))*z
+  }
+  
+  text_outputs_list <- lapply(seq_along(v), function(i) {
+    output_name <- paste0("Asset", i)
+    
+    output[[output_name]] <- renderText({
+      
+      paste("Asset", i, "value:", v[[i]])
+    })
+
+    output_name
+  })
+  
+  output$text_outputs <- renderUI({
+    lapply(text_outputs_list, function(output_name) {
+      textOutput(output_name)
+    })
+  })
+  
   
   
   output$mvp <- renderPlot({
@@ -274,10 +299,8 @@ server <- function(input, output, session) {
     
     weightened.portfolio2_F(b)
     
-    
-    
     if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weightened.portfolio.max, aes(index(weightened.portfolio.max)))+
+      ggplot(data = weightened.portfolio.max, aes(as.Date(index(weightened.portfolio.max))))+
         geom_line(aes(y = Close, colour = "Individuelles Portfolio"))
       
     }
