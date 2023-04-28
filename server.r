@@ -263,7 +263,7 @@ server <- function(input, output, session) {
     weightened.portfolio_F(b)
     
     port <- xts()
-    port <- merge(port,weightened.portfolio[,4],weightened.portfolio.mvp[,4],weightened.portfolio.tp[,4])
+    port <- merge(port,weightened.portfolio[,6],weightened.portfolio.mvp[,6],weightened.portfolio.tp[,6])
     colnames(port)<- c("Alt", "NeuMVP","NeuTP")
     
     if (input$radioHistorie == 1 & b != 1){
@@ -346,7 +346,7 @@ server <- function(input, output, session) {
     tprec_inf
   })
   
-
+  
   output$maxrec_inf <- renderTable({
     input_ckbx()
     input$slider3
