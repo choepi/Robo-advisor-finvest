@@ -362,12 +362,35 @@ server <- function(input, output, session) {
       lat = c(40, 47, 38, 46, 37, 51),
       lng = c(-100, 8, -97, 8, -95, -0.1)
     )
+    
+    # Define the borders of the countries
+    borders <- geojsonio::geojson_read("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json", what = "sp")
+    
     leaflet(data) %>%
       addTiles() %>%
       addMarkers(
         ~lng, ~lat,
         popup = ~asset,
         label = ~asset
+      ) %>%
+      addPolygons(
+        data = borders,
+        color = "#FFFFFF", # Set the border color
+        weight = 1, # Set the border weight
+        opacity = 0.7, # Set the border opacity
+        fillColor = "#FFFFFF", # Set the fill color
+        fillOpacity = 0.1, # Set the fill opacity
+        layerId = borders$ADMIN # Assign an ID to each polygon based on the country name
+      ) %>%
+      highlightOptions(
+        weight = 5, # Set the border weight of the highlighted area
+        color = "#666666", # Set the border color of the highlighted area
+        fillColor = "#666666", # Set the fill color of the highlighted area
+        fillOpacity = 0.2 # Set the fill opacity of the highlighted area
+      ) %>%
+      addLayersControl(
+        overlayGroups = c(data$asset),
+        options = layersControlOptions(collapsed = FALSE)
       )
   })
   

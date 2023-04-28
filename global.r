@@ -12,6 +12,7 @@ library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyverse)
 library(tidyquant)
+library(geojsonio)
 
 #closest index 
 which.closest <- function(x,invect,index=T) {
