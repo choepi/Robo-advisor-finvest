@@ -379,18 +379,23 @@ server <- function(input, output, session) {
         popup = ~paste("<strong>", asset, "</strong><br>", desc),
         label = ~asset
       ) %>%
-      addPolylines(
+      addPolygons(
         data = swiss_border,
-        color = "#FF0000", # Set the border color of Switzerland to red
-        weight = 2 # Set the border weight of Switzerland to 2
+        fillColor = "#FF0000",
+        fillOpacity = 0.05,
+        color = "#FF0000",
+        weight = 2
       ) %>%
-      addPolylines(
+      addPolygons(
         data = us_border,
-        color = "#0000FF", # Set the border color of the US to blue
-        weight = 2 # Set the border weight of the US to 2
+        fillColor = "#0000FF",
+        fillOpacity = 0.05,
+        color = "#0000FF",
+        weight = 2
       )
   })
   
+
   
   
   
