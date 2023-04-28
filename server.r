@@ -22,7 +22,7 @@ server <- function(input, output, session) {
   dat_tp_rec_F()
   dat_max_F()
   dat_max_rec_F()
-
+  
   
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -33,6 +33,20 @@ server <- function(input, output, session) {
     saveRDS(riskfree, file = "riskfree.RDS")
     saveRDS(dat_asset, file = "database_price.RDS")
     saveRDS(ren, file = "database_ren.RDS")
+  }
+  
+  #reactiv function for num inputs
+  inputs_num<- function(){
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+  }
+  #reactive function for checkbox
+  input_ckbx <- function(){
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+      else portfolio_s2[i] <<- 0
+    }
   }
   
   #info serverfunktion
@@ -56,19 +70,41 @@ server <- function(input, output, session) {
   
   
   output$portfolio_worth1 <- renderText({
-    #reactive auf inputs
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     w <- round(sum(portfolio_w), 1)
-    paste("Portfolio Value:", w , "CHF")
+    paste("Portfolio Value:", "CHF", w )
   })
   
   
+  output$Asset1 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[1], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  output$Asset2 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[2], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  output$Asset3 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[3], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  output$Asset4 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[4], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  output$Asset5 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[5], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  output$Asset6 <- renderText({
+    inputs_num()
+    paste("CHF", format(portfolio_w[6], big.mark = "'", decimal.mark = ".", nsmall = 2))
+  })
+  
+  
+  
   output$mvp <- renderPlot({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     dat_mvp_F()
     dat_mvp_rec_F()
     ggplot(dat_mvp, aes(x = "", y = Gewicht, fill = Asset)) +
@@ -81,10 +117,7 @@ server <- function(input, output, session) {
   
   
   output$tp <- renderPlot({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
-    
+    inputs_num()
     dat_tp_F(input$shortpara)
     dat_mvp_F()
     dat_mvp_rec_F()
@@ -98,9 +131,7 @@ server <- function(input, output, session) {
   })
   
   output$max <-  renderPlot({
-    for (i in 1:(length(portfolio_s2))) {
-      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
-    }
+    input_ckbx()
     dat_max_F()
     dat_max_rec_F()
     input$slider3
@@ -116,9 +147,7 @@ server <- function(input, output, session) {
   })
   
   output$mvp2 <- renderPlot({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     dat_mvp_F()
     dat_mvp_rec_F()
     
@@ -143,9 +172,7 @@ server <- function(input, output, session) {
   })
   
   output$max2 <-  renderPlot({
-    for (i in 1:(length(portfolio_s2))) {
-      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
-    }
+    input_ckbx()
     input$slider3
     risk_F(input$slider3)
     zu_invest_verm <<- input$num15
@@ -165,9 +192,7 @@ server <- function(input, output, session) {
   })
   
   output$tp2 <- renderPlot({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     dat_tp_F(input$shortpara)
     dat_mvp_F()
     dat_mvp_rec_F()
@@ -207,11 +232,11 @@ server <- function(input, output, session) {
       dat <- window(dat, start = start - a, end = start)
     
     if (input$radio1 == 1 & a == 1) {
-      ggplot(data = dat$Close, aes(x = Index, y = Close)) +
+      ggplot(data = dat$Adjusted, aes(x = Index, y = Adjusted)) +
         geom_point()
     }
     else if (input$radio1 == 1 & a != 1) {
-      ggplot(data = dat$Close, aes(x = Index, y = Close)) +
+      ggplot(data = dat$Adjusted, aes(x = Index, y = Adjusted)) +
         geom_line()
     }
     else if (input$radio1 == 2) {
@@ -220,24 +245,21 @@ server <- function(input, output, session) {
   })
   
   
-  #Plot Protfolio time series
+  #Plot Protfolio time series#############################
   output$weightened.portfolio <- renderPlot({
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
     if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 180
+    if (input$sliderHistorie=="6M") b <- 182
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 10*365
+    if (input$sliderHistorie=="8Y") b <- 8*365
     dat_mvp_F()
     dat_tp_F()
     dat_mvp_rec_F()
     dat_tp_rec_F()
-    
-    for (i in 1:length(portfolio_s)){
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     weightened.portfolio_F(b)
     
     port <- xts()
@@ -265,20 +287,15 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 9*365
+    if (input$sliderHistorie=="8Y") b <- 8*365
     dat_max_F()
     dat_max_rec_F()
-    for (i in 1:length(portfolio_s)){
-      input[[paste0("num", as.character(i))]]
-    }
-    
+    inputs_num()
     weightened.portfolio2_F(b)
     
-    
-    
     if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weightened.portfolio.max, aes(index(weightened.portfolio.max)))+
-        geom_line(aes(y = Close, colour = "Individuelles Portfolio"))
+      ggplot(data = weightened.portfolio.max, aes(as.Date(index(weightened.portfolio.max))))+
+        geom_line(aes(y = Adjusted, colour = "Individuelles Portfolio"))
       
     }
     else if (input$radioHistorie == 2){
@@ -288,19 +305,14 @@ server <- function(input, output, session) {
   })
   
   output$mvprec <- renderTable({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     dat_mvp_rec_F()
     dat_mvp_rec
   })
   
   
   output$tprec <- renderTable({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
-    
+    inputs_num()
     dat_tp_F(input$shortpara)
     dat_tp_rec_F()
     dat_tp_rec
@@ -308,9 +320,7 @@ server <- function(input, output, session) {
   
   
   output$maxrec <- renderTable({
-    for (i in 1:(length(portfolio_s2))) {
-      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
-    }
+    input_ckbx()
     input$slider3
     risk_F(input$slider3)
     
@@ -322,33 +332,28 @@ server <- function(input, output, session) {
   
   
   output$mvprec_inf <- renderTable({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     mvprec_inf <- data.frame("Volatilität"=round(mvpvola,2),
                              "Rendite"=round(mvpreturn,2))
     mvprec_inf
   })
   
   output$tprec_inf <- renderTable({
-    for (i in 1:length(portfolio_s)) {
-      input[[paste0("num", as.character(i))]]
-    }
+    inputs_num()
     input$shortpara
     tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
                             "Rendite"=round(tpreturn,2))
     tprec_inf
   })
   
+
   output$maxrec_inf <- renderTable({
-    for (i in 1:(length(portfolio_s2))) {
-      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
-    }
+    input_ckbx()
     input$slider3
     risk_F(input$slider3)
     
     maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
-                            "Rendite"=round(max_return,2))
+                             "Rendite"=round(max_return,2))
     maxrec_inf
   })
   
