@@ -265,7 +265,7 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 10*365
+    if (input$sliderHistorie=="10Y") b <- 9*365
     dat_max_F()
     dat_max_rec_F()
     for (i in 1:length(portfolio_s)){
