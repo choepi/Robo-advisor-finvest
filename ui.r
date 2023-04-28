@@ -21,7 +21,20 @@ library(rintrojs)
 library(xml2)
 library(rvest)
 library(leaflet)
-
+library(quantmod)
+library(zoo)
+library(xts)
+library(dplyr)
+library(expm)
+library(imputeTS)
+library(DEoptim)
+library(shinyjs)
+library(scales)
+library(pROC)
+library(fPortfolio)
+library(PortfolioAnalytics)
+library(tidyverse)
+library(tidyquant)
 
 
 ## build ui.R -----------------------------------

@@ -1,17 +1,4 @@
-library(quantmod)
-library(zoo)
-library(xts)
-library(dplyr)
-library(expm)
-library(imputeTS)
-library(DEoptim)
-library(shinyjs)
-library(scales)
-library(pROC)
-library(fPortfolio)
-library(PortfolioAnalytics)
-library(tidyverse)
-library(tidyquant)
+
 
 #closest index 
 which.closest <- function(x,invect,index=T) {
