@@ -1,17 +1,4 @@
-library(quantmod)
-library(zoo)
-library(xts)
-library(dplyr)
-library(expm)
-library(imputeTS)
-library(DEoptim)
-library(shinyjs)
-library(scales)
-library(pROC)
-library(fPortfolio)
-library(PortfolioAnalytics)
-library(tidyverse)
-library(tidyquant)
+
 
 #closest index 
 which.closest <- function(x,invect,index=T) {
@@ -282,7 +269,7 @@ dat_tp_F <- function(shortpara=F) {
 dat_max_F <- function() {
   dat_v <- max()
   dat_max <<- data.frame(Asset = rownames(dat_v),
-                        Gewicht = c(dat_v))
+                         Gewicht = c(dat_v))
   
 }
 
@@ -568,5 +555,4 @@ weightened.portfolio2_F <- function(b){
   
   weightened.portfolio.max <<- window(weightened.portfolio.max, start = end, end=start)
 }
-
 

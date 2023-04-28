@@ -21,7 +21,20 @@ library(rintrojs)
 library(xml2)
 library(rvest)
 library(leaflet)
-
+library(quantmod)
+library(zoo)
+library(xts)
+library(dplyr)
+library(expm)
+library(imputeTS)
+library(DEoptim)
+library(shinyjs)
+library(scales)
+library(pROC)
+library(fPortfolio)
+library(PortfolioAnalytics)
+library(tidyverse)
+library(tidyquant)
 
 
 ## build ui.R -----------------------------------
@@ -63,21 +76,21 @@ ui <- dashboardPage(
                            column(2,
                                   numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
                                   numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
-                                  ),
+                           ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
                                   numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
-                                  ),
+                           ),
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
-                                  ),
+                           ),
                            mainPanel(
-                               h4(textOutput("portfolio_worth1")),
-                               plotOutput("portfolio1", width = "100%")
-                               ),
-                           )
-                         ),
+                             h4(textOutput("portfolio_worth1")),
+                             plotOutput("portfolio1", width = "100%")
+                           ),
+                         )
+                ),
                 tabPanel("Individuelles Portfolio",
                          actionButton("help_tab2", "About this Page"),
                          fluidPage(
@@ -126,18 +139,18 @@ ui <- dashboardPage(
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidPage(sidebarPanel(
-                         sliderTextInput(
-                           inputId = "sliderHistorie",
-                           label = "Zeitraum",
-                           choices = c("1M","6M","1Y","5Y","10Y"),
-                           selected = "1M"),
-                         br(),
-                         radioButtons("radioHistorie", h3("Ansicht"),
-                                      choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 1),width = 2),
-                         br(), 
-                         mainPanel(
-                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                           sliderTextInput(
+                             inputId = "sliderHistorie",
+                             label = "Zeitraum",
+                             choices = c("1M","6M","1Y","5Y","10Y"),
+                             selected = "1M"),
+                           br(),
+                           radioButtons("radioHistorie", h3("Ansicht"),
+                                        choices = list("Simpel" = 1, "Erweitert" = 2),
+                                        selected = 1),width = 2),
+                           br(), 
+                           mainPanel(
+                             splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
                            )
                          )
                 ),
@@ -223,8 +236,8 @@ ui <- dashboardPage(
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                  )
-                ),
+                )
+              ),
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
@@ -235,12 +248,12 @@ ui <- dashboardPage(
                 type = "tabs",
                 tabPanel("AssetInfo",
                          includeHTML("AssetInfo.html")),
-                tabPanel("Miscellaneous",
+                tabPanel("Geografische Verteilung",
                          tabPanel("Map", leafletOutput("map"))
-                         )
                 )
               )
       )
+    )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")
