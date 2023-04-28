@@ -33,7 +33,6 @@ library(scales)
 library(pROC)
 library(fPortfolio)
 library(PortfolioAnalytics)
-library(tidyverse)
 library(tidyquant)
 
 
@@ -49,7 +48,7 @@ ui <- dashboardPage(
                                         tags$style(".main-header .logo {height: 80px !important;}"),
                                         tags$style(".sidebar-toggle {font-size: 30px !important;}"),
                                         tags$style(".dropdown-toggle {font-size: 35px !important;}"))
-
+                                      
   ),
   
   dropdownMenu(icon = icon("circle-info"),  messageItem(
@@ -90,22 +89,34 @@ ui <- dashboardPage(
                            
                            column(2,
                                   numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  textOutput("Asset1"),
+                                  br(),
+                                  br(),
                                   numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
-                                  ),
+                                  textOutput("Asset2")
+                           ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
-                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
-                                  ),
+                                  textOutput("Asset3"),
+                                  br(),
+                                  br(),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset4")
+                           ),
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
-                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
-                                  ),
+                                  textOutput("Asset5"),
+                                  br(),
+                                  br(),
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset6")
+                           ),
                            mainPanel(
-                               h4(textOutput("portfolio_worth1")),
-                               plotOutput("portfolio1", width = "100%")
-                               ),
-                           )
-                         ),
+                             h4(textOutput("portfolio_worth1")),
+                             plotOutput("portfolio1", width = "100%")
+                           ),
+                         )
+                ),
                 tabPanel("Individuelles Portfolio",
                          actionButton("help_tab2", "About this Page"),
                          fluidPage(
@@ -154,18 +165,18 @@ ui <- dashboardPage(
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidPage(sidebarPanel(
-                         sliderTextInput(
-                           inputId = "sliderHistorie",
-                           label = "Zeitraum",
-                           choices = c("1M","6M","1Y","5Y","10Y"),
-                           selected = "1M"),
-                         br(),
-                         radioButtons("radioHistorie", h3("Ansicht"),
-                                      choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 1),width = 2),
-                         br(), 
-                         mainPanel(
-                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                           sliderTextInput(
+                             inputId = "sliderHistorie",
+                             label = "Zeitraum",
+                             choices = c("1M","6M","1Y","5Y","8Y"),
+                             selected = "1M"),
+                           br(),
+                           radioButtons("radioHistorie", h3("Ansicht"),
+                                        choices = list("Simpel" = 1, "Erweitert" = 2),
+                                        selected = 1),width = 2),
+                           br(), 
+                           mainPanel(
+                             splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
                            )
                          )
                 ),
@@ -251,8 +262,8 @@ ui <- dashboardPage(
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                  )
-                ),
+                )
+              ),
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
@@ -265,10 +276,10 @@ ui <- dashboardPage(
                          includeHTML("AssetInfo.html")),
                 tabPanel("Geografische Verteilung",
                          tabPanel("Map", leafletOutput("map"))
-                         )
                 )
               )
       )
+    )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")
