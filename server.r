@@ -10,13 +10,19 @@ server <- function(input, output, session) {
   ren <<- readRDS("database_ren.RDS")#database einlesen
   riskfree <<- readRDS("riskfree.RDS")#riskfree einlesen
   time_now <- Sys.Date() 
-  portfolio_s <<- c(1, 0, 1, 0, 0, 0)
-  portfolio_s2 <<- c(1, 0, 1, 0, 0, 0)
+  age <<- 5*365 #gedächtnis mvp/tp
+  portfolio_s <<- c(1, 0, 1, 0, 1, 0)
+  portfolio_s2 <<- c(1, 0, 1, 0, 1, 0)
+  zu_invest_verm <<- 1000
+  risk_F("Geringes Risiko")
   portfolio_w_F()
   dat_mvp_F()
-  dat_tp_F()
   dat_mvp_rec_F()
+  dat_tp_F()
   dat_tp_rec_F()
+  dat_max_F()
+  dat_max_rec_F()
+
   
   #database updaten falls älter als 1,
   if ((time_now - as.Date(last(index(dat_asset[[4]])))) >= 1) {
@@ -30,20 +36,6 @@ server <- function(input, output, session) {
   }
   
   #info serverfunktion
-  hintjs(
-    session,
-    options = list("hintButtonLabel" = "Hope this hint was helpful"),
-    events = list("onhintclose" = I('alert("Wasn\'t that hint helpful")'))
-  )
-  
-  observeEvent(c(input$help1,input$help2),
-               introjs(session, options = list("nextLabel"="Next",
-                                               "prevLabel"="Back"),
-                       events = list())
-  )
-  
-  
-  
   output$portfolio1 <- renderPlot({
     for (i in 1:length(asl)) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
@@ -58,32 +50,6 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity",
                width = 1,
                color = "white") +
-      coord_polar("y", start = 0) +
-      theme_void() # remove background, grid, numeric labels
-  })
-  
-  
-  output$portfolio2 <-  renderPlot({
-    for (i in 1:(length(portfolio_s2))) {
-      portfolio_s2[i] <<- if (input[[paste0("checkbox", as.character(i))]]) 1
-    }
-    
-    if (input$slider3 == "Geringes Risiko")
-      risk <<- 1
-    else if (input$slider3 == "Mittleres Risiko")
-      risk <<- 2
-    else if (input$slider3 == "Hohes Risiko")
-      risk <<- 3
-    
-    zu_invest_verm <<- input$num15
-    
-    dat_v <- as.matrix(t(portfolio_s2))
-    colnames(dat_v) <- asl
-    dat_port <- data.frame(group = colnames(dat_v),
-                           value = c(dat_v))
-    ggplot(dat_port, aes(x = "", y = value, fill = group)) +
-      geom_bar(stat = "identity",
-               width = 1) +
       coord_polar("y", start = 0) +
       theme_void() # remove background, grid, numeric labels
   })
@@ -104,6 +70,7 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     dat_mvp_F()
+    dat_mvp_rec_F()
     ggplot(dat_mvp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
@@ -117,9 +84,11 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    input$shortpara
-    dat_tp_F(input$shortpara)
     
+    dat_tp_F(input$shortpara)
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
     ggplot(dat_tp, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
                width = 1,
@@ -128,9 +97,92 @@ server <- function(input, output, session) {
       theme_void()
   })
   
+  output$max <-  renderPlot({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    dat_max_F()
+    dat_max_rec_F()
+    input$slider3
+    risk_F(input$slider3)
+    zu_invest_verm <<- input$num15
+    
+    ggplot(dat_max, aes(x = "", y = Gewicht, fill = Asset)) +
+      geom_bar(stat = "identity",
+               width = 1,
+               color = "white") +
+      coord_polar("y", start = 0) +
+      theme_void()
+  })
+  
+  output$mvp2 <- renderPlot({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    
+    ggplot(dat_mvp, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    
+    
+    
+    # ggplot(dat_mvp, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
+  })
   
   output$selected_var <- renderText({ 
     paste("You have selected", asl[as.numeric(input$select2)])
+  })
+  
+  output$max2 <-  renderPlot({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    zu_invest_verm <<- input$num15
+    dat_max_F()
+    dat_max_rec_F()
+    ggplot(dat_max, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    # ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
+  })
+  
+  output$tp2 <- renderPlot({
+    for (i in 1:length(portfolio_s)) {
+      input[[paste0("num", as.character(i))]]
+    }
+    dat_tp_F(input$shortpara)
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
+    ggplot(dat_tp, 
+           aes(x = Asset, 
+               y = Gewicht, 
+               fill = Gewicht < 0)) + 
+      geom_bar(stat = "identity") + 
+      scale_fill_manual(guide = FALSE,
+                        name = 'Gewicht < 0', 
+                        values = setNames(c('green', 'red'), c(F, T)))
+    # ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
+    #   geom_col(fill = "#0099f9") +
+    #   coord_flip()
   })
   
   
@@ -169,9 +221,10 @@ server <- function(input, output, session) {
   
   
   #Plot Protfolio time series
-  output$weighted.portfolio <- renderPlot({
-    if (input$sliderHistorie=="1D") b <- 1 #2d da am sonntag 1tag == 0
-    if (input$sliderHistorie=="5D") b <- 5
+  output$weightened.portfolio <- renderPlot({
+    # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
+    # if (input$sliderHistorie=="1D") b <- 1 
+    # if (input$sliderHistorie=="5D") b <- 5
     if (input$sliderHistorie=="1M") b <- 30
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
@@ -185,141 +238,59 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)){
       input[[paste0("num", as.character(i))]]
     }
+    weightened.portfolio_F(b)
     
-    start = Sys.Date()  #gewünschter zeit horizont
-    if (b == 1 ){
-      w = start
-    }else{
-      w = start-b
-    }
+    port <- xts()
+    port <- merge(port,weightened.portfolio[,4],weightened.portfolio.mvp[,4],weightened.portfolio.tp[,4])
+    colnames(port)<- c("Alt", "NeuMVP","NeuTP")
     
-    #weighted portfolio basic
-    ######################
-
-    c.old <- rep(0,length(portfolio_w))
-    for(s in 1:length(portfolio_w)){
-      if (portfolio_w[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    weight <- portfolio_w
-    for (i in 1:length(portfolio_w)){
-      if (portfolio_w[i]>0){
-        weight[i] <- weight[i]/c.old[i]
-      }
-    }
-    ######################
-    weighted.portfolio <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio <- weighted.portfolio + weight[i]*dat_asset[[i]]
-    }
-    weighted.portfolio <- na.omit(weighted.portfolio)
-    
-    
-    if (b == 1 ){
-      weighted.portfolio <- window(weighted.portfolio, start = start, end=start)
-    }else{
-      weighted.portfolio <- window(weighted.portfolio, start = start-b, end=start)
-    }
-    
-    #weighted portfolio TP
-    names.ren.tp <- c()
-    for (i in ren) names.ren.tp <- rbind(names.ren.tp,colnames(i[,2]))
-    weights_tp <- c(0,0,0,0,0,0,0)
-    
-    for (i in 1:length(names.ren.tp)){
-      q = names.ren.tp[i]
-      for(d in 1:length(dat_tp_rec[,1])){
-        r <- dat_tp[,1][d]
-        if (r==q) weights_tp[i] <- dat_tp_rec[d,3]
-      }
-    };print(dat_tp_rec);print(weights_tp)
-    
-    ######################
-    c.old <- rep(0,length(weights_tp))
-    for(s in 1:length(names.ren.tp)){
-      if (weights_tp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    
-    for (i in 1:length(weights_tp)){
-        if (weights_tp[i]>0){
-          weights_tp[i] <- weights_tp[i]/c.old[i]
-        }
-    }
-    ######################
-    
-    weighted.portfolio.tp <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio.tp <- weighted.portfolio.tp + weights_tp[i]*dat_asset[[i]]
-    }
-    weighted.portfolio.tp <- na.omit(weighted.portfolio.tp)
-
-    if (b == 1 ){
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start, end=start)
-    }else{
-      weighted.portfolio.tp <- window(weighted.portfolio.tp, start = start-b, end=start)
-    }
-    #weighted portfolio MVP
-    names.ren.mvp <- c()
-    for (i in ren) names.ren.mvp <- rbind(names.ren.mvp,colnames(i[,2]))
-    weights_mvp <- c(0,0,0,0,0,0,0)
-    for (i in 1:length(names.ren.mvp)){
-      q = names.ren.mvp[i]
-      for(d in 1:length(dat_mvp_rec[,1])){
-        r <- dat_mvp[,1][d]
-        if (r==q) weights_mvp[i] <- dat_mvp_rec[d,3]
-      }
-    };print(dat_mvp_rec);print(weights_mvp)
-    
-    
-    ######################
-    c.old <- rep(0,length(weights_mvp))
-    for(s in 1:length(names.ren.mvp)){
-      if (weights_mvp[s]>0) c.old[s] <- coredata(dat_asset[[s]][w,4]) 
-    };c.old
-    
-    for (i in 1:length(weights_mvp)){
-      if (weights_mvp[i]>0){
-        weights_mvp[i] <- weights_mvp[i]/c.old[i]
-      }
-    }
-    ######################
-    
-    
-    weighted.portfolio.mvp <- 0 #dat_asset[[1]]
-    for (i in 1:(length(asl))){
-      weighted.portfolio.mvp  <- weighted.portfolio.mvp  + weights_mvp[i]*dat_asset[[i]]
-    }
-    weighted.portfolio.mvp <- na.omit(weighted.portfolio.mvp)
-    
-    if (b == 1 ){
-      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start, end=start)
-    }else {
-      weighted.portfolio.mvp <- window(weighted.portfolio.mvp, start = start-b, end=start)
-    }
-    
-    if (input$radioHistorie == 1 & b == 1) {
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close))+
-        geom_point(color = "green4")+
-        geom_point(data = weighted.portfolio.mvp[,4], color = "blue")+
-        geom_point(data = weighted.portfolio.tp[,4], color = "red")
-    }
-    else if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weighted.portfolio[,4], aes(x = Index, y = Close)) +
-        geom_line(color = "green4")+
-        geom_line(data = weighted.portfolio.mvp[,4], aes(x = Index, y = Close), color = "blue")+
-        geom_line(data = weighted.portfolio.tp[,4], aes(x = Index, y = Close), color = "red")
+    if (input$radioHistorie == 1 & b != 1){
+      ggplot(data = port, aes(index(port)))+
+        geom_line(aes(y = Alt, colour = "Alt")) + 
+        geom_line(aes(y = NeuMVP, colour = "NeuMVP")) +
+        geom_line(aes(y = NeuTP, colour = "NeuTP"))
+      
     }
     else if (input$radioHistorie == 2){
-      chartSeries(weighted.portfolio ,name="Historie",theme = 'white')
+      chartSeries(weightened.portfolio ,name="Historie",theme = 'white')
     }
     
   })
   
+  output$weightened.portfolio2 <- renderPlot({
+    # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
+    # if (input$sliderHistorie=="1D") b <- 1 
+    # if (input$sliderHistorie=="5D") b <- 5
+    if (input$sliderHistorie=="1M") b <- 30
+    if (input$sliderHistorie=="6M") b <- 180
+    if (input$sliderHistorie=="1Y") b <- 365
+    if (input$sliderHistorie=="5Y") b <- 5*365
+    if (input$sliderHistorie=="10Y") b <- 10*365
+    dat_max_F()
+    dat_max_rec_F()
+    for (i in 1:length(portfolio_s)){
+      input[[paste0("num", as.character(i))]]
+    }
+    
+    weightened.portfolio2_F(b)
+    
+    
+    
+    if (input$radioHistorie == 1 & b != 1){
+      ggplot(data = weightened.portfolio.max, aes(index(weightened.portfolio.max)))+
+        geom_line(aes(y = Close, colour = "Individuelles Portfolio"))
+      
+    }
+    else if (input$radioHistorie == 2){
+      chartSeries(weightened.portfolio.max ,name="Historie",theme = 'white')
+    }
+    
+  })
   
   output$mvprec <- renderTable({
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
-    
     dat_mvp_rec_F()
     dat_mvp_rec
   })
@@ -330,8 +301,23 @@ server <- function(input, output, session) {
       input[[paste0("num", as.character(i))]]
     }
     
+    dat_tp_F(input$shortpara)
     dat_tp_rec_F()
     dat_tp_rec
+  })
+  
+  
+  output$maxrec <- renderTable({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    
+    zu_invest_verm <<- input$num15
+    
+    dat_max_rec_F()
+    dat_max_rec
   })
   
   
@@ -348,12 +334,75 @@ server <- function(input, output, session) {
     for (i in 1:length(portfolio_s)) {
       input[[paste0("num", as.character(i))]]
     }
+    input$shortpara
     tprec_inf <- data.frame("Volatilität"=round(tpvola,2),
                             "Rendite"=round(tpreturn,2))
     tprec_inf
   })
   
+  output$maxrec_inf <- renderTable({
+    for (i in 1:(length(portfolio_s2))) {
+      if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
+    }
+    input$slider3
+    risk_F(input$slider3)
+    
+    maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
+                            "Rendite"=round(max_return,2))
+    maxrec_inf
+  })
   
-
+  output$map <- renderLeaflet({
+    data <- data.frame(
+      asset = c("Bitcoin (digital currency)",
+                "Swiss Market Index",
+                "S&P 500 Index",
+                "Swiss government bond",
+                "U.S. government bond", "Gold"),
+      lat = c(40, 47, 38, 46, 37, 51),
+      lng = c(-100, 8, -97, 8, -95, -0.1)
+    )
+    leaflet(data) %>%
+      addTiles() %>%
+      addMarkers(
+        ~lng, ~lat,
+        popup = ~asset,
+        label = ~asset
+      )
+  })
   
+  
+  
+  ####################################Help-Box##################################
+  help_text <- reactive({
+    if (input$help_tab1) whichtab <- "help_tab1"
+    if (input$help_tab2) whichtab <- "help_tab2"
+    # if (input$help_tab3) whichtab <- "help_tab3"
+    subset(helptext, tab == whichtab)
+  })
+  
+  observeEvent(input$help_tab1,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab2,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  # observeEvent(input$help_tab3,
+  #              introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  # )
+  
+  
+  
+  helptext <- data.frame(
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2")
+    , step <- c(3, 3, 3, 2, 2)
+    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#checkbox1")
+    , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
+                "Gib dein zu investierendes Vermögen ein","Wähle die Assets die du in deinem Portfolio haben möchtest")
+  )
 }

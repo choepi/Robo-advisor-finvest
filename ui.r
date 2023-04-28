@@ -20,8 +20,8 @@ library(shinyWidgets)
 library(rintrojs)
 library(xml2)
 library(rvest)
-#suppressWarnings(install.packages("IntroCompFinR", repos="http://R-Forge.R-project.org"))
-library(IntroCompFinR)
+library(leaflet)
+
 
 
 ## build ui.R -----------------------------------
@@ -49,11 +49,11 @@ ui <- dashboardPage(
     tabItems(
       tabItem(tabName = "profil",
               h1("Profil"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
-                         actionButton("help1", "About this Page"),
+                         actionButton("help_tab1", "About this Page"),
                          h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
                             Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
                             Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
@@ -61,29 +61,25 @@ ui <- dashboardPage(
                          fluidRow(
                            
                            column(2,
-                                  introBox(
-                                    numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
-
-                                    introBox(
-                                      numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
-                                      data.step = 1,
-                                      data.intro = "Auswahl welches zu Ihnen passt"))),
+                                  numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+                                  ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
-                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
+                                  ),
                            column(2,
-                                  numericInput("num5", label = h5("SNP500"), value = 0, width = 100, min = 0),
-                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)),
-                           
+                                  numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
+                                  ),
                            mainPanel(
-                             introBox(
                                h4(textOutput("portfolio_worth1")),
-                               data.step = 2,
-                               data.intro = "Hier sehen sie den aktuellen Wert ihres Portfolios"),
-                             plotOutput("portfolio1", width = "100%")),
-                         )),
-                tabPanel("Kein Portfolio",
-                         actionButton("help2", "About this Page"),
+                               plotOutput("portfolio1", width = "100%")
+                               ),
+                           )
+                         ),
+                tabPanel("Individuelles Portfolio",
+                         actionButton("help_tab2", "About this Page"),
                          fluidPage(
                            h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
                             welches du dann nach bedarf anpassen kannst."),
@@ -91,7 +87,7 @@ ui <- dashboardPage(
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
                              introBox(
-                               numericInput("num15", label = h6(""), value = 0, width = 100, min = 0),
+                               numericInput("num15", label = h6(""), value = 1000, width = 100, min = 0),
                                data.step = 1,
                                data.intro = "Eingabe"),
                              sliderTextInput(
@@ -101,59 +97,117 @@ ui <- dashboardPage(
                                selected = "Geringes Risiko"
                              ),
                              column(5,
-                                    checkboxInput("checkbox1", "SMI", value = F),
+                                    checkboxInput("checkbox1", "SMI", value = T),
                                     checkboxInput("checkbox2", "SWIBND", value = F),
-                                    checkboxInput("checkbox3", "GOLD", value = F),
+                                    checkboxInput("checkbox3", "GOLD", value = T),
                                     checkboxInput("checkbox4", "BITCOIN", value = F)),
                              column(5,
-                                    checkboxInput("checkbox5", "SNP500", value = F),
+                                    checkboxInput("checkbox5", "SNP500", value = T),
                                     checkboxInput("checkbox6", "USBND", value = F))),
                          )),
-              ))
+              )
       ),
       
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
               h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
-              mainPanel(tabsetPanel(
+              tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         fluidPage(sidebarPanel(
                          sliderTextInput(
                            inputId = "sliderHistorie",
                            label = "Zeitraum",
-                           choices = c("1D","5D","1M","6M","1Y","5Y","10Y"),
-                           selected = "5D"),
+                           choices = c("1M","6M","1Y","5Y","10Y"),
+                           selected = "1M"),
                          br(),
                          radioButtons("radioHistorie", h3("Ansicht"),
                                       choices = list("Simpel" = 1, "Erweitert" = 2),
-                                      selected = 2),
+                                      selected = 1),width = 2),
                          br(), 
-                         plotOutput("weighted.portfolio",width = "60%")
+                         mainPanel(
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                           )
+                         )
                 ),
                 tabPanel("MVP",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidRow(
                            tableOutput("mvprec"),
-                           plotOutput("mvp",width = "60%"),
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("mvp"), plotOutput("mvp2")),
                            tableOutput("mvprec_inf"))),
                 tabPanel("TP",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
                          fluidRow(
                            tableOutput("tprec"),
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
-                           plotOutput("tp", width = "60%"),
-                           tableOutput("tprec_inf")))
-              ))
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("tp"), plotOutput("tp2")),
+                           tableOutput("tprec_inf"))),
+                tabPanel("Individuelles Portfolio",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         fluidRow(
+                           tableOutput("maxrec"),
+                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("max"), plotOutput("max2")),
+                           tableOutput("maxrec_inf")))
+              )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
-              h5("Aktuelle Kursangaben"),
+              h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
               fluidPage(
                 sidebarPanel(
                   sliderTextInput(
                     inputId = "slider2",
                     label = "Choice",
                     choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "5D"
+                    selected = "6M"
                   ),
                   br(), 
                   selectInput("select2", h3("Asset"),
@@ -165,18 +219,28 @@ ui <- dashboardPage(
                   br(), 
                   radioButtons("radio1", h3("Ansicht"),
                                choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 2)
+                               selected = 1)
                   ,width = 2),
                 mainPanel(
                   plotOutput("historical_data", width = "60%")
-                )),
+                  )
+                ),
       ),
       tabItem(tabName = "about",
               includeHTML("about.html")),
       
       tabItem(tabName = "AssetInfo",
-              includeHTML("AssetInfo.html"))
-    )
+              tabsetPanel(
+                id = "tabsetPanelID",
+                type = "tabs",
+                tabPanel("AssetInfo",
+                         includeHTML("AssetInfo.html")),
+                tabPanel("Miscellaneous",
+                         tabPanel("Map", leafletOutput("map"))
+                         )
+                )
+              )
+      )
   ),
 )
 dashboardPage(header, sidebar, body,skin = "black")
