@@ -68,7 +68,7 @@ server <- function(input, output, session) {
   v <- list()
   for (i in 1:length(asl)) {
     z <- portfolio_s[i]
-    v[[i]] <- as.numeric(last(dat_asset[[i]]$Close))*z
+    v[[i]] <- as.numeric(last(dat_asset[[i]]$Adjusted))*z
   }
   
   text_outputs_list <- lapply(seq_along(v), function(i) {
@@ -232,11 +232,11 @@ server <- function(input, output, session) {
       dat <- window(dat, start = start - a, end = start)
     
     if (input$radio1 == 1 & a == 1) {
-      ggplot(data = dat$Close, aes(x = Index, y = Close)) +
+      ggplot(data = dat$Adjusted, aes(x = Index, y = Adjusted)) +
         geom_point()
     }
     else if (input$radio1 == 1 & a != 1) {
-      ggplot(data = dat$Close, aes(x = Index, y = Close)) +
+      ggplot(data = dat$Adjusted, aes(x = Index, y = Adjusted)) +
         geom_line()
     }
     else if (input$radio1 == 2) {
@@ -301,7 +301,7 @@ server <- function(input, output, session) {
     
     if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weightened.portfolio.max, aes(as.Date(index(weightened.portfolio.max))))+
-        geom_line(aes(y = Close, colour = "Individuelles Portfolio"))
+        geom_line(aes(y = Adjusted, colour = "Individuelles Portfolio"))
       
     }
     else if (input$radioHistorie == 2){
