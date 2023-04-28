@@ -265,7 +265,7 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="6M") b <- 180
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="10Y") b <- 10*365
+    if (input$sliderHistorie=="10Y") b <- 9*365
     dat_max_F()
     dat_max_rec_F()
     for (i in 1:length(portfolio_s)){
@@ -354,45 +354,43 @@ server <- function(input, output, session) {
   
   output$map <- renderLeaflet({
     data <- data.frame(
-      asset = c("Bitcoin (digital currency)",
-                "Swiss Market Index",
-                "S&P 500 Index",
-                "Swiss government bond",
-                "U.S. government bond", "Gold"),
-      lat = c(40, 47, 38, 46, 37, 51),
-      lng = c(-100, 8, -97, 8, -95, -0.1)
+      asset = c("Swiss Market Index",
+                "S&P 500 Index & Gold",
+                "Swiss Government Bond",
+                "U.S. Government Bond"),
+      lat = c(47.37147, 40.70704, 46.94657, 38.89766),
+      lng = c(8.53208, -74.01119, 7.44429, -77.03641),
+      desc = c("Der Swiss Market Index (SMI) ist der führende Aktienindex der Schweiz, der die 20 größten und liquidesten Unternehmen des Landes abbildet.",
+               "Der S&P 500 ist ein Aktienindex, der die Performance von 500 der größten börsennotierten Unternehmen in den USA widerspiegelt. 
+               Gold ist ein Edelmetall, das als Rohstoff für Schmuck, elektronische Bauteile und Investitionen verwendet wird. Es gilt als sicheres Investment.",
+               "Eine Schweizer Staatsanleihe ist eine Schuldverschreibung der Schweizer Regierung, mit der sie sich Kapital beschafft und den Gläubigern regelmäßige Zinszahlungen sowie die Rückzahlung des Kapitals zum Fälligkeitsdatum verspricht.",
+               "Ein US Government Bond ist eine Anleihe, die von der Regierung der Vereinigten Staaten ausgegeben wird und als Schuldtitel fungiert.")
     )
     
-    # Define the borders of the countries
+    # Define the borders of Switzerland and the United States
     borders <- geojsonio::geojson_read("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json", what = "sp")
+    swiss_border <- borders[borders$name == "Switzerland",]
+    us_border <- borders[borders$name == "United States of America",]
     
     leaflet(data) %>%
       addTiles() %>%
       addMarkers(
         ~lng, ~lat,
-        popup = ~asset,
+        popup = ~paste("<strong>", asset, "</strong><br>", desc),
         label = ~asset
       ) %>%
-      addPolygons(
-        data = borders,
-        color = "#FFFFFF", # Set the border color
-        weight = 1, # Set the border weight
-        opacity = 0.7, # Set the border opacity
-        fillColor = "#FFFFFF", # Set the fill color
-        fillOpacity = 0.1, # Set the fill opacity
-        layerId = borders$ADMIN # Assign an ID to each polygon based on the country name
+      addPolylines(
+        data = swiss_border,
+        color = "#FF0000", # Set the border color of Switzerland to red
+        weight = 2 # Set the border weight of Switzerland to 2
       ) %>%
-      highlightOptions(
-        weight = 5, # Set the border weight of the highlighted area
-        color = "#666666", # Set the border color of the highlighted area
-        fillColor = "#666666", # Set the fill color of the highlighted area
-        fillOpacity = 0.2 # Set the fill opacity of the highlighted area
-      ) %>%
-      addLayersControl(
-        overlayGroups = c(data$asset),
-        options = layersControlOptions(collapsed = FALSE)
+      addPolylines(
+        data = us_border,
+        color = "#0000FF", # Set the border color of the US to blue
+        weight = 2 # Set the border weight of the US to 2
       )
   })
+  
   
   
   
