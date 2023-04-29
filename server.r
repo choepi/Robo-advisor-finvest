@@ -316,18 +316,13 @@ server <- function(input, output, session) {
     
     if (input$radioHistorie == 1 & b != 1){
       ggplot(data = weightened.portfolio.max, aes(as.Date(index(weightened.portfolio.max))))+
-<<<<<<< HEAD
         geom_line(aes(y = Adjusted, colour = "Individuell"))+
         labs(color = "Portfolio")+
         ylab("Portfoliowert [CHF]") +
         xlab("Zeit [Monate / Jahre]")
-=======
-        geom_line(aes(y = Adjusted, colour = "Individuelles Portfolio"))
->>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
-      
     }
     else if (input$radioHistorie == 2){
-      chartSeries(weightened.portfolio.max ,name="Historie des individuellen Portfolios",theme = 'white')
+      chartSeries(weightened.portfolio.max ,name="Historie des individuellen",theme = 'white')
     }
     
   })
@@ -374,7 +369,7 @@ server <- function(input, output, session) {
     tprec_inf
   })
   
-
+  
   output$maxrec_inf <- renderTable({
     input_ckbx()
     input$slider3

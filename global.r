@@ -555,4 +555,3 @@ weightened.portfolio2_F <- function(b){
   
   weightened.portfolio.max <<- window(weightened.portfolio.max, start = end, end=start)
 }
-

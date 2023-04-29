@@ -93,16 +93,6 @@ ui <- dashboardPage(
                                   br(),
                                   br(),
                                   numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
-<<<<<<< HEAD
-                           ),
-                           column(2,
-                                  numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
-                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0)
-                           ),
-                           column(2,
-                                  numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
-                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
-=======
                                   textOutput("Asset2")
                            ),
                            column(2,
@@ -120,7 +110,6 @@ ui <- dashboardPage(
                                   br(),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
                                   textOutput("Asset6")
->>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                            ),
                            mainPanel(
                              h4(textOutput("portfolio_worth1")),
@@ -175,23 +164,15 @@ ui <- dashboardPage(
                  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
-<<<<<<< HEAD
                          fluidPage(fixedPage(position = "right", sidebarPanel(
                            sliderTextInput(
                              inputId = "sliderHistorie",
                              label = h3("Zeitraum"),
-=======
-                         fluidPage(sidebarPanel(
-                           sliderTextInput(
-                             inputId = "sliderHistorie",
-                             label = "Zeitraum",
->>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                              choices = c("1M","6M","1Y","5Y","8Y"),
                              selected = "1M"),
                            br(),
                            radioButtons("radioHistorie", h3("Ansicht"),
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
-<<<<<<< HEAD
                                         selected = 1),
                            br(), 
                            h3("Renditen"),
@@ -204,12 +185,6 @@ ui <- dashboardPage(
                            mainPanel(
                              plotOutput("weightened.portfolio"),
                              plotOutput("weightened.portfolio2")
-=======
-                                        selected = 1),width = 2),
-                           br(), 
-                           mainPanel(
-                             splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
->>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                            )
                          )
                          )
