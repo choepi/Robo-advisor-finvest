@@ -1,19 +1,6 @@
-library(quantmod)
-library(zoo)
-library(xts)
-library(dplyr)
-library(expm)
-library(imputeTS)
-library(DEoptim)
-library(shinyjs)
-library(scales)
-library(pROC)
-library(fPortfolio)
-library(PortfolioAnalytics)
-library(tidyverse)
-library(tidyquant)
 
-#closest index 
+
+#Adjustedst index 
 which.closest <- function(x,invect,index=T) {
   pick <- which.min(abs(invect-x))
   if (index) {
@@ -42,7 +29,7 @@ cbind.fill <- function(...) {
 }
 
 usdchf <- function(){
-  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,4])
+  usd_chf <- suppressWarnings(getSymbols(fx, src = "yahoo", auto.assign = FALSE)[,6])
   colnames(usd_chf) <- "usd_chf"
   usd_chf <<- usd_chf
 }
@@ -91,7 +78,7 @@ get_data <- function() {
   
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
-    r <- na.omit(l[[i]][,4])
+    r <- na.omit(l[[i]][,6])
     r <- na.omit(ROC(r))*260/100
     colnames(r) <-
       c(paste0("r.", asl[i]))
@@ -237,7 +224,7 @@ get_rf <- function() {
 portfolio_w_F <- function() {
   portfolio_w <- c()
   for (i in 1:length(portfolio_s)) {
-    portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+    portfolio_w[i] <- portfolio_s[i] * last(dat_asset[[i]]$Adjusted)
   }
   portfolio_w <<- round((portfolio_w), 1)
 }
@@ -245,7 +232,7 @@ portfolio_w_F <- function() {
 portfolio_w_max_F <- function() {
   portfolio_w_max <- c()
   for (i in 1:length(portfolio_s2)) {
-    portfolio_w_max[i] <- portfolio_s2[i] * last(dat_asset[[i]]$Close)
+    portfolio_w_max[i] <- portfolio_s2[i] * last(dat_asset[[i]]$Adjusted)
   }
   portfolio_w_max <<- round((portfolio_w_max), 1)
 }
@@ -300,7 +287,7 @@ dat_mvp_rec_F <- function() {
   dat_mvp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
-    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Adjusted)
   }
   pa <- pa[pa != 0]
   dat_mvp_rec$Anzahl <- round(g / pa,1)
@@ -334,7 +321,7 @@ dat_tp_rec_F <- function() {
   dat_tp_rec$Investiert <- (g)
   pa <- portfolio_w
   for (i in 1:length(asl)) {
-    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Close)
+    pa[i] <- portfolio_s[i] * last(dat_asset[[i]]$Adjusted)
   }
   pa <- pa[pa != 0]
   dat_tp_rec$Anzahl <- round(g / pa,1)
@@ -379,7 +366,7 @@ dat_max_rec_F <- function() {
   
   pa <- weights_max
   for (i in 1:length(asl)) {
-    pa[i] <- weights_max[i] * last(dat_asset[[i]]$Close)
+    pa[i] <- weights_max[i] * last(dat_asset[[i]]$Adjusted)
   }
   
   pa <- pa[pa != 0]

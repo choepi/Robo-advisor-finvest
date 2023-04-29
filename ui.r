@@ -21,28 +21,55 @@ library(rintrojs)
 library(xml2)
 library(rvest)
 library(leaflet)
-
+library(quantmod)
+library(zoo)
+library(xts)
+library(dplyr)
+library(expm)
+library(imputeTS)
+library(DEoptim)
+library(shinyjs)
+library(scales)
+library(pROC)
+library(fPortfolio)
+library(PortfolioAnalytics)
+library(tidyquant)
 
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
-  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=60)
+  header <- dashboardHeader(title=div(img(src="fusion.jpg", height=120),
+                                      tags$style(".navbar {min-height: 80px !important;}"),
+                                      tags$style(".main-header {min-height: 80px !important;}"),
+                                      tags$style(".logo img {height: 80px !important;}"),
+                                      tags$li(
+                                        class = "dropdown",
+                                        tags$style(".main-header .logo {height: 80px !important;}"),
+                                        tags$style(".sidebar-toggle {font-size: 30px !important;}"),
+                                        tags$style(".dropdown-toggle {font-size: 35px !important;}"))
+                                      
   ),
   
   dropdownMenu(icon = icon("circle-info"),  messageItem(
     from = "",
     icon = icon("headset"),
-    message = (img(src="support.jpg", height=180))
+    message = (img(src="support.jpg", height=180)),
+    tags$li(
+      tags$head(
+        class = "dropdown",
+        tags$style(".dropdown-menu .fa-circle-info { font-size: 100px !important; }")))
   ))
   ),
   sidebar <- dashboardSidebar(
+    tags$head(tags$style(".sidebar { margin-top: 40px; }")),
     sidebarMenu(
       menuItem("Profil", tabName = "profil", icon = icon("user")),
       menuItem("Portfolio", tabName = "portfolio", icon = icon("folder-open")),
       menuItem("Kurse", tabName = "kurse", icon = icon("eye")),
       menuItem("Mehr Infos", tabName = "AssetInfo", icon = icon("folder-open")),
-      menuItem("Über uns", tabName = "about", icon = icon("people-group")))),
+      menuItem("Über uns", tabName = "about", icon = icon("people-group")),
+      tags$style(".sidebar-menu li a {font-size: 18px;}"))),
   
   body <- dashboardBody( 
     introjsUI(),
@@ -62,7 +89,11 @@ ui <- dashboardPage(
                            
                            column(2,
                                   numericInput("num1", label = h5("SMI"), value = 1, width = 100, min = 0),
+                                  textOutput("Asset1"),
+                                  br(),
+                                  br(),
                                   numericInput("num2", label = h5("SWIBND"), value = 0, width = 100, min = 0),
+<<<<<<< HEAD
                            ),
                            column(2,
                                   numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
@@ -71,6 +102,25 @@ ui <- dashboardPage(
                            column(2,
                                   numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
                                   numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0)
+=======
+                                  textOutput("Asset2")
+                           ),
+                           column(2,
+                                  numericInput("num3", label = h5("GOLD"), value = 1, width = 100, min = 0),
+                                  textOutput("Asset3"),
+                                  br(),
+                                  br(),
+                                  numericInput("num4", label = h5("BITCOIN"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset4")
+                           ),
+                           column(2,
+                                  numericInput("num5", label = h5("SNP500"), value = 1, width = 100, min = 0),
+                                  textOutput("Asset5"),
+                                  br(),
+                                  br(),
+                                  numericInput("num6", label = h5("USBND"), value = 0, width = 100, min = 0),
+                                  textOutput("Asset6")
+>>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                            ),
                            mainPanel(
                              h4(textOutput("portfolio_worth1")),
@@ -125,15 +175,23 @@ ui <- dashboardPage(
                  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+<<<<<<< HEAD
                          fluidPage(fixedPage(position = "right", sidebarPanel(
                            sliderTextInput(
                              inputId = "sliderHistorie",
                              label = h3("Zeitraum"),
+=======
+                         fluidPage(sidebarPanel(
+                           sliderTextInput(
+                             inputId = "sliderHistorie",
+                             label = "Zeitraum",
+>>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                              choices = c("1M","6M","1Y","5Y","8Y"),
                              selected = "1M"),
                            br(),
                            radioButtons("radioHistorie", h3("Ansicht"),
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
+<<<<<<< HEAD
                                         selected = 1),
                            br(), 
                            h3("Renditen"),
@@ -146,6 +204,12 @@ ui <- dashboardPage(
                            mainPanel(
                              plotOutput("weightened.portfolio"),
                              plotOutput("weightened.portfolio2")
+=======
+                                        selected = 1),width = 2),
+                           br(), 
+                           mainPanel(
+                             splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+>>>>>>> 88704c945dc8c843a3ff27e1a808acf001b8962f
                            )
                          )
                          )
