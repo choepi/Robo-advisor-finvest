@@ -181,7 +181,6 @@ ui <- dashboardPage(
                            textOutput("tp.venturini"),
                            textOutput("individuell"),
                            width = 2),
-                           
                            mainPanel(
                              plotOutput("weightened.portfolio"),
                              plotOutput("weightened.portfolio2")
