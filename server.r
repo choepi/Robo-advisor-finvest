@@ -244,15 +244,36 @@ server <- function(input, output, session) {
     port <- merge(port,weightened.portfolio[,4],weightened.portfolio.mvp[,4],weightened.portfolio.tp[,4])
     colnames(port)<- c("Alt", "NeuMVP","NeuTP")
     
+    output$mvp.venturini <- renderText({
+      paste("MVP = ", round(tail(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1)),sep = " ")
+    })
+    
+    output$alt <- renderText({
+      paste("Bestehendes = ", round(tail(as.numeric(weightened.portfolio$Adjusted), n = 1) - head(as.numeric(weightened.portfolio$Adjusted), n = 1)),sep = " ")
+    })
+    
+    output$tp.venturini <- renderText({
+      paste("TP = ", round(tail(as.numeric(weightened.portfolio.tp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.tp$Adjusted), n = 1)),sep = " ")
+    })
+    
+    output$individuell <- renderText({
+      paste("Individuell = ", round(tail(as.numeric(weightened.portfolio.max$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.max$Adjusted), n = 1)),sep = " ")
+    })
+    
     if (input$radioHistorie == 1 & b != 1){
       ggplot(data = port, aes(index(port)))+
-        geom_line(aes(y = Alt, colour = "Alt")) + 
-        geom_line(aes(y = NeuMVP, colour = "NeuMVP")) +
-        geom_line(aes(y = NeuTP, colour = "NeuTP"))
+        ggtitle("Historien der Portfolios")+
+        theme(plot.title = element_text(hjust = 0.5, vjust = 0.5, size = 15))+
+        geom_line(aes(y = Alt, colour = "Bestehendes")) + 
+        geom_line(aes(y = NeuMVP, colour = "Minimum\nVaraince")) +
+        geom_line(aes(y = NeuTP, colour = "Tangential")) +
+        labs(color = "Portfolios")+
+        ylab("Portfoliowert [CHF]") +
+        xlab("Zeit [Monate / Jahre]")
       
     }
     else if (input$radioHistorie == 2){
-      chartSeries(weightened.portfolio ,name="Historie",theme = 'white')
+      chartSeries(weightened.portfolio ,name="Historie des bestehenden Portfolios",theme = 'white')
     }
     
   })
@@ -277,12 +298,15 @@ server <- function(input, output, session) {
     
     
     if (input$radioHistorie == 1 & b != 1){
-      ggplot(data = weightened.portfolio.max, aes(index(weightened.portfolio.max)))+
-        geom_line(aes(y = Close, colour = "Individuelles Portfolio"))
+      ggplot(data = weightened.portfolio.max, aes(as.Date(index(weightened.portfolio.max))))+
+        geom_line(aes(y = Adjusted, colour = "Individuell"))+
+        labs(color = "Portfolio")+
+        ylab("Portfoliowert [CHF]") +
+        xlab("Zeit [Monate / Jahre]")
       
     }
     else if (input$radioHistorie == 2){
-      chartSeries(weightened.portfolio.max ,name="Historie",theme = 'white')
+      chartSeries(weightened.portfolio.max ,name="Historie des individuellen Portfolios",theme = 'white')
     }
     
   })
