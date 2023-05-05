@@ -43,12 +43,19 @@ server <- function(input, output, session) {
   }
   #reactive function for checkbox
   input_ckbx <- function(){
+    for (i in 1:length(portfolio_s2)) {
+      input[[paste0("checkbox", as.character(i))]]
+    }
     for (i in 1:(length(portfolio_s2))) {
       if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
       else portfolio_s2[i] <<- 0
     }
   }
-  
+  input_slid3 <- function(){
+    a <- input$slider3
+    input$num15
+    return(a)
+  }
   #info serverfunktion
   output$portfolio1 <- renderPlot({
     inputs_num()
@@ -133,10 +140,9 @@ server <- function(input, output, session) {
   
   output$max <-  renderPlot({
     input_ckbx()
+    risk_F(input_slid3())
     dat_max_F()
     dat_max_rec_F()
-    input$slider3
-    risk_F(input$slider3)
     zu_invest_verm <<- input$num15
     
     ggplot(dat_max, aes(x = "", y = Gewicht, fill = Asset)) +
@@ -174,8 +180,7 @@ server <- function(input, output, session) {
   
   output$max2 <-  renderPlot({
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
+    risk_F(input_slid3())
     zu_invest_verm <<- input$num15
     dat_max_F()
     dat_max_rec_F()
@@ -310,6 +315,8 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
     if (input$sliderHistorie=="8Y") b <- 8*365
+    input_ckbx()
+    input_slid3()
     dat_max_F()
     dat_max_rec_F()
     inputs_num()
@@ -345,8 +352,7 @@ server <- function(input, output, session) {
   
   output$maxrec <- renderTable({
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
+    risk_F(input_slid3())
     
     zu_invest_verm <<- input$num15
     
@@ -373,8 +379,7 @@ server <- function(input, output, session) {
   
   output$maxrec_inf <- renderTable({
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
+    risk_F(input_slid3())
     
     maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
                              "Rendite"=round(max_return,2))
