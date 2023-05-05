@@ -248,7 +248,7 @@ ui <- dashboardPage(
                  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
-              fluidPage(
+              fluidPage(fixedPage(position = "right",
                 sidebarPanel(
                   sliderTextInput(
                     inputId = "slider2",
@@ -269,8 +269,9 @@ ui <- dashboardPage(
                                selected = 1)
                   ,width = 2),
                 mainPanel(
-                  plotOutput("historical_data", width = "60%")
+                  plotOutput("historical_data", width = "100%")
                 )
+              )
               ),
       ),
       tabItem(tabName = "about",
