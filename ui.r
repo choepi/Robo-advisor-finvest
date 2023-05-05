@@ -35,8 +35,7 @@ library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
 library(geojsonio)
-
-
+library(gridExtra)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -154,6 +153,21 @@ ui <- dashboardPage(
               tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
+                tabPanel("Übersicht",
+                         h5("Lorem ipsum dolor sit amet, 
+                 consetetur sadipscing elitr, 
+                 sed diam nonumy eirmod tempor invidunt ut labore et
+                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
+                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
+                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
+                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
+                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         fluidPage(fluidRow(
+                           downloadButton("download_pdf", "Download PDF"),
+                           column(6,
+                                  dataTableOutput("overview"))))),
                 tabPanel("Historie",
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
