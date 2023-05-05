@@ -34,6 +34,7 @@ library(pROC)
 library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
+library(geojsonio)
 
 
 ## build ui.R -----------------------------------
@@ -164,20 +165,28 @@ ui <- dashboardPage(
                  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
-                         fluidPage(sidebarPanel(
+                         fluidPage(fixedPage(position = "right", sidebarPanel(
                            sliderTextInput(
                              inputId = "sliderHistorie",
-                             label = "Zeitraum",
+                             label = h3("Zeitraum"),
                              choices = c("1M","6M","1Y","5Y","8Y"),
                              selected = "1M"),
                            br(),
                            radioButtons("radioHistorie", h3("Ansicht"),
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
-                                        selected = 1),width = 2),
+                                        selected = 1),
                            br(), 
+                           h3("Renditen"),
+                           textOutput("alt"),
+                           textOutput("mvp.venturini"),
+                           textOutput("tp.venturini"),
+                           textOutput("individuell"),
+                           width = 2),
                            mainPanel(
-                             splitLayout(cellWidths = c("50%", "50%"), plotOutput("weightened.portfolio"), plotOutput("weightened.portfolio2"))
+                             plotOutput("weightened.portfolio"),
+                             plotOutput("weightened.portfolio2")
                            )
+                         )
                          )
                 ),
                 tabPanel("MVP",
@@ -240,29 +249,30 @@ ui <- dashboardPage(
                  eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
-              fluidPage(
-                sidebarPanel(
-                  sliderTextInput(
-                    inputId = "slider2",
-                    label = "Choice",
-                    choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "6M"
-                  ),
-                  br(), 
-                  selectInput("select2", h3("Asset"),
-                              choices = list("BITCOIN"=4,"SMI" =1,"SWIBND" = 2,
-                                             "GOLD"=3,
-                                             "SNP500"=5,"USBND"=6,
-                                             "USD"=7),selected = "BITCOIN"),
-                  textOutput("selected_var"),
-                  br(), 
-                  radioButtons("radio1", h3("Ansicht"),
-                               choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 1)
-                  ,width = 2),
-                mainPanel(
-                  plotOutput("historical_data", width = "60%")
-                )
+              fluidPage(fixedPage(position = "right",
+                                  sidebarPanel(
+                                    sliderTextInput(
+                                      inputId = "slider2",
+                                      label = "Choice",
+                                      choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                                      selected = "6M"
+                                    ),
+                                    br(), 
+                                    selectInput("select2", h3("Asset"),
+                                                choices = list("BITCOIN"=4,"SMI" =1,"SWIBND" = 2,
+                                                               "GOLD"=3,
+                                                               "SNP500"=5,"USBND"=6,
+                                                               "USD"=7),selected = "BITCOIN"),
+                                    textOutput("selected_var"),
+                                    br(), 
+                                    radioButtons("radio1", h3("Ansicht"),
+                                                 choices = list("Simpel" = 1, "Erweitert" = 2),
+                                                 selected = 1)
+                                    ,width = 2),
+                                  mainPanel(
+                                    plotOutput("historical_data", width = "100%")
+                                  )
+              )
               ),
       ),
       tabItem(tabName = "about",
