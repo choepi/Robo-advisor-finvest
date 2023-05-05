@@ -80,9 +80,9 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
-                         actionButton("help_tab1", "About this Page"),
-                         h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
-                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
+                         actionButton("help_tab1", "Hilfe"),
+                         h4("Hier können Sie Ihr bestehendes Portfolio eintragen, welches Sie später in der Maske 
+                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen können.
                             Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
                             verschieden Assets zu erhalten."),
                          fluidRow(
@@ -118,10 +118,10 @@ ui <- dashboardPage(
                          )
                 ),
                 tabPanel("Individuelles Portfolio",
-                         actionButton("help_tab2", "About this Page"),
+                         actionButton("help_tab2", "Hilfe"),
                          fluidPage(
-                           h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
-                            welches du dann nach bedarf anpassen kannst."),
+                           h4("Hier könen Sie Ihre individuellen Wünsche eintragen und daraus eine Portfoliooempfehlung erhalten,
+                            welches später angepasst werden kann."),
                            br(),
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
@@ -149,7 +149,7 @@ ui <- dashboardPage(
       
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
-              h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
+              h5("Performance der Portfolios anhand MVP oder Tangential Methode"),
               tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
