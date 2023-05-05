@@ -51,6 +51,7 @@ server <- function(input, output, session) {
   
   #info serverfunktion
   output$portfolio1 <- renderPlot({
+    inputs_num()
     for (i in 1:length(asl)) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
