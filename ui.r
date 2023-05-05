@@ -34,6 +34,7 @@ library(pROC)
 library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
+library(geojson)
 
 
 ## build ui.R -----------------------------------
@@ -249,28 +250,28 @@ ui <- dashboardPage(
                  At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
                  no sea takimata sanctus est Lorem ipsum dolor sit amet."),
               fluidPage(fixedPage(position = "right",
-                sidebarPanel(
-                  sliderTextInput(
-                    inputId = "slider2",
-                    label = "Choice",
-                    choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
-                    selected = "6M"
-                  ),
-                  br(), 
-                  selectInput("select2", h3("Asset"),
-                              choices = list("BITCOIN"=4,"SMI" =1,"SWIBND" = 2,
-                                             "GOLD"=3,
-                                             "SNP500"=5,"USBND"=6,
-                                             "USD"=7),selected = "BITCOIN"),
-                  textOutput("selected_var"),
-                  br(), 
-                  radioButtons("radio1", h3("Ansicht"),
-                               choices = list("Simpel" = 1, "Erweitert" = 2),
-                               selected = 1)
-                  ,width = 2),
-                mainPanel(
-                  plotOutput("historical_data", width = "100%")
-                )
+                                  sidebarPanel(
+                                    sliderTextInput(
+                                      inputId = "slider2",
+                                      label = "Choice",
+                                      choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
+                                      selected = "6M"
+                                    ),
+                                    br(), 
+                                    selectInput("select2", h3("Asset"),
+                                                choices = list("BITCOIN"=4,"SMI" =1,"SWIBND" = 2,
+                                                               "GOLD"=3,
+                                                               "SNP500"=5,"USBND"=6,
+                                                               "USD"=7),selected = "BITCOIN"),
+                                    textOutput("selected_var"),
+                                    br(), 
+                                    radioButtons("radio1", h3("Ansicht"),
+                                                 choices = list("Simpel" = 1, "Erweitert" = 2),
+                                                 selected = 1)
+                                    ,width = 2),
+                                  mainPanel(
+                                    plotOutput("historical_data", width = "100%")
+                                  )
               )
               ),
       ),
