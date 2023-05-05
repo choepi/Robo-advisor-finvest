@@ -43,14 +43,22 @@ server <- function(input, output, session) {
   }
   #reactive function for checkbox
   input_ckbx <- function(){
+    for (i in 1:length(portfolio_s2)) {
+      input[[paste0("checkbox", as.character(i))]]
+    }
     for (i in 1:(length(portfolio_s2))) {
       if (input[[paste0("checkbox", as.character(i))]]) portfolio_s2[i] <<- 1
       else portfolio_s2[i] <<- 0
     }
   }
-  
+  input_slid3 <- function(){
+    a <- input$slider3
+    input$num15
+    return(a)
+  }
   #info serverfunktion
   output$portfolio1 <- renderPlot({
+    inputs_num()
     for (i in 1:length(asl)) {
       portfolio_s[i] <<- input[[paste0("num", as.character(i))]]
     }
@@ -131,12 +139,15 @@ server <- function(input, output, session) {
   })
   
   output$max <-  renderPlot({
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
     input_ckbx()
     dat_max_F()
     dat_max_rec_F()
-    input$slider3
-    risk_F(input$slider3)
-    zu_invest_verm <<- input$num15
+    
+    
+
     
     ggplot(dat_max, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
@@ -172,10 +183,10 @@ server <- function(input, output, session) {
   })
   
   output$max2 <-  renderPlot({
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
-    zu_invest_verm <<- input$num15
     dat_max_F()
     dat_max_rec_F()
     ggplot(dat_max, 
@@ -309,6 +320,10 @@ server <- function(input, output, session) {
     if (input$sliderHistorie=="1Y") b <- 365
     if (input$sliderHistorie=="5Y") b <- 5*365
     if (input$sliderHistorie=="8Y") b <- 8*365
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
+    input_ckbx()
     dat_max_F()
     dat_max_rec_F()
     inputs_num()
@@ -343,12 +358,10 @@ server <- function(input, output, session) {
   
   
   output$maxrec <- renderTable({
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
-    
-    zu_invest_verm <<- input$num15
-    
     dat_max_rec_F()
     dat_max_rec
   })
@@ -371,10 +384,10 @@ server <- function(input, output, session) {
   
   
   output$maxrec_inf <- renderTable({
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
     input_ckbx()
-    input$slider3
-    risk_F(input$slider3)
-    
     maxrec_inf <- data.frame("Volatilität"=round(max_vola,2),
                              "Rendite"=round(max_return,2))
     maxrec_inf
@@ -422,6 +435,68 @@ server <- function(input, output, session) {
         weight = 2
       )
   })
+  
+  output$overview<- renderDataTable({
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
+    input_ckbx()
+    dat_max_F()
+    dat_max_rec_F()
+    inputs_num()
+    dat_mvp_F()
+    dat_tp_F()
+    dat_mvp_rec_F()
+    dat_tp_rec_F()
+    
+    
+    a <- xts()
+    for (i in 1:length(portfolio_s)) {
+      if (portfolio_s2[i] > 0)
+        a <- na.omit(merge(a, ren[[i]]))
+    }
+    y <-window(a, start=Sys.Date()-365*2, end=Sys.Date())
+    ret_b <- sum(colMeans(y)*100)
+    sd_b <- sqrt(sum(colSds(y)))
+    n <- sum(portfolio_s)#length(portfolio_s[portfolio_s == 0])
+    
+    ov_basic <- c(portfolio_s[portfolio_s != 0]/n,ret_b,sd_b,(ret_b-riskfree)/sd_b)
+    ov_mvp <- c(dat_mvp$Gewicht,mvpreturn,mvpvola,(mvpreturn-riskfree)/mvpvola)
+    ov_tp <- c(dat_tp$Gewicht,tpreturn,tpvola,(tpreturn-riskfree)/tpvola)
+    ov_max <- c(dat_max$Gewicht,max_return,max_vola,(max_return-riskfree)/max_vola)
+    
+    overview_df <- data.frame("Basic"=ov_basic,"MVP"=ov_mvp,"TP"=ov_tp)
+    row.names(overview_df) <- c(dat_mvp$Asset,"Rendite","Vola","Sharp")
+    overview_df <<- round(overview_df,3)
+    datatable(round(overview_df,3), options = list(dom = 't'))
+  })
+
+# output$download_pdf <- downloadHandler(
+#   filename = "portfolio_performance_FusionFinance.pdf",
+#   content = function(file) {
+#     pdf(file)
+#     print(xtable(overview_df))
+#     dev.off()
+#   },
+#   contentType = "application/pdf",
+#   after = function(file) {
+#     file.remove(file)
+#   }
+# )
+
+  
+  output$download_pdf <- downloadHandler(
+    filename = function() {
+      paste0("portfolio_performance_FusionFinance_", Sys.Date(), ".pdf")
+    },
+    content = function(file) {
+      pdf(file)
+      print(xtable(overview_df))
+      dev.off()
+    },
+    contentType = "application/pdf"
+  )
+    
   
   
   
