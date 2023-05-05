@@ -147,7 +147,7 @@ server <- function(input, output, session) {
     dat_max_rec_F()
     
     
-
+    
     
     ggplot(dat_max, aes(x = "", y = Gewicht, fill = Asset)) +
       geom_bar(stat = "identity",
@@ -436,6 +436,7 @@ server <- function(input, output, session) {
       )
   })
   
+  vals <- reactiveValues(p1=NULL)
   output$overview<- renderDataTable({
     risk_F(input_slid3())
     if (risk == 2) zu_invest_verm <<- 2*input$num15
@@ -467,37 +468,25 @@ server <- function(input, output, session) {
     
     overview_df <- data.frame("Basic"=ov_basic,"MVP"=ov_mvp,"TP"=ov_tp)
     row.names(overview_df) <- c(dat_mvp$Asset,"Rendite","Vola","Sharp")
-    overview_df <<- round(overview_df,3)
-    datatable(round(overview_df,3), options = list(dom = 't'))
+    overview_df <- round(overview_df,2)
+    vals$p1 <- tableGrob(overview_df)
+    datatable(round(overview_df,2), options = list(dom = 't'))
   })
-
-output$download_pdf <- downloadHandler(
-  filename = "portfolio_performance_FusionFinance.pdf",
-  content = function(file) {
-    pdf(file)
-    print(xtable(overview_df))
-    dev.off()
-  },
-  contentType = "application/pdf",
-  after = function(file) {
-    file.remove(file)
-  }
-)
-
   
-  # output$download_pdf <- downloadHandler(
-  #   filename = function() {
-  #     paste0("portfolio_performance_FusionFinance_", Sys.Date(), ".pdf")
-  #   },
-  #   content = function(file) {
-  #     pdf(file)
-  #     print(xtable(overview_df))
-  #     dev.off()
-  #   },
-  #   contentType = "application/pdf"
-  # )
-    
-  
+
+ 
+  output$download_pdf <- downloadHandler(
+    filename = function() {
+      paste0("portfolio_performance_FusionFinance_", Sys.Date(), ".pdf")
+    },
+    content = function(file) {
+      pdf(file,onefile=T)
+      grid.arrange(vals$p1)
+      dev.off()
+    },
+    contentType = "application/pdf"
+  )
+
   
   
   ####################################Help-Box##################################

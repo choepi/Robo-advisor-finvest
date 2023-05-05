@@ -194,7 +194,7 @@ max <- function() {
   # MAXX<<-as.matrix(m)
   # rownames(MAXX) <- NULL
   
-
+  
   if (risk == 0) {
     max_return <<- mvpreturn_m
     max_vola <<- mvpvola_m
@@ -245,8 +245,8 @@ portfolio_w_max_F <- function() {
     portfolio_w_max[i] <- portfolio_s2[i] * last(dat_asset[[i]]$Adjusted)
   }
   portfolio_w_max <<- round((portfolio_w_max), 1)
-
- 
+  
+  
 }
 
 dat_mvp_F <- function() {
@@ -363,7 +363,7 @@ dat_max_rec_F <- function() {
   sg <- zu_invest_verm
   abssum<- sum(abs(dat_max[lp, 2]))
   g <- sg/abssum*dat_max[lp, 2]
- 
+  
   dat_max_rec$Investiert <- (g)
   
   names.max <- c()
@@ -532,7 +532,7 @@ weightened.portfolio2_F <- function(b){
     dat[[i]] <- window(dat_asset[[i]],start=end,end=start)
   }
   # #weightened portfolio MAXX
-
+  
   names.ren.max <- c()
   v <- dat_max_rec[order(as.numeric(rownames(dat_max_rec))),,drop=FALSE]
   

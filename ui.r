@@ -35,8 +35,7 @@ library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
 library(geojsonio)
-library(xtable)
-library(tinytex)
+library(gridExtra)
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -168,7 +167,7 @@ ui <- dashboardPage(
                          fluidPage(fluidRow(
                            downloadButton("download_pdf", "Download PDF"),
                            column(6,
-                           dataTableOutput("overview"))))),
+                                  dataTableOutput("overview"))))),
                 tabPanel("Historie",
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
