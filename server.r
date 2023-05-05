@@ -382,20 +382,44 @@ server <- function(input, output, session) {
   
   output$map <- renderLeaflet({
     data <- data.frame(
-      asset = c("Bitcoin (digital currency)",
-                "Swiss Market Index",
-                "S&P 500 Index",
-                "Swiss government bond",
-                "U.S. government bond", "Gold"),
-      lat = c(40, 47, 38, 46, 37, 51),
-      lng = c(-100, 8, -97, 8, -95, -0.1)
+      asset = c("Swiss Market Index",
+                "S&P 500 Index & Gold",
+                "Swiss Government Bond",
+                "U.S. Government Bond"),
+      lat = c(47.37147, 40.70704, 46.94657, 38.89766),
+      lng = c(8.53208, -74.01119, 7.44429, -77.03641),
+      desc = c("Der Swiss Market Index (SMI) ist der führende Aktienindex der Schweiz, der die 20 größten und liquidesten Unternehmen des Landes abbildet.",
+               "Der S&P 500 ist ein Aktienindex, der die Performance von 500 der größten börsennotierten Unternehmen in den USA widerspiegelt. 
+               Gold ist ein Edelmetall, das als Rohstoff für Schmuck, elektronische Bauteile und Investitionen verwendet wird. Es gilt als sicheres Investment.",
+               "Eine Schweizer Staatsanleihe ist eine Schuldverschreibung der Schweizer Regierung, mit der sie sich Kapital beschafft und den Gläubigern regelmäßige Zinszahlungen sowie die Rückzahlung des Kapitals zum Fälligkeitsdatum verspricht.",
+               "Ein US Government Bond ist eine Anleihe, die von der Regierung der Vereinigten Staaten ausgegeben wird und als Schuldtitel fungiert.")
     )
+    
+    # Define the borders of Switzerland and the United States
+    borders <- geojsonio::geojson_read("https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json", what = "sp")
+    swiss_border <- borders[borders$name == "Switzerland",]
+    us_border <- borders[borders$name == "United States of America",]
+    
     leaflet(data) %>%
       addTiles() %>%
       addMarkers(
         ~lng, ~lat,
-        popup = ~asset,
+        popup = ~paste("<strong>", asset, "</strong><br>", desc),
         label = ~asset
+      ) %>%
+      addPolygons(
+        data = swiss_border,
+        fillColor = "#FF0000",
+        fillOpacity = 0.05,
+        color = "#FF0000",
+        weight = 2
+      ) %>%
+      addPolygons(
+        data = us_border,
+        fillColor = "#0000FF",
+        fillOpacity = 0.05,
+        color = "#0000FF",
+        weight = 2
       )
   })
   
