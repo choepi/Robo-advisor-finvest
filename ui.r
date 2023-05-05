@@ -34,7 +34,7 @@ library(pROC)
 library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
-library(geojson)
+library(geojsonio)
 
 
 ## build ui.R -----------------------------------
