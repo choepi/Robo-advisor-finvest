@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Portfoliotheorie - Erklärung von MVP, TP und Markowitz</title>
+</head>
+<body>
+	<h1>Portfoliotheorie</h1>
+	<p>Die Portfoliotheorie ist eine Finanztheorie, die sich mit der Optimierung von Portfolios beschäftigt. Das Ziel ist es, ein Portfolio mit dem besten Verhältnis von Rendite zu Risiko zu finden.</p>
+
+	<div style="display: flex; align-items: center;">
+		<div>
+			<h3>Minimum-Variance-Portfolio (MVP)</h3>
+			<p>Das Minimum-Variance-Portfolio ist das Portfolio, das das geringste Risiko aufweist. Es besteht aus einer Kombination von Vermögenswerten, die das Risiko des Portfolios minimieren. Das MVP wird durch die Optimierung der Gewichtung der Vermögenswerte erreicht.<p>
+
+			<h3>Tangency-Portfolio (TP)</h3>
+			 </p>Das Tangency-Portfolio ist das Portfolio, das die höchste Rendite bei gegebenem Risiko bietet. Es liegt auf der Effizienzgrenze, die den besten Kompromiss zwischen Rendite und Risiko darstellt. Das TP wird durch die Optimierung der Gewichtung der Vermögenswerte erreicht.</p>
+		</div>
+		<img src="mvp_tp.jpg" alt="MVP and TP" width="250">
+	</div>
+
+<h3>Berechnung von Portfolio-Gewichten</h3>
+
+    <p>Die Gewichte für TP und MVP können mithilfe der Kovarianzmatrix berechnet werden. Die Kovarianzmatrix ist eine Matrix, die die Kovarianz zwischen den verschiedenen Anlageklassen widerspiegelt. Um die Gewichte zu berechnen, muss zunächst die Kovarianzmatrix berechnet werden. Anschließend können die Gewichte für jede Anlageklasse berechnet werden, indem die inversen Kovarianzmatrix multipliziert wird mit einem Vektor von durchschnittlichen erwarteten Renditen der Anlageklassen.</p>
+
+<p>Die Formel zur Berechnung der Gewichte für TP lautet:</p>
+
+<p>𝑤<sub>TP</sub> = Λ Σ<sup>-1</sup> (𝑟<sub>f</sub> − 𝑟<sub>TP</sub>) / (1<sup>T</sup> Σ<sup>-1</sup> (𝑟<sub>f</sub> − 𝑟<sub>TP</sub>))</p>
+
+<p>Wobei 𝑤<sub>TP</sub> ein Vektor von Gewichten für jede Anlageklasse im TP-Portfolio ist, Σ die Kovarianzmatrix, Λ ein Faktor zur Risikoreduzierung, 𝑟<sub>f</sub> ein Vektor von durchschnittlichen erwarteten Renditen der Anlageklassen, 𝑟<sub>TP</sub> die erwartete Rendite des TP-Portfolios, ^-1 die Inverse der Kovarianzmatrix, und 1 ein Vektor von Einsen.</p>
+
+<p>Die Formel zur Berechnung der Gewichte für MVP lautet:</p>
+
+<p>𝑤<sub>MVP</sub> = 𝜇 Σ<sup>-1</sup> / (1<sup>T</sup> Σ<sup>-1</sup> 𝟏)</p>
+
+<p>Wobei 𝑤<sub>MVP</sub> ein Vektor von Gewichten für jede Anlageklasse im MVP-Portfolio ist, Σ die Kovarianzmatrix, 𝜇 ein Faktor zur Renditemaximierung, ^-1 die Inverse der Kovarianzmatrix, und 1 ein Vektor von Einsen.</p>
+
+<p>Indem man die Gewichte für TP und MVP berechnet, kann man ein ausgewogenes Portfolio aus verschiedenen Anlageklassen aufbauen, das das Risiko minimiert und gleichzeitig eine optimale Rendite erzielt.</p>
+
+	<div style="display: flex; align-items: center;">
+		<img src="markowitz.png"alt="Harry Markowitz" style="margin-right: 20px;" width="120">
+		<div>
+			<h3>Markowitz</h3>
+			<p>Harry Markowitz war ein amerikanischer Ökonom, der die Portfoliotheorie entwickelte. Er stellte fest, dass die Diversifikation von Vermögenswerten das Risiko des Portfolios reduzieren kann. Seine Theorie geht davon aus, dass die Renditen von Vermögenswerten normalverteilt sind und dass Anleger Rendite und Risiko berücksichtigen sollten, um ein optimales Portfolio zu erreichen.</p>
+
+			<p>Insgesamt geht es bei der Portfoliotheorie darum, ein Portfolio zu konstruieren, das das beste Verhältnis von Rendite zu Risiko bietet. Das MVP und das TP sind zwei wichtige Konzepte, die dabei helfen, dieses Ziel zu erreichen. Markowitz hat mit seiner Theorie einen großen Einfluss auf die moderne Portfoliotheorie und die Anlagepraxis im Allgemeinen gehabt.</p>
+		</div>
+	</div>
+</body>
+</html>
