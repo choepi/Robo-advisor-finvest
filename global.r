@@ -11,11 +11,11 @@ which.closest <- function(x,invect,index=T) {
 } 
 risk_F<-function(o){
   if (o == "Geringes Risiko")
-    risk <<- 0.07
+    risk <<- 0
   else if (o == "Mittleres Risiko")
-    risk <<- 0.1
+    risk <<- 1
   else if (o == "Hohes Risiko")
-    risk <<- 0.5
+    risk <<- 2
 }
 #binds data columnwise and fills with NA
 cbind.fill <- function(...) {
@@ -79,9 +79,9 @@ get_data <- function() {
   ren <- list(rep(NA, length(assets_list)))
   for (i in 1:length(assets_list)){
     r <- na.omit(l[[i]][,6])
-    r <- na.omit(ROC(r))*260/100
+    r <- na.omit(dailyReturn(r,type = "arithmetic"))*260/100
     colnames(r) <-
-      c(paste0("r.", asl[i]))
+      c(paste0(asl[i],"."))
     ren[[i]] <- r
     attributes(ren[[i]])$na.action <- NULL
   }
@@ -164,46 +164,56 @@ max <- function() {
       a <- na.omit(merge(a, ren[[i]]))
   }
   y <-window(a, start=Sys.Date()-age, end=Sys.Date())
+  N = dim(y)[1]
   mvp_m <- minvariancePortfolio(as.timeSeries(y),spec =portfolioSpec() , constraints = "LongOnly")
   MVP_m <<- getWeights(mvp_m)
-  N = dim(y)[1]
   mittel_m <<- t(y) %*% rep(1 / N, N) * 260
   Sigma_m = cov(y, y)
-  mvpreturn <<- t(MVP_m) %*% mittel_m
-  mvpvola <<- sqrt(t(MVP_m) %*% (Sigma_m %*% MVP_m)) * sqrt(260)
-  
-  Portfolio2 <- as.timeSeries(y)
-  excess_m = t(y) %*% rep(1 / N, N) * 260 - riskfree
-  spec <- portfolioSpec()
-  setRiskFreeRate(spec) <- riskfree #???
-  tanPort2 <- tangencyPortfolio(Portfolio2, spec=spec, constraints="LongOnly")
-  TP_m<<-getWeights(tanPort2)
-  tpreturn_m <<- t(TP_m) %*% (excess_m + riskfree)
-  tpvola_m <<- sqrt(t(TP_m) %*% (Sigma_m %*% TP_m)) * sqrt(260)
+  mvpreturn_m <<- t(MVP_m) %*% mittel_m
+  mvpvola_m <<- sqrt(t(MVP_m) %*% (Sigma_m %*% MVP_m)) * sqrt(260)
   
   
-  alpha = seq(-1e4,1e3,1)/10 #alpha = 1 => tp, alpha get ban von 0-1.5 durch
-  walpha = (alpha %o% TP_m) + ((1 - alpha) %o% as.numeric(MVP_m))
-  preturn <- walpha%*%mittel_m
-  pvola <- c()
-  for (i in 1:length(alpha)){
-    pvola[i] <- sqrt(walpha[i,] %*%(Sigma_m %*% walpha[i,]))*sqrt(260)
+  
+  # alpha = seq(-1e4,1e3,1)/10 #alpha = 1 => tp, alpha get ban von 0-1.5 durch
+  # walpha = (alpha %o% TP_m) + ((1 - alpha) %o% as.numeric(MVP_m))
+  # preturn <- walpha%*%mittel_m
+  # pvola <- c()
+  # for (i in 1:length(alpha)){
+  #   pvola[i] <- sqrt(walpha[i,] %*%(Sigma_m %*% walpha[i,]))*sqrt(260)
+  # }
+  # walpha <- as.data.frame(walpha)
+  # walpha$alpha <- as.matrix(alpha)
+  # walpha$preturn <- as.matrix(preturn)
+  # walpha$pvola <- c(pvola)
+  # walpha <- walpha/100
+  # #plot(x = walpha$pvola,y <- walpha$preturn)
+  # df <- walpha[which.min(abs((risk-walpha$preturn))),]
+  # max_return <<- df$preturn
+  # max_vola<<- df$pvola
+  # m<-(df[ , -which(names(df) %in% c("alpha","pvola","preturn"))])
+  # MAXX<<-as.matrix(m)
+  # rownames(MAXX) <- NULL
+  
+  
+  if (risk == 0) {
+    max_return <<- mvpreturn_m
+    max_vola <<- mvpvola_m
+    MAXX <<- MVP_m
+  } else if (risk == 1 | risk==2) {
+    Portfolio2 <- as.timeSeries(y)
+    excess_m = t(y) %*% rep(1 / N, N) * 260 - riskfree
+    spec <- portfolioSpec()
+    setRiskFreeRate(spec) <- 0 #???
+    tanPort2 <- tangencyPortfolio(Portfolio2, spec=spec, constraints="LongOnly")
+    TP_m<<-getWeights(tanPort2)
+    tpreturn_m <<- t(TP_m) %*% (excess_m + riskfree)
+    tpvola_m <<- sqrt(t(TP_m) %*% (Sigma_m %*% TP_m)) * sqrt(260)
+    
+    max_return <<- tpreturn_m
+    max_vola <<- tpvola_m
+    MAXX <<- TP_m
   }
-  walpha <- as.data.frame(walpha)
-  walpha$alpha <- as.matrix(alpha)
-  walpha$preturn <- as.matrix(preturn)
-  walpha$pvola <- c(pvola)
-  walpha <- walpha/100
-  #plot(x = walpha$pvola,y <- walpha$preturn)
-  df <- walpha[which.min(abs((risk-walpha$preturn))),]
-  max_return <<- df$preturn
-  max_vola<<- df$pvola
-  m<-(df[ , -which(names(df) %in% c("alpha","pvola","preturn"))])
-  MAXX<<-as.matrix(m)
-  rownames(MAXX) <- NULL
-  
-  
-  return(t(MAXX))
+  return((as.matrix(MAXX)))
 }
 
 get_rf <- function() {
@@ -235,6 +245,8 @@ portfolio_w_max_F <- function() {
     portfolio_w_max[i] <- portfolio_s2[i] * last(dat_asset[[i]]$Adjusted)
   }
   portfolio_w_max <<- round((portfolio_w_max), 1)
+  
+  
 }
 
 dat_mvp_F <- function() {
@@ -294,11 +306,11 @@ dat_mvp_rec_F <- function() {
   n = length(dat_mvp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
-    if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] < 0)
+    if (round(portfolio_s[i] - dat_mvp_rec$Anzahl[i],2) < 0)
       h[i] <- "Kaufen"
-    else if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] > 0)
+    else if (round(portfolio_s[i] - dat_mvp_rec$Anzahl[i],2) > 0)
       h[i] <- "Verkaufen"
-    else if (portfolio_s[i] - dat_mvp_rec$Anzahl[i] == 0)
+    else if (round(portfolio_s[i] - dat_mvp_rec$Anzahl[i],2) == 0)
       h[i] <- "Halten"
   }
   dat_mvp_rec$Handlung <- h
@@ -328,11 +340,11 @@ dat_tp_rec_F <- function() {
   n = length(dat_tp_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
-    if (portfolio_s[i] - dat_tp_rec$Anzahl[i] < 0)
+    if (round(portfolio_s[i] - dat_tp_rec$Anzahl[i],2) < 0)
       h[i] <- "Kaufen"
-    else if (portfolio_s[i] - dat_tp_rec$Anzahl[i] > 0)
+    else if (round(portfolio_s[i] - dat_tp_rec$Anzahl[i],2) > 0)
       h[i] <- "Verkaufen"
-    else if (portfolio_s[i] - dat_tp_rec$Anzahl[i] == 0)
+    else if (round(portfolio_s[i] - dat_tp_rec$Anzahl[i],2) == 0)
       h[i] <- "Halten"
   }
   dat_tp_rec$Handlung <- h
@@ -351,6 +363,7 @@ dat_max_rec_F <- function() {
   sg <- zu_invest_verm
   abssum<- sum(abs(dat_max[lp, 2]))
   g <- sg/abssum*dat_max[lp, 2]
+  
   dat_max_rec$Investiert <- (g)
   
   names.max <- c()
@@ -366,19 +379,18 @@ dat_max_rec_F <- function() {
   
   pa <- weights_max
   for (i in 1:length(asl)) {
-    pa[i] <- weights_max[i] * last(dat_asset[[i]]$Adjusted)
+    pa[i] <- portfolio_s2[i]*last(dat_asset[[i]]$Adjusted)
   }
-  
   pa <- pa[pa != 0]
   dat_max_rec$Anzahl <- round(g / pa,3)
   n = length(dat_max_rec$Anzahl)
   h = c(rep(NA, n))
   for (i in 1:n) {
-    if (dat_max_rec$Gewicht[i] > 0)
+    if (dat_max_rec$Anzahl[i] > 0)
       h[i] <- "Kaufen"
-    else if (dat_max_rec$Gewicht[i] < 0)
+    else if (dat_max_rec$Anzahl[i] < 0)
       h[i] <- "Verkaufen"
-    else if (dat_max_rec$Gewicht[i] == 0)
+    else if (dat_max_rec$Anzahl[i] == 0)
       h[i] <- "Nicht Kaufen"
   }
   dat_max_rec$Handlung <- h
@@ -519,17 +531,20 @@ weightened.portfolio2_F <- function(b){
   for (i in 1:length(asl)){
     dat[[i]] <- window(dat_asset[[i]],start=end,end=start)
   }
-  #weightened portfolio MAXX
+  # #weightened portfolio MAXX
+  
   names.ren.max <- c()
+  v <- dat_max_rec[order(as.numeric(rownames(dat_max_rec))),,drop=FALSE]
+  
   for (i in ren) names.ren.max <- rbind(names.ren.max,colnames(i[,1]))
   weights_max <- c(0,0,0,0,0,0)
   for (i in 1:length(names.ren.max)){
     q = names.ren.max[i]
-    for(d in 1:length(dat_max_rec[,1])){
-      r <- dat_mvp[,1][d]
-      if (r==q) weights_max[i] <- dat_max_rec[d,3]
+    for(d in 1:length(v[,1])){
+      r <- dat_max[,1][d]
+      if (r==q) weights_max[i] <- v[d,3]
     }
-  }#;print(dat_max_rec);print(weights_max)
+  }#;print(v);print(weights_max)
   
   
   ######################

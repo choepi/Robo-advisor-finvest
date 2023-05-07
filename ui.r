@@ -159,7 +159,7 @@ ui <- dashboardPage(
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
+                 dolore magna aliquyam erat, sed didata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAAA00lEQVR42mNgGAWjYBQMUxAauorZLL452TyhZQUtMMhs47QGLrIdaJ7QmtSyeP+5fTc//N98+e1/agGQWSvOvPqfNGHnRbO4lnjyHRjfvHzvzff/Zx5+/r9x60OqORBkFgg3bHnw1yy+ZQkFIdiyAuRbmIHUdiAIg+wYdeCoA0cdOOrAUQdSyYG0wKMOHHUgOQ6kNGOMOhCXpaMOHHXgiHTgSmDva9A6ENRvTejfcYFWDkzs33kBZAfZDvTMncQO6huDup+06rhbhvZxjg6RjILBDgAZYqbbTdtPRgAAAABJRU5ErkJggg==am voluptua. At vero eos 
                  et accusam et justo duo dolores et ea rebum. Stet clita kasd 
                  gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
                  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
