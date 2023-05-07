@@ -35,6 +35,7 @@ library(fPortfolio)
 library(PortfolioAnalytics)
 library(tidyquant)
 library(geojsonio)
+library(gridExtra)
 
 
 ## build ui.R -----------------------------------
@@ -156,16 +157,9 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Übersicht",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed didata:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAkCAYAAAD7PHgWAAAA00lEQVR42mNgGAWjYBQMUxAauorZLL452TyhZQUtMMhs47QGLrIdaJ7QmtSyeP+5fTc//N98+e1/agGQWSvOvPqfNGHnRbO4lnjyHRjfvHzvzff/Zx5+/r9x60OqORBkFgg3bHnw1yy+ZQkFIdiyAuRbmIHUdiAIg+wYdeCoA0cdOOrAUQdSyYG0wKMOHHUgOQ6kNGOMOhCXpaMOHHXgiHTgSmDva9A6ENRvTejfcYFWDkzs33kBZAfZDvTMncQO6huDup+06rhbhvZxjg6RjILBDgAZYqbbTdtPRgAAAABJRU5ErkJggg==am voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         h4("Hier sehen Sie eine Übersicht über die verschiedenen Gewichtungen ihres aktuellen 
+                            Porfolios, des Minimum" , br(), "Varianz Portfolios und des Tangentialportfolios.
+                            Gerne können Sie die Daten mittels einem Klick auf den Button " , br(), "\"Download PDF\" herunterladen."),
                          fluidPage(fluidRow(
                            downloadButton("download_pdf", "Download PDF"),
                            column(6,
@@ -217,16 +211,7 @@ ui <- dashboardPage(
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp"), plotOutput("tp2")),
                            tableOutput("tprec_inf"))),
                 tabPanel("Individuelles Portfolio",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         h4("In dieser Maske .........."),
                          fluidRow(
                            tableOutput("maxrec"),
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("max"), plotOutput("max2")),
@@ -235,21 +220,13 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
-              h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+              h4("Hier können Sie sich den Verlauf der Kurse der verschiedenen Assets genauer ansehen.", br(), "
+                 Dabei können Sie die Laufzeit, den gewünschten Asset und die Ansicht selbst anpassen."),
               fluidPage(fixedPage(position = "right",
                                   sidebarPanel(
                                     sliderTextInput(
                                       inputId = "slider2",
-                                      label = "Choice",
+                                      label = "Laufzeit",
                                       choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
                                       selected = "6M"
                                     ),
