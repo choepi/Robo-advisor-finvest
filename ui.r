@@ -119,7 +119,7 @@ ui <- dashboardPage(
                            ),
                          )
                 ),
-                tabPanel("Individuelles Portfolio",
+                tabPanel("Portfolio erstellen",
                          actionButton("help_tab2", "About this Page"),
                          fluidPage(
                            h4("Hier erhalten Sie mittels ihren individuellen Wünschen eine Portfolioempfehlung,
@@ -210,8 +210,8 @@ ui <- dashboardPage(
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp"), plotOutput("tp2")),
                            tableOutput("tprec_inf"))),
-                tabPanel("Individuelles Portfolio",
-                         h4("In dieser Maske .........."),
+                tabPanel("erstelltes Portfolio",
+                         h4("In dieser Maske sehen Sie unsere Kaufempfehlung basierend auf Ihren persönlichen Angaben aus der Maske Profil \"Portfolio erstellen\"."),
                          fluidRow(
                            tableOutput("maxrec"),
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("max"), plotOutput("max2")),

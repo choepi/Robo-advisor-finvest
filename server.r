@@ -74,7 +74,7 @@ server <- function(input, output, session) {
                color = "white") +
       coord_polar("y", start = 0) +
       theme_void() + # remove background, grid, numeric labels
-      scale_fill_manual(values = c("#017ca8", "#86ceec", "#A3E77F", "#B9CD74", "#7FB174", "#027b76"))
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   
@@ -121,7 +121,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   
@@ -136,7 +137,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   output$max <-  renderPlot({
@@ -155,7 +157,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   output$mvp2 <- renderPlot({
@@ -170,7 +173,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('limegreen', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', "red"), c(F, T)))
     
     
     
