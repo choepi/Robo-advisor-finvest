@@ -158,7 +158,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', 'red'), c(F, T)))
     
     
     
@@ -185,7 +185,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', 'red'), c(F, T)))
     # ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
     #   geom_col(fill = "#0099f9") +
     #   coord_flip()
@@ -204,7 +204,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', 'red'), c(F, T)))
     # ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
     #   geom_col(fill = "#0099f9") +
     #   coord_flip()
