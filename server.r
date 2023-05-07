@@ -73,14 +73,15 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void() # remove background, grid, numeric labels
+      theme_void() + # remove background, grid, numeric labels
+      scale_fill_manual(values = c("#017ca8", "#86ceec", "#A3E77F", "#B9CD74", "#7FB174", "#027b76"))
   })
   
   
   output$portfolio_worth1 <- renderText({
     inputs_num()
     w <- round(sum(portfolio_w), 1)
-    paste("Portfolio Value:", "CHF", w )
+    paste("Portfolio Value:", "CHF", format(w, big.mark = "\'"))
   })
   
   

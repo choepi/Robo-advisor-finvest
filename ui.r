@@ -115,7 +115,7 @@ ui <- dashboardPage(
                            ),
                            mainPanel(
                              h4(textOutput("portfolio_worth1")),
-                             plotOutput("portfolio1", width = "100%")
+                             plotOutput("portfolio1", width = "70%")
                            ),
                          )
                 ),
