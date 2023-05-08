@@ -22,17 +22,13 @@
 
     <p>Die Gewichte für TP und MVP können mithilfe der Kovarianzmatrix berechnet werden. Die Kovarianzmatrix ist eine Matrix, die die Kovarianz zwischen den verschiedenen Anlageklassen widerspiegelt. Um die Gewichte zu berechnen, muss zunächst die Kovarianzmatrix berechnet werden. Anschließend können die Gewichte für jede Anlageklasse berechnet werden, indem die inversen Kovarianzmatrix multipliziert wird mit einem Vektor von durchschnittlichen erwarteten Renditen der Anlageklassen.</p>
 
-<p>Die Formel zur Berechnung der Gewichte für TP lautet:</p>
+<p>Die Formel zur Berechnung der Gewichte für TP & MVP lauten:</p>
 
-<p>𝑤<sub>TP</sub> = Λ Σ<sup>-1</sup> (𝑟<sub>f</sub> − 𝑟<sub>TP</sub>) / (1<sup>T</sup> Σ<sup>-1</sup> (𝑟<sub>f</sub> − 𝑟<sub>TP</sub>))</p>
+<p>𝑤<sub>TP</sub> = Λ Σ<sup>-1</sup> (𝑟<sub>TP</sub> − 𝑟<sub>RF</sub> ⋅𝟏 ) mit 𝑤<sub>TP</sub>⋅𝟏  = 1</p>
 
-<p>Wobei 𝑤<sub>TP</sub> ein Vektor von Gewichten für jede Anlageklasse im TP-Portfolio ist, Σ die Kovarianzmatrix, Λ ein Faktor zur Risikoreduzierung, 𝑟<sub>f</sub> ein Vektor von durchschnittlichen erwarteten Renditen der Anlageklassen, 𝑟<sub>TP</sub> die erwartete Rendite des TP-Portfolios, ^-1 die Inverse der Kovarianzmatrix, und 1 ein Vektor von Einsen.</p>
+<p>𝑤<sub>MVP</sub> = 𝜇 Σ<sup>-1</sup> ⋅ 𝟏 mit 𝑤<sub>MVP</sub>⋅𝟏  =  1</p>
 
-<p>Die Formel zur Berechnung der Gewichte für MVP lautet:</p>
-
-<p>𝑤<sub>MVP</sub> = 𝜇 Σ<sup>-1</sup> / (1<sup>T</sup> Σ<sup>-1</sup> 𝟏)</p>
-
-<p>Wobei 𝑤<sub>MVP</sub> ein Vektor von Gewichten für jede Anlageklasse im MVP-Portfolio ist, Σ die Kovarianzmatrix, 𝜇 ein Faktor zur Renditemaximierung, ^-1 die Inverse der Kovarianzmatrix, und 1 ein Vektor von Einsen.</p>
+<p>Wobei 𝑤<sub>TP</sub> ein Vektor von Gewichten für jede Anlageklasse im TP-Portfolio ist, Σ die Kovarianzmatrix, Λ ein Faktor zur Risikoreduzierung, 𝜇 ein Faktor zur Renditemaximierung,𝑟<sub>f</sub> ein Vektor von durchschnittlichen erwarteten Renditen der Anlageklassen, 𝑟<sub>TP</sub> die erwartete Rendite des TP-Portfolios, Σ<sup>-1</sup> die Inverse der Kovarianzmatrix, und 𝟏 ein Vektor von Einsen.</p>
 
 <p>Indem man die Gewichte für TP und MVP berechnet, kann man ein ausgewogenes Portfolio aus verschiedenen Anlageklassen aufbauen, das das Risiko minimiert und gleichzeitig eine optimale Rendite erzielt.</p>
 
