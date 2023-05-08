@@ -242,6 +242,7 @@ ui <- dashboardPage(
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
+              actionButton("help_tab7", "Hilfe"),
               h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et

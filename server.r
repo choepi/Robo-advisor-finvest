@@ -431,6 +431,9 @@ server <- function(input, output, session) {
     if (input$help_tab2) whichtab <- "help_tab2"
     if (input$help_tab3) whichtab <- "help_tab3"
     if (input$help_tab4) whichtab <- "help_tab4"
+    if (input$help_tab5) whichtab <- "help_tab5"
+    if (input$help_tab6) whichtab <- "help_tab6"
+    if (input$help_tab7) whichtab <- "help_tab7"
     subset(helptext, tab == whichtab)
   })
   
@@ -454,27 +457,39 @@ server <- function(input, output, session) {
                                                "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
   )
   
-  # observeEvent(input$help_tab5,
-  #              introjs(session, options = list("showBullets"="false", "showProgress"="true",
-  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
-  # )
-  # 
-  # observeEvent(input$help_tab6,
-  #              introjs(session, options = list("showBullets"="false", "showProgress"="true",
-  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
-  # )
+  observeEvent(input$help_tab5,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+
+  observeEvent(input$help_tab6,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab7,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
   
   
   helptext <- data.frame(
-    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2", "help_tab3", "help_tab4")
-    , step <- c(3, 3, 3,    3, 3, 3,    1,    1)
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2", "help_tab3", "help_tab4","help_tab4","help_tab4", "help_tab4", "help_tab5", "help_tab5", "help_tab5", "help_tab5", "help_tab5", "help_tab6", "help_tab6", "help_tab6", "help_tab6", "help_tab7", "help_tab7", "help_tab7")
+    , step <- c(3, 3, 3,    3, 3, 3,    1,    4,4,4,4,    5,5,5,5,5,    4,4,4,4,   3,3,3)
     , element = c("#num1", "#portfolio_worth1", "#portfolio1", 
                   "#num15","#Risikobereitschaft","#checkbox1", 
                   "#radioHistorie", 
-                  "#mvp")
-    , intro = c("Wählen Sie hier die Anzahl Ihrer Assets","Hier sehen Sie den Wert Ihres Portfolios","Hier ist die Verteilung Ihres Portfolios dargestellt",
+                  "#mvprec ","#mvp", "#mvp2","#mvprec_inf",
+                  "#tprec", "#shortpara", "#tp", "#tp2", "#tprec_inf",
+                  "#maxrec", "#max", "#max2", "#maxrec_inf",
+                  "#selected_var", "#radio1", "#historical_data")
+    , intro = c("Wählen Sie hier die Anzahl Ihrer Assets","Hier sehen Sie den Wert Ihres Portfolios","Hier ist die Verteilung der Assets im Portfolios dargestellt",
                 "Geben Sie Ihr zu investierendes Vermögen ein","Geben Sie hier Ihre Risikobereitschaft ein","Wählen Sie hier die Assets, die in Ihrem Portfolio haben möchten",
                 "Hier kann zwischen der Standardansicht und einer erweiterten Ansicht gewechselt werden", 
-                "Test")
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt", "Im Vergleich zum MVP-Portfolio ist Shorting hier erlaubt und kann über diesen Knopf aktiviert/deaktiviert werden","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt (Rot bedeutet ein negatives Gewicht, also dieses ASset wird geshortet)","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt (Rot bedeutet ein negatives Gewicht, also dieses Asset wird geshortet)","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Im obigen Drop-down Menu können Sie ein Asset auswählen, von welchem Sie den Kursverlauf anschauen möchten", "Hier kann zwischen der Standardansicht und einer erweiterten Ansicht gewechselt werden", "Dieses Liniendiagramm zeigt den Kursverlauf über die angewählte Zeitspanne an")
   )
 }
