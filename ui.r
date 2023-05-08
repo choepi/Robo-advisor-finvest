@@ -81,11 +81,11 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
-                         actionButton("help_tab1", "About this Page"),
-                         h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
-                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
-                            Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
-                            verschieden Assets zu erhalten."),
+                         actionButton("help_tab1", "Hilfe"),
+                         h4("Hier können Sie Ihr bestehendes Portfolio eintragen, welches Sie später in der Maske 
+                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen können.
+                            Es ist auch möglich zufällige Gewichtungen einzutragen, um die Auswirkungen einer 
+                            Änderung zu erkennen."),
                          fluidRow(
                            
                            column(2,
@@ -119,10 +119,9 @@ ui <- dashboardPage(
                          )
                 ),
                 tabPanel("Individuelles Portfolio",
-                         actionButton("help_tab2", "About this Page"),
+                         actionButton("help_tab2", "Hilfe"),
                          fluidPage(
-                           h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
-                            welches du dann nach bedarf anpassen kannst."),
+                           h4("Hier können Sie Ihre Wunschassets und Ihr zu investierendes Vermögen eintragen"),
                            br(),
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
@@ -155,6 +154,7 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Historie",
+                         actionButton("help_tab3", "Hilfe"),
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et
@@ -190,6 +190,7 @@ ui <- dashboardPage(
                          )
                 ),
                 tabPanel("MVP",
+                         actionButton("help_tab4", "Hilfe"),
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et
@@ -205,6 +206,7 @@ ui <- dashboardPage(
                            splitLayout(cellWidths = c("50%", "50%"), plotOutput("mvp"), plotOutput("mvp2")),
                            tableOutput("mvprec_inf"))),
                 tabPanel("TP",
+                         actionButton("help_tab5", "Hilfe"),
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et
@@ -221,6 +223,7 @@ ui <- dashboardPage(
                            splitLayout(cellWidths = c("50%", "50%"), plotOutput("tp"), plotOutput("tp2")),
                            tableOutput("tprec_inf"))),
                 tabPanel("Individuelles Portfolio",
+                         actionButton("help_tab6", "Hilfe"),
                          h5("Lorem ipsum dolor sit amet, 
                  consetetur sadipscing elitr, 
                  sed diam nonumy eirmod tempor invidunt ut labore et

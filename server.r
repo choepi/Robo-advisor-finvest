@@ -429,7 +429,8 @@ server <- function(input, output, session) {
   help_text <- reactive({
     if (input$help_tab1) whichtab <- "help_tab1"
     if (input$help_tab2) whichtab <- "help_tab2"
-    # if (input$help_tab3) whichtab <- "help_tab3"
+    if (input$help_tab3) whichtab <- "help_tab3"
+    if (input$help_tab4) whichtab <- "help_tab4"
     subset(helptext, tab == whichtab)
   })
   
@@ -443,18 +444,37 @@ server <- function(input, output, session) {
                                                "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
   )
   
-  # observeEvent(input$help_tab3,
-  #              introjs(session, options = list("showBullets"="false", "showProgress"="true", 
+  observeEvent(input$help_tab3,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab4,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  # observeEvent(input$help_tab5,
+  #              introjs(session, options = list("showBullets"="false", "showProgress"="true",
+  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  # )
+  # 
+  # observeEvent(input$help_tab6,
+  #              introjs(session, options = list("showBullets"="false", "showProgress"="true",
   #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
   # )
   
   
-  
   helptext <- data.frame(
-    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2")
-    , step <- c(3, 3, 3, 2, 2)
-    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#checkbox1")
-    , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
-                "Gib dein zu investierendes Vermögen ein","Wähle die Assets die du in deinem Portfolio haben möchtest")
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2", "help_tab3", "help_tab4")
+    , step <- c(3, 3, 3,    3, 3, 3,    1,    1)
+    , element = c("#num1", "#portfolio_worth1", "#portfolio1", 
+                  "#num15","#Risikobereitschaft","#checkbox1", 
+                  "#radioHistorie", 
+                  "#mvp")
+    , intro = c("Wählen Sie hier die Anzahl Ihrer Assets","Hier sehen Sie den Wert Ihres Portfolios","Hier ist die Verteilung Ihres Portfolios dargestellt",
+                "Geben Sie Ihr zu investierendes Vermögen ein","Geben Sie hier Ihre Risikobereitschaft ein","Wählen Sie hier die Assets, die in Ihrem Portfolio haben möchten",
+                "Hier kann zwischen der Standardansicht und einer erweiterten Ansicht gewechselt werden", 
+                "Test")
   )
 }
