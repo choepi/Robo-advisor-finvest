@@ -494,17 +494,17 @@ server <- function(input, output, session) {
   
   
   ####################################Help-Box##################################
-  help_text <- reactive({
-    if (input$help_tab1) whichtab <- "help_tab1"
-    if (input$help_tab2) whichtab <- "help_tab2"
-    if (input$help_tab3) whichtab <- "help_tab3"
-    if (input$help_tab4) whichtab <- "help_tab4"
-    if (input$help_tab5) whichtab <- "help_tab5"
-    if (input$help_tab6) whichtab <- "help_tab6"
-    if (input$help_tab7) whichtab <- "help_tab7"
-    if (input$help_tab8) whichtab <- "help_tab8"
-    subset(helptext, tab == whichtab)
-  })
+help_text <- reactive({
+  subset(helptext, tab == if (input$help_tab1) "help_tab1"
+                          else if (input$help_tab2) "help_tab2"
+                          else if (input$help_tab3) "help_tab3"
+                          else if (input$help_tab4) "help_tab4"
+                          else if (input$help_tab5) "help_tab5"
+                          else if (input$help_tab6) "help_tab6"
+                          else if (input$help_tab7) "help_tab7"
+                          else if (input$help_tab8) "help_tab8")
+})
+
   
   observeEvent(input$help_tab1,
                introjs(session, options = list("showBullets"="false", "showProgress"="true", 
