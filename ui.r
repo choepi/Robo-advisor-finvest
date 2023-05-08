@@ -259,7 +259,9 @@ ui <- dashboardPage(
                          includeHTML("AssetInfo.html")),
                 tabPanel("Geografische Verteilung",
                          tabPanel("Map", leafletOutput("map"))
-                )
+                ),
+                tabPanel("Portfoliotheorie",
+                         includeHTML("Portfoliotheorie.html"))
               )
       )
     )
