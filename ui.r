@@ -36,6 +36,9 @@ library(PortfolioAnalytics)
 library(tidyquant)
 library(geojsonio)
 library(gridExtra)
+library(forecast)
+library(hts)
+
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
 ui <- dashboardPage(
@@ -80,10 +83,10 @@ ui <- dashboardPage(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
-                         actionButton("help_tab1", "About this Page"),
-                         h4("Hier kannst du dein bestehendes Portfolio eintragen, damit du später in der Maske 
-                            Portfolio mit dem MVP oder dem Tangentialportfolio vergleichen kannst.
-                            Selbstverständlich dürfen Sie auch willkürliche Gewichtungen eintragen, um ein Gefühl für
+                         actionButton("help_tab1", "Hilfe"),
+                         h4("Hier können Sie ihr bestehendes Portfolio eintragen, damit Sie dieses später in der Maske 
+                            Portfolio mit dem Minimum" , br(), "Varianz Portflio oder dem Tangentialportfolio vergleichen können.
+                            Selbstverständlich dürfen Sie auch willkürliche" , br(), "Gewichtungen eintragen, um ein Gefühl für
                             verschieden Assets zu erhalten."),
                          fluidRow(
                            
@@ -113,15 +116,16 @@ ui <- dashboardPage(
                            ),
                            mainPanel(
                              h4(textOutput("portfolio_worth1")),
-                             plotOutput("portfolio1", width = "100%")
+                             plotOutput("portfolio1", width = "70%")
                            ),
                          )
                 ),
-                tabPanel("Individuelles Portfolio",
-                         actionButton("help_tab2", "About this Page"),
+                tabPanel("Portfolio erstellen",
+                         actionButton("help_tab2", "Hilfe"),
                          fluidPage(
-                           h4("Hier kannst du mittels deinen individuellen Wünschen eine Portfoliooempfehlung erhalten,
-                            welches du dann nach bedarf anpassen kannst."),
+                           h4("Hier erhalten Sie mittels ihren individuellen Wünschen eine Portfolioempfehlung,
+                            welche Sie dann nach Bedarf anpassen können." , br(), "Hierbei informieren Sie uns über ihren gewünschten 
+                            zu investierenden Betrag und ihre Risikobereitschaft."),
                            br(),
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
@@ -133,58 +137,51 @@ ui <- dashboardPage(
                                inputId = "slider3",
                                label = "Risikobereitschaft",
                                choices = c("Geringes Risiko", "Mittleres Risiko", "Hohes Risiko"),
-                               selected = "Geringes Risiko"
+                               selected = "Mittleres Risiko"
                              ),
                              column(5,
                                     checkboxInput("checkbox1", "SMI", value = T),
-                                    checkboxInput("checkbox2", "SWIBND", value = F),
+                                    checkboxInput("checkbox2", "SWIBND", value = T),
                                     checkboxInput("checkbox3", "GOLD", value = T),
-                                    checkboxInput("checkbox4", "BITCOIN", value = F)),
+                                    checkboxInput("checkbox4", "BITCOIN", value = T)),
                              column(5,
                                     checkboxInput("checkbox5", "SNP500", value = T),
-                                    checkboxInput("checkbox6", "USBND", value = F))),
+                                    checkboxInput("checkbox6", "USBND", value = T))),
                          )),
               )
       ),
       
       tabItem(tabName = "portfolio",
               h1("Portfolio"),
-              h5("Einsehbarkeit der Performance des Portfolios anhand mvp oder tangential Methode"),
+              h4("Einsehbarkeit der Performance des Portfolios anhand der Minimum Varianz oder der Tangential Methode"),
               tabsetPanel(
                 id = "tabsetPanelID",
                 type = "tabs",
                 tabPanel("Übersicht",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         actionButton("help_tab8", "Hilfe"),
+                         h4("Hier sehen Sie eine Übersicht über die verschiedenen Gewichtungen ihres aktuellen 
+                            Porfolios, des Minimum" , br(), "Varianz Portfolios und des Tangentialportfolios.
+                            Gerne können Sie die Daten mittels einem Klick auf den Button " , br(), "\"Download PDF\" herunterladen."),
                          fluidPage(fluidRow(
                            downloadButton("download_pdf", "Download PDF"),
-                           column(6,
-                                  dataTableOutput("overview"))))),
+                           dataTableOutput("overview"),
+                           br(),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("basic_forecast"), plotOutput("mvp_forecast")),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp_forecast"), plotOutput("individual_forecast"))
+                           )
+                           )
+                         ),
                 tabPanel("Historie",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         actionButton("help_tab3", "Hilfe"),
+                         h4("Hier können Sie ihr bestehendes Portfolio mit dem Minimum Varianz Portfolio und dem 
+                            Tangentialportfolio vergleichen.", br(), "Dabei können Sie einen gewünschten Zeitraum und die Ansicht 
+                            je nach Bedarf anpassen."),
                          fluidPage(fixedPage(position = "right", sidebarPanel(
                            sliderTextInput(
                              inputId = "sliderHistorie",
                              label = h3("Zeitraum"),
                              choices = c("1M","6M","1Y","5Y","8Y"),
-                             selected = "1M"),
+                             selected = "8Y"),
                            br(),
                            radioButtons("radioHistorie", h3("Ansicht"),
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
@@ -204,70 +201,44 @@ ui <- dashboardPage(
                          )
                 ),
                 tabPanel("MVP",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         actionButton("help_tab4", "Hilfe"),
+                         h4("Hier können Sie sehen, welche Handlungen ihrerseits getätigt werden müssten, um das Minimum Varianz Portfolio zu erhalten."),
+                         h4("Das Minimum Varianz Portfolio ist eine Portfoliokonstruktionstechnik, bei der Assets ausgewählt werden, um das 
+                            Portfolio", br(), "mit der geringstmöglichen Volatilität oder dem geringsten Risiko zu erstellen, unabhängig von der erwarteten 
+                            Rendite.", br(), "Es wird eine optimale Balance zwischen den verschiedenen Vermögenswerten gefunden, um das Portfoliorisiko zu minimieren."),
                          fluidRow(
                            tableOutput("mvprec"),
-                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("mvp"), plotOutput("mvp2")),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("mvp"), plotOutput("mvp2")),
                            tableOutput("mvprec_inf"))),
                 tabPanel("TP",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                         actionButton("help_tab5", "Hilfe"),
+                         h4("Hier können Sie sehen, welche Handlungen ihrerseits getätigt werden müssten, um das Tangentialportfolio zu erhalten."),
+                         h4("Das Tangentialportfolio ist ein Portfolio, das auf der effizienten Grenze liegt und die maximale Rendite für ein gegebenes", br(), "Risikoniveau bietet. 
+                            Es ist die optimale Kombination von risikoreichen Anlagen, um das Renditepotenzial zu maximieren,", br(), "während das Risiko kontrolliert wird."),
                          fluidRow(
                            tableOutput("tprec"),
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
-                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("tp"), plotOutput("tp2")),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp"), plotOutput("tp2")),
                            tableOutput("tprec_inf"))),
-                tabPanel("Individuelles Portfolio",
-                         h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+                tabPanel("erstelltes Portfolio",
+                         actionButton("help_tab6", "Hilfe"),
+                         h4("In dieser Maske sehen Sie unsere Kaufempfehlung basierend auf Ihren persönlichen Angaben aus der Maske Profil \"Portfolio erstellen\"."),
                          fluidRow(
                            tableOutput("maxrec"),
-                           splitLayout(cellWidths = c("50%", "50%"), plotOutput("max"), plotOutput("max2")),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("max"), plotOutput("max2")),
                            tableOutput("maxrec_inf")))
               )
       ),
       tabItem(tabName = "kurse",
               h1("Kurse"),
-              h5("Lorem ipsum dolor sit amet, 
-                 consetetur sadipscing elitr, 
-                 sed diam nonumy eirmod tempor invidunt ut labore et
-                 dolore magna aliquyam erat, sed diam voluptua. At vero eos 
-                 et accusam et justo duo dolores et ea rebum. Stet clita kasd 
-                 gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
-                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy 
-                 eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                 At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, 
-                 no sea takimata sanctus est Lorem ipsum dolor sit amet."),
+              actionButton("help_tab7", "Hilfe"),
+              h4("Hier können Sie sich den Verlauf der Kurse der verschiedenen Assets genauer ansehen.", br(), "
+                 Dabei können Sie die Laufzeit, den gewünschten Asset und die Ansicht selbst anpassen."),
               fluidPage(fixedPage(position = "right",
                                   sidebarPanel(
                                     sliderTextInput(
                                       inputId = "slider2",
-                                      label = "Choice",
+                                      label = "Laufzeit",
                                       choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
                                       selected = "6M"
                                     ),
@@ -299,8 +270,10 @@ ui <- dashboardPage(
                 tabPanel("AssetInfo",
                          includeHTML("AssetInfo.html")),
                 tabPanel("Geografische Verteilung",
-                         tabPanel("Map", leafletOutput("map"))
-                )
+                         tabPanel("Map", leafletOutput("map", width = "1250px", height = "1000px"))
+                ),
+                tabPanel("Portfoliotheorie",
+                         includeHTML("Portfoliotheorie.html"))
               )
       )
     )

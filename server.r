@@ -14,6 +14,7 @@ server <- function(input, output, session) {
   portfolio_s <<- c(1, 0, 1, 0, 1, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 1, 0)
   zu_invest_verm <<- 1000
+  b<<-8*365
   risk_F("Geringes Risiko")
   portfolio_w_F()
   dat_mvp_F()
@@ -73,14 +74,15 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void() # remove background, grid, numeric labels
+      theme_void() + # remove background, grid, numeric labels
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   
   output$portfolio_worth1 <- renderText({
     inputs_num()
     w <- round(sum(portfolio_w), 1)
-    paste("Portfolio Value:", "CHF", w )
+    paste("Portfolio Value:", "CHF", format(w, big.mark = "\'"))
   })
   
   
@@ -120,7 +122,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   
@@ -135,7 +138,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   output$max <-  renderPlot({
@@ -154,7 +158,8 @@ server <- function(input, output, session) {
                width = 1,
                color = "white") +
       coord_polar("y", start = 0) +
-      theme_void()
+      theme_void() +
+      scale_fill_manual(values = c("#1a3a37","#038838", "#53c1b4", "#67d555", "#B2D800", "#027b76"))
   })
   
   output$mvp2 <- renderPlot({
@@ -169,7 +174,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', "red"), c(F, T)))
     
     
     
@@ -196,7 +201,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', 'red'), c(F, T)))
     # ggplot(dat_max, aes(x = Gewicht, y = Asset)) +
     #   geom_col(fill = "#0099f9") +
     #   coord_flip()
@@ -215,7 +220,7 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") + 
       scale_fill_manual(guide = FALSE,
                         name = 'Gewicht < 0', 
-                        values = setNames(c('green', 'red'), c(F, T)))
+                        values = setNames(c('limegreen', 'red'), c(F, T)))
     # ggplot(dat_tp, aes(x = Gewicht, y = Asset)) +
     #   geom_col(fill = "#0099f9") +
     #   coord_flip()
@@ -436,7 +441,7 @@ server <- function(input, output, session) {
       )
   })
   
-  vals <- reactiveValues(p1=NULL)
+  vals <- reactiveValues(p1=NULL,p2=NULL,p3=NULL,p4=NULL,p5=NULL)
   output$overview<- renderDataTable({
     risk_F(input_slid3())
     if (risk == 2) zu_invest_verm <<- 2*input$num15
@@ -473,29 +478,69 @@ server <- function(input, output, session) {
     datatable(round(overview_df,2), options = list(dom = 't'))
   })
   
-
- 
+  
+  
   output$download_pdf <- downloadHandler(
     filename = function() {
       paste0("portfolio_performance_FusionFinance_", Sys.Date(), ".pdf")
     },
     content = function(file) {
       pdf(file,onefile=T)
-      grid.arrange(vals$p1)
+      grid.arrange(vals$p1,vals$p2,vals$p3,vals$p4,vals$p5)
       dev.off()
     },
     contentType = "application/pdf"
   )
+  
+  
+  output$tp_forecast<-renderPlot({
+    weightened.portfolio_F(8*365)
+    weightened.portfolio2_F(8*365)
 
+    
+    vals$p2 <-plot_forecast(x = weightened.portfolio.tp$Adjusted,30,"TP")
+    vals$p2 
+    
+  })
+  
+  output$mvp_forecast<-renderPlot({
+    weightened.portfolio_F(8*365)
+    weightened.portfolio2_F(8*365)
+
+    
+    vals$p3 <- plot_forecast(x = weightened.portfolio.mvp$Adjusted,30,"MVP")
+    vals$p3
+  })
+  
+  output$individual_forecast<-renderPlot({
+    weightened.portfolio_F(8*365)
+    weightened.portfolio2_F(8*365)
+
+    vals$p4 <-plot_forecast(x = weightened.portfolio.max$Adjusted,30,"Individual")
+    vals$p4
+  })
+  
+  output$basic_forecast<-renderPlot({
+    weightened.portfolio_F(8*365)
+    weightened.portfolio2_F(8*365)
+
+    vals$p5 <-plot_forecast(x=weightened.portfolio$Adjusted,30,"Basic Portfolio")
+    vals$p5
+  })
   
   
   ####################################Help-Box##################################
   help_text <- reactive({
-    if (input$help_tab1) whichtab <- "help_tab1"
-    if (input$help_tab2) whichtab <- "help_tab2"
-    # if (input$help_tab3) whichtab <- "help_tab3"
-    subset(helptext, tab == whichtab)
+    subset(helptext, tab == if (input$help_tab1) "help_tab1"
+           else if (input$help_tab2) "help_tab2"
+           else if (input$help_tab3) "help_tab3"
+           else if (input$help_tab4) "help_tab4"
+           else if (input$help_tab5) "help_tab5"
+           else if (input$help_tab6) "help_tab6"
+           else if (input$help_tab7) "help_tab7"
+           else if (input$help_tab8) "help_tab8")
   })
+  
   
   observeEvent(input$help_tab1,
                introjs(session, options = list("showBullets"="false", "showProgress"="true", 
@@ -507,18 +552,57 @@ server <- function(input, output, session) {
                                                "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
   )
   
-  # observeEvent(input$help_tab3,
-  #              introjs(session, options = list("showBullets"="false", "showProgress"="true", 
-  #                                              "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
-  # )
+  observeEvent(input$help_tab3,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab4,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab5,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab6,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab7,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
+  
+  observeEvent(input$help_tab8,
+               introjs(session, options = list("showBullets"="false", "showProgress"="true",
+                                               "showStepNumbers"="false","nextLabel"="Next","prevLabel"="Prev","skipLabel"="Skip", steps=help_text()))
+  )
   
   
   
   helptext <- data.frame(
-    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2")
-    , step <- c(3, 3, 3, 2, 2)
-    , element = c("#num1", "#portfolio_worth1", "#portfolio1", "#num15","#checkbox1")
-    , intro = c("Wähle die Anzahl an Assets","Hier siehst du den Wert deines Portfolios","Hier ist die Verteilung deines Portfolios ersichtlich",
-                "Gib dein zu investierendes Vermögen ein","Wähle die Assets die du in deinem Portfolio haben möchtest")
+    tab = c("help_tab1", "help_tab1", "help_tab1", "help_tab2","help_tab2","help_tab2", "help_tab3", "help_tab4","help_tab4","help_tab4", "help_tab4", 
+            "help_tab5", "help_tab5", "help_tab5", "help_tab5", "help_tab5", "help_tab6", "help_tab6", "help_tab6", "help_tab6", "help_tab7", "help_tab7", "help_tab7", "help_tab8", "help_tab8")
+    , step <- c(3, 3, 3,    3, 3, 3,    1,    4,4,4,4,    5,5,5,5,5,    4,4,4,4,   3,3,3,  2,2)
+    , element = c("#num1", "#portfolio_worth1", "#portfolio1", 
+                  "#num15","#Risikobereitschaft","#checkbox1", 
+                  "#radioHistorie", 
+                  "#mvprec ","#mvp", "#mvp2","#mvprec_inf",
+                  "#tprec", "#shortpara", "#tp", "#tp2", "#tprec_inf",
+                  "#maxrec", "#max", "#max2", "#maxrec_inf",
+                  "#selected_var", "#radio1", "#historical_data",
+                  "#overview", "#download_pdf")
+    , intro = c("Wählen Sie hier die Anzahl Ihrer Assets","Hier sehen Sie den Wert Ihres Portfolios","Hier ist die Verteilung der Assets im Portfolios dargestellt",
+                "Geben Sie Ihr zu investierendes Vermögen ein","Geben Sie hier Ihre Risikobereitschaft ein","Wählen Sie hier die Assets, die in Ihrem Portfolio haben möchten",
+                "Hier kann zwischen der Standardansicht und einer erweiterten Ansicht gewechselt werden", 
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt", "Im Vergleich zum MVP-Portfolio ist Shorting hier erlaubt und kann über diesen Knopf aktiviert/deaktiviert werden","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt (Rot bedeutet ein negatives Gewicht, also dieses ASset wird geshortet)","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Hier werden die Gewichte der verwendetes Assets des Portfolios numerisch dargestellt","Hier ist die Verteilung der Assets im Portfolio grafisch als Kuchendiagramm dargestellt", "Hier werden die Gewichte der Assets zusätzlich als Balkendiagramm dargestellt (Rot bedeutet ein negatives Gewicht, also dieses Asset wird geshortet)","Hier sind die beiden Performance Indikatoren Volatiliät und Rendite des Portfolios in Dezimalschreibweise aufgeführt",
+                "Im obigen Drop-down Menu können Sie ein Asset auswählen, von welchem Sie den Kursverlauf anschauen möchten", "Hier kann zwischen der Standardansicht und einer erweiterten Ansicht gewechselt werden", "Dieses Liniendiagramm zeigt den Kursverlauf über die angewählte Zeitspanne an",
+                "Hier ist eine Übericht mit aller Performance- Indikatoren und Gewichten sämtlicher zusammengestellten Portfolios", "Drücken Sie hier um die Übersichtstabelle als PDF herunterzuladen")
   )
 }

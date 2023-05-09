@@ -570,3 +570,34 @@ weightened.portfolio2_F <- function(b){
   
   weightened.portfolio.max <<- window(weightened.portfolio.max, start = end, end=start)
 }
+
+
+plot_forecast<-function(x,b,name_a){
+  auscafe <-as.ts(x)
+  train <- auscafe
+  h <- b
+  ETS <- forecast(ets(train), h=h)
+  ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE),h=h)
+  NNAR <- forecast(nnetar(train), h=h)
+  TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
+  Combination <- (ETS[["mean"]] + ARIMA[["mean"]] +
+                    NNAR[["mean"]] + TBATS[["mean"]])/4
+  ymin=min(auscafe)-20
+  ymax=max(auscafe)+20
+  
+  p <- autoplot(auscafe) +
+    autolayer(ETS, series="ETS", PI=FALSE) +
+    autolayer(ARIMA, series="ARIMA", PI=FALSE) +
+    autolayer(NNAR, series="NNAR", PI=FALSE) +
+    autolayer(TBATS, series="TBATS", PI=FALSE) +
+    autolayer(Combination, series="Combination",linewidth=2) +
+    xlab(as.Date(index(x))) + ylab("CHF") + xlim(c(length(x)-30,length(x)+40))+
+    ylim(c(ymin,ymax))
+    ggtitle(name_a)
+  return(p)
+}
+
+
+
+
+
