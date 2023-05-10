@@ -23,6 +23,8 @@ server <- function(input, output, session) {
   dat_tp_rec_F()
   dat_max_F()
   dat_max_rec_F()
+  weightened.portfolio_F(8*365)
+  weightened.portfolio2_F(8*365)
   
   
   #database updaten falls älter als 1,
@@ -266,11 +268,11 @@ server <- function(input, output, session) {
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
-    if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 182
-    if (input$sliderHistorie=="1Y") b <- 365
-    if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="8Y") b <- 8*365
+    if (input$sliderHistorie=="1M") b <<- 30
+    if (input$sliderHistorie=="6M") b <<- 182
+    if (input$sliderHistorie=="1Y") b <<- 365
+    if (input$sliderHistorie=="5Y") b <<- 5*365
+    if (input$sliderHistorie=="8Y") b <<- 8*365
     dat_mvp_F()
     dat_tp_F()
     dat_mvp_rec_F()
@@ -320,11 +322,11 @@ server <- function(input, output, session) {
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
-    if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 180
-    if (input$sliderHistorie=="1Y") b <- 365
-    if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="8Y") b <- 8*365
+    if (input$sliderHistorie=="1M") b <<- 30
+    if (input$sliderHistorie=="6M") b <<- 180
+    if (input$sliderHistorie=="1Y") b <<- 365
+    if (input$sliderHistorie=="5Y") b <<- 5*365
+    if (input$sliderHistorie=="8Y") b <<- 8*365
     risk_F(input_slid3())
     if (risk == 2) zu_invest_verm <<- 2*input$num15
     else zu_invest_verm <<- input$num15
@@ -492,39 +494,52 @@ server <- function(input, output, session) {
     contentType = "application/pdf"
   )
   
-  
-  output$tp_forecast<-renderPlot({
-    weightened.portfolio_F(8*365)
-    weightened.portfolio2_F(8*365)
 
-    
-    vals$p2 <-plot_forecast(x = weightened.portfolio.tp$Adjusted,30,"TP")
+  output$tp_forecast<-renderPlot({
+    input$sliderHistorie
+    dat_tp_F()
+    dat_tp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d1 <- weightened.portfolio.tp$Adjusted
+    vals$p2 <-plot_forecast(xs = d1,30,"TP")
     vals$p2 
     
   })
   
   output$mvp_forecast<-renderPlot({
-    weightened.portfolio_F(8*365)
-    weightened.portfolio2_F(8*365)
-
-    
-    vals$p3 <- plot_forecast(x = weightened.portfolio.mvp$Adjusted,30,"MVP")
+    input$sliderHistorie
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d2 <- weightened.portfolio.mvp$Adjusted
+    vals$p3 <- plot_forecast(xs =d2,30,"MVP")
     vals$p3
   })
   
   output$individual_forecast<-renderPlot({
-    weightened.portfolio_F(8*365)
-    weightened.portfolio2_F(8*365)
-
-    vals$p4 <-plot_forecast(x = weightened.portfolio.max$Adjusted,30,"Individual")
+    input$sliderHistorie
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
+    input_ckbx()
+    dat_max_F()
+    dat_max_rec_F()
+    weightened.portfolio2_F(b)
+    d3 <- weightened.portfolio.max$Adjusted
+    vals$p4 <-plot_forecast(xs = d3,30,"Individual")
     vals$p4
   })
   
   output$basic_forecast<-renderPlot({
-    weightened.portfolio_F(8*365)
-    weightened.portfolio2_F(8*365)
-
-    vals$p5 <-plot_forecast(x=weightened.portfolio$Adjusted,30,"Basic Portfolio")
+    input$sliderHistorie
+    dat_tp_F()
+    dat_tp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d4 <- weightened.portfolio$Adjusted
+    vals$p5 <-plot_forecast(xs=d4,30,"Basic Portfolio")
     vals$p5
   })
   
