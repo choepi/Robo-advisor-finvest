@@ -594,8 +594,8 @@ plot_forecast<-function(xs,q,name_a){
   yl <- seq(length(xs)-10,(length(xs)+h),1)
   
   
-  ymax <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = T)]) + 100;ymax
-  ymin <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = F)]) - 100;ymin
+  ymax <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = T)]) + 1000;ymax
+  ymin <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = F)]) - 1000;ymin
   p <- autoplot(auscafe) +
     autolayer(ETS, series = "ETS", PI = FALSE) +
     autolayer(ARIMA, series = "ARIMA", PI = FALSE) +
