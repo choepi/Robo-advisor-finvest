@@ -282,19 +282,19 @@ server <- function(input, output, session) {
     colnames(port)<- c("Alt", "NeuMVP","NeuTP")
     
     output$mvp.venturini <- renderText({
-      paste("MVP = ", round(tail(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1)),".-",sep = " ")
+      paste("MVP = ", round(tail(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1)),sep = " ")
     })
     
     output$alt <- renderText({
-      paste("Bestehend = ", round(tail(as.numeric(weightened.portfolio$Adjusted), n = 1) - head(as.numeric(weightened.portfolio$Adjusted), n = 1)),".-",sep = " ")
+      paste("Bestehend = ", round(tail(as.numeric(weightened.portfolio$Adjusted), n = 1) - head(as.numeric(weightened.portfolio$Adjusted), n = 1)),sep = " ")
     })
     
     output$tp.venturini <- renderText({
-      paste("TP = ", round(tail(as.numeric(weightened.portfolio.tp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.tp$Adjusted), n = 1)),".-",sep = " ")
+      paste("TP = ", round(tail(as.numeric(weightened.portfolio.tp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.tp$Adjusted), n = 1)),sep = " ")
     })
     
     output$individuell <- renderText({
-      paste("Individuell = ", round(tail(as.numeric(weightened.portfolio.max$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.max$Adjusted), n = 1)),".-",sep = " ")
+      paste("Individuell = ", round(tail(as.numeric(weightened.portfolio.max$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.max$Adjusted), n = 1)),sep = " ")
     })
     
     if (input$radioHistorie == 1 & b != 1){
