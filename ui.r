@@ -238,7 +238,7 @@ ui <- dashboardPage(
                                   sidebarPanel(
                                     sliderTextInput(
                                       inputId = "slider2",
-                                      label = "Laufzeit",
+                                      label = h3("Laufzeit"),
                                       choices = c("1D","5D","1M","6M","1Y","5Y","Max."),
                                       selected = "6M"
                                     ),
