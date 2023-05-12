@@ -14,6 +14,7 @@ server <- function(input, output, session) {
   portfolio_s <<- c(1, 0, 1, 0, 1, 0)
   portfolio_s2 <<- c(1, 0, 1, 0, 1, 0)
   zu_invest_verm <<- 1000
+  b<<-8*365
   risk_F("Geringes Risiko")
   portfolio_w_F()
   dat_mvp_F()
@@ -22,6 +23,8 @@ server <- function(input, output, session) {
   dat_tp_rec_F()
   dat_max_F()
   dat_max_rec_F()
+  weightened.portfolio_F(8*365)
+  weightened.portfolio2_F(8*365)
   
   
   #database updaten falls älter als 1,
@@ -265,11 +268,11 @@ server <- function(input, output, session) {
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
-    if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 182
-    if (input$sliderHistorie=="1Y") b <- 365
-    if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="8Y") b <- 8*365
+    if (input$sliderHistorie=="1M") b <<- 30
+    if (input$sliderHistorie=="6M") b <<- 182
+    if (input$sliderHistorie=="1Y") b <<- 365
+    if (input$sliderHistorie=="5Y") b <<- 5*365
+    if (input$sliderHistorie=="8Y") b <<- 8*365
     dat_mvp_F()
     dat_tp_F()
     dat_mvp_rec_F()
@@ -282,19 +285,19 @@ server <- function(input, output, session) {
     colnames(port)<- c("Alt", "NeuMVP","NeuTP")
     
     output$mvp.venturini <- renderText({
-      paste("MVP = ", round(tail(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1)),sep = " ")
+      paste("MVP = ", round(tail(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.mvp$Adjusted), n = 1)),".-",sep = " ")
     })
     
     output$alt <- renderText({
-      paste("Bestehend = ", round(tail(as.numeric(weightened.portfolio$Adjusted), n = 1) - head(as.numeric(weightened.portfolio$Adjusted), n = 1)),sep = " ")
+      paste("Bestehend = ", round(tail(as.numeric(weightened.portfolio$Adjusted), n = 1) - head(as.numeric(weightened.portfolio$Adjusted), n = 1)),".-",sep = " ")
     })
     
     output$tp.venturini <- renderText({
-      paste("TP = ", round(tail(as.numeric(weightened.portfolio.tp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.tp$Adjusted), n = 1)),sep = " ")
+      paste("TP = ", round(tail(as.numeric(weightened.portfolio.tp$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.tp$Adjusted), n = 1)),".-",sep = " ")
     })
     
     output$individuell <- renderText({
-      paste("Individuell = ", round(tail(as.numeric(weightened.portfolio.max$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.max$Adjusted), n = 1)),sep = " ")
+      paste("Individuell = ", round(tail(as.numeric(weightened.portfolio.max$Adjusted), n = 1) - head(as.numeric(weightened.portfolio.max$Adjusted), n = 1)),".-",sep = " ")
     })
     
     if (input$radioHistorie == 1 & b != 1){
@@ -319,11 +322,11 @@ server <- function(input, output, session) {
     # 1 bios 5 tage useless, da daten jenachdem nicht genug abdecken
     # if (input$sliderHistorie=="1D") b <- 1 
     # if (input$sliderHistorie=="5D") b <- 5
-    if (input$sliderHistorie=="1M") b <- 30
-    if (input$sliderHistorie=="6M") b <- 180
-    if (input$sliderHistorie=="1Y") b <- 365
-    if (input$sliderHistorie=="5Y") b <- 5*365
-    if (input$sliderHistorie=="8Y") b <- 8*365
+    if (input$sliderHistorie=="1M") b <<- 30
+    if (input$sliderHistorie=="6M") b <<- 180
+    if (input$sliderHistorie=="1Y") b <<- 365
+    if (input$sliderHistorie=="5Y") b <<- 5*365
+    if (input$sliderHistorie=="8Y") b <<- 8*365
     risk_F(input_slid3())
     if (risk == 2) zu_invest_verm <<- 2*input$num15
     else zu_invest_verm <<- input$num15
@@ -440,7 +443,7 @@ server <- function(input, output, session) {
       )
   })
   
-  vals <- reactiveValues(p1=NULL)
+  vals <- reactiveValues(p1=NULL,p2=NULL,p3=NULL,p4=NULL,p5=NULL)
   output$overview<- renderDataTable({
     risk_F(input_slid3())
     if (risk == 2) zu_invest_verm <<- 2*input$num15
@@ -485,26 +488,74 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       pdf(file,onefile=T)
-      grid.arrange(vals$p1)
+      grid.arrange(vals$p1,vals$p2,vals$p3,vals$p4,vals$p5)
       dev.off()
     },
     contentType = "application/pdf"
   )
   
+
+  output$tp_forecast<-renderPlot({
+    input$sliderHistorie
+    dat_tp_F()
+    dat_tp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d1 <- weightened.portfolio.tp$Adjusted
+    vals$p2 <-plot_forecast(xs = d1,30,"TP")
+    vals$p2 
+    
+  })
+  
+  output$mvp_forecast<-renderPlot({
+    input$sliderHistorie
+    dat_mvp_F()
+    dat_mvp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d2 <- weightened.portfolio.mvp$Adjusted
+    vals$p3 <- plot_forecast(xs =d2,30,"MVP")
+    vals$p3
+  })
+  
+  output$individual_forecast<-renderPlot({
+    input$sliderHistorie
+    risk_F(input_slid3())
+    if (risk == 2) zu_invest_verm <<- 2*input$num15
+    else zu_invest_verm <<- input$num15
+    input_ckbx()
+    dat_max_F()
+    dat_max_rec_F()
+    weightened.portfolio2_F(b)
+    d3 <- weightened.portfolio.max$Adjusted
+    vals$p4 <-plot_forecast(xs = d3,30,"Individual")
+    vals$p4
+  })
+  
+  output$basic_forecast<-renderPlot({
+    input$sliderHistorie
+    dat_tp_F()
+    dat_tp_rec_F()
+    inputs_num()
+    weightened.portfolio_F(b)
+    d4 <- weightened.portfolio$Adjusted
+    vals$p5 <-plot_forecast(xs=d4,30,"Basic Portfolio")
+    vals$p5
+  })
   
   
   ####################################Help-Box##################################
-help_text <- reactive({
-  subset(helptext, tab == if (input$help_tab1) "help_tab1"
-                          else if (input$help_tab2) "help_tab2"
-                          else if (input$help_tab3) "help_tab3"
-                          else if (input$help_tab4) "help_tab4"
-                          else if (input$help_tab5) "help_tab5"
-                          else if (input$help_tab6) "help_tab6"
-                          else if (input$help_tab7) "help_tab7"
-                          else if (input$help_tab8) "help_tab8")
-})
-
+  help_text <- reactive({
+    subset(helptext, tab == if (input$help_tab1) "help_tab1"
+           else if (input$help_tab2) "help_tab2"
+           else if (input$help_tab3) "help_tab3"
+           else if (input$help_tab4) "help_tab4"
+           else if (input$help_tab5) "help_tab5"
+           else if (input$help_tab6) "help_tab6"
+           else if (input$help_tab7) "help_tab7"
+           else if (input$help_tab8) "help_tab8")
+  })
+  
   
   observeEvent(input$help_tab1,
                introjs(session, options = list("showBullets"="false", "showProgress"="true", 
