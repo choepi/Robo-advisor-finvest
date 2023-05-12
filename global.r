@@ -597,8 +597,8 @@ plot_forecast<-function(xs,q,name_a){
   
   max_1 <- last(d_max[order(d_max,decreasing = F)])+100
   min_1 <- last(d_max[order(d_max,decreasing = T)])-100
-  max_2 <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = T)]) + 100;ymax
-  min_2<- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = F)]) - 100;ymin
+  max_2 <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = T)]) + 100
+  min_2<- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = F)]) - 100
   ymin <- 0
   ymax <- 0
   if (min_1>min_2) ymin <- min_2 else ymin <- min_1
