@@ -36,7 +36,8 @@ library(PortfolioAnalytics)
 library(tidyquant)
 library(geojsonio)
 library(gridExtra)
-
+library(forecast)
+library(hts)
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -163,8 +164,13 @@ ui <- dashboardPage(
                             Gerne können Sie die Daten mittels einem Klick auf den Button " , br(), "\"Download PDF\" herunterladen."),
                          fluidPage(fluidRow(
                            downloadButton("download_pdf", "Download PDF"),
-                           column(6,
-                                  dataTableOutput("overview"))))),
+                           dataTableOutput("overview"),
+                           br(),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("basic_forecast"), plotOutput("mvp_forecast")),
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp_forecast"), plotOutput("individual_forecast"))
+                         )
+                         )
+                ),
                 tabPanel("Historie",
                          actionButton("help_tab3", "Hilfe"),
                          h4("Hier können Sie ihr bestehendes Portfolio mit dem Minimum Varianz Portfolio und dem 
@@ -175,13 +181,13 @@ ui <- dashboardPage(
                              inputId = "sliderHistorie",
                              label = h3("Zeitraum"),
                              choices = c("1M","6M","1Y","5Y","8Y"),
-                             selected = "1M"),
+                             selected = "8Y"),
                            br(),
                            radioButtons("radioHistorie", h3("Ansicht"),
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
                                         selected = 1),
                            br(), 
-                           h3("Renditen [CHF]"),
+                           h3("Renditen"),
                            textOutput("alt"),
                            textOutput("mvp.venturini"),
                            textOutput("tp.venturini"),
