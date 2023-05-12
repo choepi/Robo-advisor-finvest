@@ -181,7 +181,7 @@ ui <- dashboardPage(
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
                                         selected = 1),
                            br(), 
-                           h3("Renditen"),
+                           h3("Renditen [CHF]"),
                            textOutput("alt"),
                            textOutput("mvp.venturini"),
                            textOutput("tp.venturini"),
