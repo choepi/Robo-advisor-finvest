@@ -570,3 +570,48 @@ weightened.portfolio2_F <- function(b){
   
   weightened.portfolio.max <<- window(weightened.portfolio.max, start = end, end=start)
 }
+
+
+plot_forecast<-function(xs,q,name_a){
+  auscafe <-as.ts(xs)
+  a <- coredata(xs)
+  train <- auscafe
+  h <- q
+  
+  ETS <- forecast(ets(train), h=h)
+  ARIMA <- forecast(auto.arima(train, lambda=0, biasadj=TRUE),h=h)
+  NNAR <- forecast(nnetar(train), h=h)
+  TBATS <- forecast(tbats(train, biasadj=TRUE), h=h)
+  Combination <- (ETS[["mean"]] + ARIMA[["mean"]] +
+                    NNAR[["mean"]] + TBATS[["mean"]])/4
+  
+  st_d <- index(xs[(length(xs)-10):(length(xs)-1)])
+  start_date <- index(xs[length(xs)])
+  end_date <- start_date+h
+  date_vector <- seq(start_date, end_date, by = "day")
+  date_vector_no_weekend <- date_vector[!(weekdays(date_vector) %in% c("Saturday", "Sunday"))]
+  d_ind <- append(st_d,date_vector_no_weekend)
+  yl <- seq(length(xs)-10,(length(xs)+h),1)
+  
+  
+  ymax <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = T)]) + 100;ymax
+  ymin <- first(coredata(xs[(length(xs)-10):length(xs)])[order(xs[(length(xs)-10):length(xs)],decreasing = F)]) - 100;ymin
+  p <- autoplot(auscafe) +
+    autolayer(ETS, series = "ETS", PI = FALSE) +
+    autolayer(ARIMA, series = "ARIMA", PI = FALSE) +
+    autolayer(NNAR, series = "NNAR", PI = FALSE) +
+    autolayer(TBATS, series = "TBATS", PI = FALSE) +
+    autolayer(Combination, series = "Combination", linewidth = 3) +
+    ylab("CHF") +
+    xlab(d_ind)+
+    xlim(c(length(a) - 10, length(a) + 40))+
+    scale_y_continuous( limits = c(ymin,ymax))+
+    ggtitle(name_a)
+
+  return(p)
+}
+
+
+
+
+
