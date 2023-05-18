@@ -38,6 +38,7 @@ library(geojsonio)
 library(gridExtra)
 library(forecast)
 library(hts)
+library(grid)
 
 ## build ui.R -----------------------------------
 ## 1. header -------------------------------
@@ -84,10 +85,10 @@ ui <- dashboardPage(
                 type = "tabs",
                 tabPanel("Bestehendes Portfolio",
                          actionButton("help_tab1", "Hilfe"),
-                         h4("Hier können Sie ihr bestehendes Portfolio eintragen, damit Sie dieses später in der Maske 
-                            Portfolio mit dem Minimum" , br(), "Varianz Portflio oder dem Tangentialportfolio vergleichen können.
+                         h4("Hier können Sie Ihr bestehendes Portfolio eintragen, damit Sie dieses später in der Maske 
+                            Portfolio mit dem Minimum" , br(), "Varianz Portfolio oder dem Tangentialportfolio vergleichen können.
                             Selbstverständlich dürfen Sie auch willkürliche" , br(), "Gewichtungen eintragen, um ein Gefühl für
-                            verschieden Assets zu erhalten."),
+                            die verschiedenen Assets zu erhalten."),
                          fluidRow(
                            
                            column(2,
@@ -123,9 +124,9 @@ ui <- dashboardPage(
                 tabPanel("Portfolio erstellen",
                          actionButton("help_tab2", "Hilfe"),
                          fluidPage(
-                           h4("Hier erhalten Sie mittels ihren individuellen Wünschen eine Portfolioempfehlung,
-                            welche Sie dann nach Bedarf anpassen können." , br(), "Hierbei informieren Sie uns über ihren gewünschten 
-                            zu investierenden Betrag und ihre Risikobereitschaft."),
+                           h4("Hier erhalten Sie mittels Ihren individuellen Wünschen eine Portfolioempfehlung,
+                            welche Sie dann nach Bedarf anpassen können." , br(), "Dafür informieren Sie uns über Ihren gewünschten 
+                            zu investierenden Betrag und Ihre Risikobereitschaft."),
                            br(),
                            basicPage(
                              h4("Zu investierendes Vermögen:"),
@@ -159,21 +160,26 @@ ui <- dashboardPage(
                 type = "tabs",
                 tabPanel("Übersicht",
                          actionButton("help_tab8", "Hilfe"),
-                         h4("Hier sehen Sie eine Übersicht über die verschiedenen Gewichtungen ihres aktuellen 
+                         h4("Hier sehen Sie eine Übersicht über die verschiedenen Gewichtungen Ihres aktuellen 
                             Porfolios, des Minimum" , br(), "Varianz Portfolios und des Tangentialportfolios.
                             Gerne können Sie die Daten mittels einem Klick auf den Button " , br(), "\"Download PDF\" herunterladen."),
-                         fluidPage(fluidRow(
+                         fluidPage(
+                           fluidRow(
                            downloadButton("download_pdf", "Download PDF"),
-                           dataTableOutput("overview"),
+                           column(
+                           dataTableOutput("overview"),width=5)),
+                           fluidRow(
                            br(),
+                           h4("Auf folgenden Abbildungen werden die Prognosen der einzelnen Portfolios dargestellt. Dabei beruhen diese auf einer",br(),
+                           "Kombination aus 4 verschiedenen Prognosen Methoden, welche hier fett in grüm eingefärbt werden."),
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("basic_forecast"), plotOutput("mvp_forecast")),
-                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp_forecast"), plotOutput("individual_forecast"))
+                           splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp_forecast"), plotOutput("individual_forecast")),
                          )
                          )
                 ),
                 tabPanel("Historie",
                          actionButton("help_tab3", "Hilfe"),
-                         h4("Hier können Sie ihr bestehendes Portfolio mit dem Minimum Varianz Portfolio und dem 
+                         h4("Hier können Sie Ihr bestehendes Portfolio mit dem Minimum Varianz Portfolio und dem 
                             Tangentialportfolio vergleichen.", br(), "Dabei können Sie einen gewünschten Zeitraum und die Ansicht 
                             je nach Bedarf anpassen."),
                          fluidPage(fixedPage(position = "right", sidebarPanel(
@@ -187,7 +193,7 @@ ui <- dashboardPage(
                                         choices = list("Simpel" = 1, "Erweitert" = 2),
                                         selected = 1),
                            br(), 
-                           h3("Renditen"),
+                           h4("Renditen [CHF]"),
                            textOutput("alt"),
                            textOutput("mvp.venturini"),
                            textOutput("tp.venturini"),
@@ -212,7 +218,7 @@ ui <- dashboardPage(
                            tableOutput("mvprec_inf"))),
                 tabPanel("TP",
                          actionButton("help_tab5", "Hilfe"),
-                         h4("Hier können Sie sehen, welche Handlungen ihrerseits getätigt werden müssten, um das Tangentialportfolio zu erhalten."),
+                         h4("Hier können Sie sehen, welche Handlungen Ihrerseits getätigt werden müssten, um das Tangentialportfolio zu erhalten."),
                          h4("Das Tangentialportfolio ist ein Portfolio, das auf der effizienten Grenze liegt und die maximale Rendite für ein gegebenes", br(), "Risikoniveau bietet. 
                             Es ist die optimale Kombination von risikoreichen Anlagen, um das Renditepotenzial zu maximieren,", br(), "während das Risiko kontrolliert wird."),
                          fluidRow(
@@ -220,7 +226,7 @@ ui <- dashboardPage(
                            checkboxInput("shortpara", "Shorten erlaubt",value = F),
                            splitLayout(cellWidths = c("40%", "40%"), plotOutput("tp"), plotOutput("tp2")),
                            tableOutput("tprec_inf"))),
-                tabPanel("erstelltes Portfolio",
+                tabPanel("Erstelltes Portfolio",
                          actionButton("help_tab6", "Hilfe"),
                          h4("In dieser Maske sehen Sie unsere Kaufempfehlung basierend auf Ihren persönlichen Angaben aus der Maske Profil \"Portfolio erstellen\"."),
                          fluidRow(
@@ -233,7 +239,7 @@ ui <- dashboardPage(
               h1("Kurse"),
               actionButton("help_tab7", "Hilfe"),
               h4("Hier können Sie sich den Verlauf der Kurse der verschiedenen Assets genauer ansehen.", br(), "
-                 Dabei können Sie die Laufzeit, den gewünschten Asset und die Ansicht selbst anpassen."),
+                 Dabei können Sie die Laufzeit des gewünschten Assets und die Ansicht selbst anpassen."),
               fluidPage(fixedPage(position = "right",
                                   sidebarPanel(
                                     sliderTextInput(
