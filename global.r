@@ -615,10 +615,9 @@ plot_forecast<-function(xs,q,name_a){
     xlim(c(length(a) - 10, length(a) + 40))+
     scale_y_continuous( limits = c(ymin,ymax))+
     ggtitle(name_a)
-
+  
   return(p)
 }
-
 
 
 
