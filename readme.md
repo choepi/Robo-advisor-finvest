@@ -2,6 +2,15 @@
 
 Welcome to the Fusion Finance Portfolio Optimizer! This package is designed to help you optimize your investment portfolio, maximize returns, and minimize risk. Whether you're an individual investor or a financial institution, this powerful tool will assist you in making informed decisions about your investments.
 
+
+# Run the App
+- Download repository
+- Install needed libraries
+- Open App.r in Rstudio
+- run App.r
+
+
+
 ## Features
 
 ### 1. Portfolio Analysis
